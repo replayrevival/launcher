@@ -58,51 +58,15 @@ bool App::init(Rml::ElementDocument* doc, std::string& err) {
     doc_ = doc;
     screenEl_ = doc->GetElementById("screen");
     if (!screenEl_) { err = "The launcher screen file is missing its content area."; return false; }
-    if (!settings_.loadSchema(paths_.exeDir / "config" / "settings.json", err)) return false;
-
-    settings_.load(settingsDir());
-    state_.load(paths_.dataDir / "launcher_state.json");  // also holds the monitor choice, UI size, vrr note
-    if (ignoreSaved_) state_.clearGame();
-    gameVersion_ = readExeVersion(exePath());
-    // While no game build with the V-Sync / variable-refresh fix is known, presets start with variable
-    // refresh Off (V-Sync stays On), so the out-of-the-box settings avoid the known start-up crash.
-    if (!vsyncFixPresent()) settings_.setPresetDefault("video.vrr", "off");
-    // Once a fixed build is detected, go back to Auto - but only if the launcher chose Off by itself and
-    // the user has not touched the row since.
-    if (vsyncFixPresent() && state_.vrrDefaultedOff) {
-        if (settings_.value("video.vrr").value_or("auto") == "off") settings_.set("video.vrr", std::nullopt);
-        state_.vrrDefaultedOff = false;
-        std::string e3;
-        settings_.save(settingsDir(), e3);
-        state_.save(paths_.dataDir / "launcher_state.json", e3);
-    }
-    // First run only: start from the MAX preset (the approved design shows it selected). "First run" means
-    // there are no settings files AND the marker is absent; once the marker exists, saved choices are only
-    // ever read, never replaced by a preset.
-    std::error_code ec;
-    const fs::path marker = paths_.dataDir / "settings_initialized";
-    const bool anyIni = fs::exists(settingsDir() / Settings::fileName("video"), ec) || fs::exists(settingsDir() / Settings::fileName("enhance"), ec);
-    if (!anyIni && !fs::exists(marker, ec)) {
-        applyPresetNoted("max");
-        std::string e2;
-        settings_.save(settingsDir(), e2);
-    }
-    if (!fs::exists(marker, ec)) {
-        fs::create_directories(paths_.dataDir, ec);
-        std::ofstream(marker) << "settings initialised\n";
-    }
+    if (!model_.load(err)) return false;
     refreshDisplays();
-    mods_.setRoot(modsRoot());
-    mods_.reload();
-
-    if (!input_.loadSchema(pathToUtf8(paths_.exeDir / "config" / "controls.json"), err)) return false;
-    input_.load(pathToUtf8(inputMapPath()));
     nav_.swapConfirmBack = input_.swapConfirmBack;
     nav_.capture = [this](const SDL_Event& ev) { return onCapture(ev); };
 
     doc->AddEventListener(Rml::EventId::Click, this);
     doc->AddEventListener(Rml::EventId::Mouseover, this);
 
+    std::error_code ec;
     // Remembered game: trust it if the file is unchanged, otherwise check it again.
     if (!ignoreSaved_ && state_.load(paths_.dataDir / "launcher_state.json") && !state_.gamePath.empty()) {
         const fs::path p = pathFromUtf8(state_.gamePath);
@@ -120,37 +84,6 @@ bool App::init(Rml::ElementDocument* doc, std::string& err) {
     return true;
 }
 
-fs::path App::exePath() const {
-    if (const char* o = SDL_getenv("LAUNCHER_GAME_EXE")) return pathFromUtf8(o);
-    return paths_.exeDir / pathFromUtf8(profile_.exe);
-}
-
-std::string App::buildNumber() const {
-    std::error_code ec;
-    if (!fs::exists(exePath(), ec)) return "Game program not found";
-    if (gameVersion_.empty()) return "build unknown";
-    // "<launcher version>+<game build tag>", e.g. 0.1.1+c250 (the tag is the part after "+" in the game's own version)
-    const size_t plus = gameVersion_.find('+');
-    if (plus == std::string::npos) return "build " + gameVersion_;
-    return std::string("build ") + LAUNCHER_VERSION + gameVersion_.substr(plus);
-}
-
-// True when the installed game build is known to contain the V-Sync / variable-refresh start-up fix
-// (profile.json compat.vsync_vrr_fix_build; version looks like "0.1.0+c250").
-// Applies a preset and remembers whether variable refresh Off came from the launcher's own default
-// (not from the user), so it can be switched back to Auto once the game build is fixed.
-void App::applyPresetNoted(const std::string& id) {
-    settings_.applyPreset(id);
-    state_.vrrDefaultedOff = settings_.hasPresetDefault("video.vrr") && settings_.value("video.vrr").value_or("auto") == "off";
-    if (!ignoreSaved_) saveState();
-}
-
-bool App::vsyncFixPresent() const {
-    if (profile_.vsyncVrrFixBuild <= 0) return false;
-    const size_t c = gameVersion_.rfind("+c");
-    return c != std::string::npos && std::atoi(gameVersion_.c_str() + c + 2) >= profile_.vsyncVrrFixBuild;
-}
-
 std::string App::shortPath(const std::string& p, size_t maxLen) {
     if (p.size() <= maxLen) return p;
     return "..." + p.substr(p.size() - (maxLen - 3));
@@ -158,7 +91,7 @@ std::string App::shortPath(const std::string& p, size_t maxLen) {
 
 bool App::saveState() {
     std::string err;
-    if (!state_.save(paths_.dataDir / "launcher_state.json", err)) {
+    if (!model_.saveState(err)) {
         showModal("Could not save", "The launcher could not remember your game.", err);
         return false;
     }
@@ -167,13 +100,12 @@ bool App::saveState() {
 
 bool App::saveSettings() {
     std::string err;
-    if (!settings_.save(settingsDir(), err)) {
+    if (!model_.saveSettings(err)) {
         showModal("Could not save settings", "Your settings could not be written, so the game would not see them.", err);
         return false;
     }
     return true;
 }
-
 void App::beginCheck(const fs::path& p) {
     search_.cancel();
     checkPath_ = p;
@@ -836,11 +768,6 @@ void App::render() {
         pendingNotice_.clear();
         showModal("Display settings changed", n, "");
     }
-}
-
-std::string App::buttonPromptsValue() const {
-    const auto v = settings_.value("enhance.button_prompts");
-    return v && !v->empty() ? *v : "auto";
 }
 
 void App::refreshHints() {

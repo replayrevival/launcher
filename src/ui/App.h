@@ -16,6 +16,7 @@
 #include "core/display_modes.h"
 #include "core/identify.h"
 #include "core/input_map.h"
+#include "core/launcher_model.h"
 #include "core/mods.h"
 #include "core/settings.h"
 #include "core/state.h"
@@ -30,13 +31,13 @@ struct SDL_Window;
 // Content is generated as RML into #screen; actions come back through data-action attributes.
 class App : public Rml::EventListener {
 public:
-    struct Paths {
-        std::filesystem::path exeDir;   // where the launcher and its resources live
-        std::filesystem::path dataDir;  // launcher state, game ini files, logs
-    };
+    using Paths = LauncherPaths;
 
+    // The launcher screens are a view of `LauncherModel` (src/core/launcher_model.h). The model's fields are
+    // reachable under their old member names below so the screen code reads the same as before the split.
     App(Profile profile, Paths paths, Navigation& nav, SDL_Window* window)
-        : profile_(std::move(profile)), paths_(std::move(paths)), nav_(nav), window_(window) {}
+        : model_(std::move(profile), std::move(paths)), nav_(nav), window_(window) {}
+    LauncherModel& model() { return model_; }
     ~App() override;
 
     bool init(Rml::ElementDocument* doc, std::string& err);
@@ -48,7 +49,7 @@ public:
     void setGpuInfo(const std::string& s) { gpuInfo_ = s; }
     void setUiScaleListener(std::function<void()> f) { uiScaleChanged_ = std::move(f); }
     float uiScale() const;                       // user's "UI size" multiplier (1.0 = normal)
-    void useFakeDisplays(const std::string& jsonPath) { fakeDisplays_ = jsonPath; }  // testing; call before init()
+    void useFakeDisplays(const std::string& jsonPath) { model_.fakeDisplays = jsonPath; }  // testing; call before init()
     // Test helpers: scroll offset of the option list, the focused row's key and a row's shown value.
     float pageScroll() const;
     std::string focusedKey() const { return focusKey(); }
@@ -104,21 +105,21 @@ private:
     std::string renderOverview();
     std::string renderRows(const std::string& page);
     void renderHeader();
-    std::string buildNumber() const;
-    bool vsyncFixPresent() const;
-    std::string buttonPromptsValue() const;  // "auto" | "xbox" | "xbox_original" | "playstation"
-    void applyPresetNoted(const std::string& id);
+    std::string buildNumber() const { return model_.buildNumber(); }
+    bool vsyncFixPresent() const { return model_.vsyncFixPresent(); }
+    std::string buttonPromptsValue() const { return model_.buttonPrompts(); }  // "auto" | "xbox" | "xbox_original" | "playstation"
+    void applyPresetNoted(const std::string& id) { model_.applyPresetNoted(id); }
 
     // video tab: monitors, resolution, option rows
     static std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on,
                                bool chevrons);
     std::string renderSpecialRow(const SettingRow& row);
     void refreshDisplays();
-    const DisplayInfo& curDisplay() const;
-    std::vector<ResOption> resOptions() const;
-    std::string videoMode() const;
-    bool resValid(int w, int h) const;
-    void setNative();
+    const DisplayInfo& curDisplay() const { return model_.curDisplay(); }
+    std::vector<ResOption> resOptions() const { return model_.resOptions(); }
+    std::string videoMode() const { return model_.videoMode(); }
+    bool resValid(int w, int h) const { return model_.resValid(w, h); }
+    void setNative() { model_.setNative(); }
     void stepRow(const std::string& id, int dir);
 
     // controllers tab
@@ -138,19 +139,19 @@ private:
     bool onCapture(const SDL_Event& ev);
     bool saveInput();
     std::filesystem::path dumpDir() const { return paths_.dataDir / "logs" / "dumps"; }
-    std::filesystem::path inputMapPath() const { return paths_.dataDir / profile_.inputMapFile; }
+    std::filesystem::path inputMapPath() const { return model_.inputMapPath(); }
 
     // mods tab
     std::string renderMods();
     bool modsAct(const std::string& action, const std::string& arg);  // true when the action was a mods action
     void startModInstall(const std::filesystem::path& src, bool replace);
     void pollModInstall();
-    std::filesystem::path modsRoot() const { return paths_.dataDir / profile_.modsDir; }
+    std::filesystem::path modsRoot() const { return model_.modsRoot(); }
     static void SDLCALL modDialogDone(void* ud, const char* const* list, int filter);
 
     // helpers
-    std::filesystem::path exePath() const;
-    std::filesystem::path settingsDir() const { return paths_.dataDir / "game_settings"; }
+    std::filesystem::path exePath() const { return model_.exePath(); }
+    std::filesystem::path settingsDir() const { return model_.settingsDir(); }
     std::string focusKey() const;
     void restoreFocus(const std::string& key);
     static std::string esc(const std::string& s) { return Rml::StringUtilities::EncodeRml(s); }
@@ -161,25 +162,26 @@ private:
     static void SDLCALL unpackDirDone(void* ud, const char* const* list, int filter);
     void takeDialogResult();
 
-    Profile profile_;
-    Paths paths_;
+    LauncherModel model_;  // declared first: the reference aliases below are bound to its fields
+    Profile& profile_ = model_.profile;
+    Paths& paths_ = model_.paths;
+    Settings& settings_ = model_.settings;
+    LauncherState& state_ = model_.state;
+    DisplayList& disp_ = model_.disp;
+    int& selDisplay_ = model_.selDisplay;
+    bool& customForced_ = model_.customForced;
+    std::string& pendingNotice_ = model_.pendingNotice;
+    std::string& gameVersion_ = model_.gameVersion;
+    bool& ignoreSaved_ = model_.ignoreSaved;
+    InputMap& input_ = model_.input;
+    ModStore& mods_ = model_.mods;
     Navigation& nav_;
     SDL_Window* window_;
     Rml::ElementDocument* doc_ = nullptr;
     Rml::Element* screenEl_ = nullptr;
 
-    Settings settings_;
-    LauncherState state_;
-    DisplayList disp_;
-    int selDisplay_ = 0;
-    bool customForced_ = false;        // the Custom... resolution entry is chosen
-    std::string pendingNotice_;        // shown as a message box once the main screen is up
-    std::string fakeDisplays_;         // testing: a JSON monitor list instead of the real one
-    std::string stepLastId_;
-    uint64_t stepLastTick_ = 0;
-    int stepStreak_ = 0;
+
     Tab lastTab_ = Tab::Overview;      // tab of the last render, so the scroll position is kept only within one tab
-    InputMap input_;
     int ctlPort_ = 0;
     std::string listenAction_;      // control waiting for a button press ("" = not listening)
     std::string captured_;          // source captured by the listener, applied in update()
@@ -229,17 +231,14 @@ private:
 
     // running game
     GameProcess game_;
-    std::string gameVersion_;
     std::string lastPlayedPreset_;
     bool killOnExit_ = false;
-    bool ignoreSaved_ = false;
     bool lastOriginal_ = false, lastBorderless_ = false;  // how the last game start was made
     std::filesystem::path lastVideoIni_;                 // the video ini that start used
     std::string gpuInfo_;
     std::function<void()> uiScaleChanged_;
 
     // mods
-    ModStore mods_;
     std::future<ModInstallResult> modInstall_;
     bool modBusy_ = false;
     std::string modBusyName_, modsNote_;

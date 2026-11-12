@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+﻿cmake_minimum_required(VERSION 3.25)
 project(recomp_launcher LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -32,6 +32,7 @@ add_library(launcher_ui STATIC
     src/core/state.cpp
     src/core/input_map.cpp
     src/core/mods.cpp
+    src/core/launcher_model.cpp
     src/core/display_modes.cpp
     src/platform/Displays.cpp
     src/platform/GameProcess.cpp
@@ -83,6 +84,7 @@ add_executable(xiso_unpack_tool EXCLUDE_FROM_ALL
     src/tools/xiso_unpack_tool.cpp src/core/xdvdfs.cpp src/core/identify.cpp src/core/sha256.cpp src/core/xiso.cpp)
 target_compile_definitions(xiso_unpack_tool PRIVATE UNICODE _UNICODE)
 target_include_directories(xiso_unpack_tool PRIVATE src)
+
 
 
 
