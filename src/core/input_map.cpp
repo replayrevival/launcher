@@ -181,7 +181,8 @@ std::string glyphFile(const std::string& s, PadFamily f, PromptStyle style) {
             {"lefttrigger", "xbox_lt"}, {"righttrigger", "xbox_rt"}, {"leftstick", "xbox_ls"}, {"rightstick", "xbox_rs"},
             {"dpup", "xbox_dpad_up"}, {"dpdown", "xbox_dpad_down"}, {"dpleft", "xbox_dpad_left"}, {"dpright", "xbox_dpad_right"}};
         if (style == PromptStyle::XboxOriginal) {
-            if (s == "leftshoulder" || s == "rightshoulder") return "";  // Black / White: no picture in the set, text label
+            if (s == "leftshoulder") return "ours_xbox_black";  // Black / White: not in the Kenney set; our own art
+            if (s == "rightshoulder") return "ours_xbox_white";
             if (s == "a" || s == "b" || s == "x" || s == "y") return "xbox_button_color_" + s;  // coloured, like the original pad
         }
         auto it = x.find(s);

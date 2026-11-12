@@ -271,9 +271,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 --- Kenney Input Prompts 1.5 (CC0 1.0, public domain; controller button pictures) ---
 
-Created by Kenney, www.kenney.nl. The 36 pictures in assets\glyphs\ (Xbox Series and PlayStation Series sets, "Default"
+Created by Kenney, www.kenney.nl. The 36 Kenney pictures in assets\glyphs\ (Xbox Series and PlayStation Series sets, "Default"
 size) are used unchanged. CC0 needs no credit; it is given as a courtesy. Licence text: assets\glyphs\License.txt
-(http://creativecommons.org/publicdomain/zero/1.0/).
+(http://creativecommons.org/publicdomain/zero/1.0/). The two files starting with ours_ (original Xbox Black and White buttons) are not Kenney's: they are the launcher's own art, GPL-2.0-or-later.
 
 --- glad OpenGL loader ---
 
