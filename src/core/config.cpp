@@ -35,6 +35,7 @@ bool loadProfile(const std::string& path, Profile& out, std::string& err) {
         out.inputMapEnv = im.value("env", out.inputMapEnv);
         out.inputMapFile = im.value("file", out.inputMapFile);
         out.inputMapSupported = im.value("supported", false);
+        out.returnToLauncherCode = j.value("exit_codes", nlohmann::json::object()).value("return_to_launcher", out.returnToLauncherCode);
         const nlohmann::json compat = j.value("compat", nlohmann::json::object());
         out.vsyncVrrFixBuild = compat.value("vsync_vrr_fix_build", 0);
         return true;

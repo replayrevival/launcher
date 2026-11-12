@@ -94,7 +94,7 @@
          {"label": "Window", "set": {"video.mode": "window"}},
          {"label": "Borderless", "set": {"video.mode": "borderless"}},
          {"label": "Fullscreen", "set": {"video.mode": "fullscreen"}}]},
-      {"id": "aspect", "apply": "now", "label": "Gameplay view", "hint": "Fit my screen shows more of the world. Menus always keep their original 4:3 shape",
+      {"id": "aspect", "apply": "restart", "label": "Gameplay view", "hint": "Fit my screen shows more of the world. Menus always keep their original 4:3 shape",
        "choices": [
          {"label": "Original (4:3)", "set": {"video.aspect": "4:3-pillar"}},
          {"label": "Fit my screen", "set": {"video.aspect": "wide"}}]},

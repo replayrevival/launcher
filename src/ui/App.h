@@ -26,6 +26,7 @@
 #include "core/xdvdfs.h"
 #include "platform/DriveSearch.h"
 #include "platform/GameProcess.h"
+#include "ui/ControllersUi.h"
 #include "ui/Navigation.h"
 #include "ui/views/controllers.h"
 #include "ui/views/mods.h"
@@ -131,12 +132,8 @@ private:
     void afterStep(const LauncherModel::StepOutcome& r);
 
     // controllers tab
-    struct PortInfo {
-        ResolvedPort r;                 // what the port resolved to (empty = nothing attached)
-        SDL_JoystickID padId = 0;
-        PadFamily family = PadFamily::Xbox;
-    };
-    struct DevOpt { std::string id, label; };
+    using PortInfo = ControllersUi::PortInfo;
+    using DevOpt = ControllersUi::DevOpt;
     std::string renderControllers();
     std::array<PortInfo, InputMap::kPorts> resolvePorts();
     std::vector<DevOpt> deviceOptions(const std::array<PortInfo, InputMap::kPorts>& info);
@@ -196,11 +193,12 @@ private:
 
 
     Tab lastTab_ = Tab::Overview;      // tab of the last render, so the scroll position is kept only within one tab
-    int ctlPort_ = 0;
-    std::string listenAction_;      // control waiting for a button press ("" = not listening)
+    ControllersUi ctl_{model_};      // port / device / remap logic shared with the overlay
+    int& ctlPort_ = ctl_.port;
+    std::string& listenAction_ = ctl_.listenAction;  // control waiting for a button press ("" = not listening)
     std::string captured_;          // source captured by the listener, applied in update()
     bool listenCancelled_ = false;
-    uint64_t listenSince_ = 0;      // SDL_GetTicks() when listening began
+    uint64_t& listenSince_ = ctl_.listenSince;      // SDL_GetTicks() when listening began
 
     Screen screen_ = Screen::Setup;
     SetupStep step_ = SetupStep::Choose;

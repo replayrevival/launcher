@@ -38,6 +38,7 @@ add_library(ste_ui_core STATIC
     src/platform/ExeVersion.cpp
     src/platform/png_decode.cpp
     src/ui/NavCore.cpp
+    src/ui/ControllersUi.cpp
     src/ui/Overlay.cpp
     src/ui/ChamferDecorator.cpp
     src/ui/views/rows.cpp

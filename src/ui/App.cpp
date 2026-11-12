@@ -647,7 +647,8 @@ void App::update() {
         settings_.reload(settingsDir());
         saveSettings();
         renderHeader();
-        if (code != 0 || secs < 5.0) onGameExit(code, secs);
+        // The overlay's "Return to launcher" is a normal end (profile exit_codes.return_to_launcher, 20): no "game stopped" box.
+        if (code != profile_.returnToLauncherCode && (code != 0 || secs < 5.0)) onGameExit(code, secs);
         render();
     }
 }
