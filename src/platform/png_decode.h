@@ -6,3 +6,6 @@
 #include <vector>
 
 bool decodePng(const std::vector<uint8_t>& file, int& width, int& height, std::vector<uint8_t>& rgba, std::string& err);
+
+// Reads a PNG file and returns premultiplied RGBA8, the pixel format RmlUi renderers expect for textures. `utf8Path` is UTF-8.
+bool loadPngPremultiplied(const std::string& utf8Path, int& width, int& height, std::vector<uint8_t>& rgba, std::string& err);

@@ -2,6 +2,7 @@
 // Everything the launcher knows and decides, with no window, no RmlUi and no input devices: the profile, the settings
 // (video / enhancement / controller pages), the remembered game, monitors and resolutions, the input map and the mods.
 // `App` (the launcher screens) and the planned in-game overlay (docs/OVERLAY.md) are views of this one model.
+#include <algorithm>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -63,7 +64,10 @@ public:
     // Looks at the monitors again and checks the saved display and resolution against them. A saved choice that
     // no longer exists falls back to the native resolution and leaves a notice in `pendingNotice`.
     void refreshDisplays(const DisplayDetector& detect);
-    const DisplayInfo& curDisplay() const { return disp.displays[size_t(selDisplay)]; }
+    const DisplayInfo& curDisplay() const {
+        static const DisplayInfo none{"Display 1", {1920, 1080, 60.f}, 1.f, {}};  // before refreshDisplays(): never index an empty list
+        return disp.displays.empty() ? none : disp.displays[size_t(std::min<size_t>(size_t(selDisplay), disp.displays.size() - 1))];
+    }
     std::string videoMode() const;
     std::vector<ResOption> resOptions() const;
     bool resValid(int w, int h) const;

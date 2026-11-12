@@ -101,3 +101,16 @@ bool decodePng(const std::vector<uint8_t>& f, int& width, int& height, std::vect
     }
     return true;
 }
+
+#include <filesystem>
+#include <fstream>
+
+bool loadPngPremultiplied(const std::string& utf8Path, int& width, int& height, std::vector<uint8_t>& rgba, std::string& err) {
+    std::ifstream f(std::filesystem::u8path(utf8Path), std::ios::binary);
+    if (!f) { err = "cannot open the file"; return false; }
+    std::vector<uint8_t> file((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+    if (!decodePng(file, width, height, rgba, err)) return false;
+    for (size_t i = 0; i + 3 < rgba.size(); i += 4)
+        for (int c = 0; c < 3; ++c) rgba[i + c] = uint8_t(rgba[i + c] * rgba[i + 3] / 255);
+    return true;
+}

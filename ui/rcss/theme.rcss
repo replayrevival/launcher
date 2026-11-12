@@ -78,7 +78,6 @@ button.nav {
     color: #A9C6E6;
     text-align: center;
     decorator: chamfer(8 2 #0D2142 #2F5C93);
-    border: none;
     cursor: pointer;
 }
 button.nav.selected { color: #FFFFFF; decorator: chamfer(8 2 #12396A #3FD4FF); }
