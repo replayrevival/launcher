@@ -35,6 +35,7 @@ bool loadProfile(const std::string& path, Profile& out, std::string& err) {
         out.inputMapEnv = im.value("env", out.inputMapEnv);
         out.inputMapFile = im.value("file", out.inputMapFile);
         out.inputMapSupported = im.value("supported", false);
+        out.updateRepo = j.value("update", nlohmann::json::object()).value("repo", out.updateRepo);
         out.supportUrl = j.value("support", nlohmann::json::object()).value("url", out.supportUrl);
         out.returnToLauncherCode = j.value("exit_codes", nlohmann::json::object()).value("return_to_launcher", out.returnToLauncherCode);
         const nlohmann::json compat = j.value("compat", nlohmann::json::object());

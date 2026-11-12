@@ -35,6 +35,7 @@ add_library(ste_ui_core STATIC
     src/core/mod_patch.cpp
     src/core/launcher_model.cpp
     src/core/crash_report.cpp
+    src/core/update_check.cpp
     src/core/display_modes.cpp
     src/platform/ExeVersion.cpp
     src/platform/png_decode.cpp
@@ -62,6 +63,7 @@ add_library(launcher_ui STATIC
     src/platform/Displays.cpp
     src/platform/GameProcess.cpp
     src/platform/DriveSearch.cpp
+    src/platform/UpdateFetch.cpp
     src/ui/App.cpp
     src/ui/AppMods.cpp
     src/ui/AppControllers.cpp

@@ -194,6 +194,11 @@ LauncherModel::StepOutcome LauncherModel::stepSetting(const std::string& id, int
         std::string e;
         if (!saveState(e)) out.saveError = e;
     };
+    if (id == "update-check") {
+        state.updateCheck = !state.updateCheck;
+        saveStateNoted();
+        return out;
+    }
     if (id == "ui-size") {
         static const int sizes[] = {85, 100, 115, 130, 150};
         int i = 1;

@@ -41,6 +41,7 @@
     },
     "_note": "Derived from play.bat / play_max.bat (docs/INTERFACE_ASSUMPTIONS.md). The exe name is a placeholder until the game session fixes one; LAUNCHER_GAME_EXE overrides it for development."
   },
+  "update": {"repo": "replayrevival/launcher"},
   "support": {"url": "https://github.com/replayrevival/ste-recomp/issues"},
   "exit_codes": {"return_to_launcher": 20, "_note": "Exit code 20 = the player chose Return to launcher in the in-game overlay; 2, 3, 6 and 10 are game errors (docs/OVERLAY.md)."},
   "compat": {

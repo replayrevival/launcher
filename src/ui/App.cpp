@@ -1,4 +1,6 @@
-﻿#include "ui/App.h"
+﻿#include "core/update_check.h"
+#include "platform/UpdateFetch.h"
+#include "ui/App.h"
 
 #include <SDL3/SDL.h>
 
@@ -85,6 +87,7 @@ bool App::init(Rml::ElementDocument* doc, std::string& err) {
         }
     }
     render();
+    startUpdateCheck();
     return true;
 }
 
@@ -439,6 +442,8 @@ void App::act(const std::string& action, const std::string& arg) {
         applyPresetNoted(arg);
         saveSettings();
         render();
+    } else if (action == "open-update") {
+        if (isSafeReleaseUrl(state_.latestUrl)) SDL_OpenURL(state_.latestUrl.c_str());
     } else if (action == "change-game") {
         canCancelSetup_ = true;
         screen_ = Screen::Setup;
@@ -584,6 +589,7 @@ void App::update() {
     pollUnpack();
     pollModInstall();
     pollPatchPrepare();
+    pollUpdateCheck();
 
     if (!listenAction_.empty()) {
         if (!captured_.empty() || listenCancelled_ || SDL_GetTicks() - listenSince_ > 6000) {
@@ -961,6 +967,12 @@ std::string App::renderOverview() {
          esc(shortPath(state_.gamePath)) + "</span>"
          "<button class=\"nav\" data-action=\"change-game\" data-key=\"change-game\"><span class=\"marker\"/>CHANGE GAME</button></div>";
     h += "<div class=\"section-label\">LAUNCHER</div>";
+    if (!state_.latestTag.empty() && isNewerVersion(state_.latestTag, LAUNCHER_VERSION)) {
+        h += "<div class=\"row filerow\"><span class=\"good\">A new version is available: " + esc(state_.latestTag) + " (you have " + LAUNCHER_VERSION +
+             ")</span><button class=\"nav\" data-action=\"open-update\" data-key=\"open-update\"><span class=\"marker\"/>OPEN DOWNLOAD PAGE</button></div>";
+    }
+    h += rowHtml("update-check", "Check for updates", "Once a day the launcher asks GitHub for the newest release number. Nothing is downloaded or installed.",
+                 state_.updateCheck ? "ON" : "OFF", state_.updateCheck, false);
     h += rowHtml("ui-size", "UI size", "Larger or smaller text and buttons. It already follows your Windows display scaling.",
                  std::to_string(state_.uiSize) + "%", false, true);
     h += "</div>";
@@ -968,3 +980,40 @@ std::string App::renderOverview() {
 }
 
 std::string App::renderRows(const std::string& page) { return views::settingsRows(model_, page); }
+
+// ---------------------------------------------------------------- update check
+
+#ifndef LAUNCHER_VERSION
+#define LAUNCHER_VERSION "dev"
+#endif
+
+void App::startUpdateCheck() {
+    // LAUNCHER_UPDATE_URL replaces GitHub for tests ("off" = never check).
+    const char* over = std::getenv("LAUNCHER_UPDATE_URL");
+    if (over && std::string(over) == "off") return;
+    if (!state_.updateCheck || updateBusy_) return;
+    const int64_t now = int64_t(std::time(nullptr));
+    if (!over && state_.lastUpdateCheck != 0 && now - state_.lastUpdateCheck < 24 * 3600 && now >= state_.lastUpdateCheck) return;
+    const std::string url = over ? over : "https://api.github.com/repos/" + profile_.updateRepo + "/releases?per_page=10";
+    const std::string agent = std::string("recomp-launcher/") + LAUNCHER_VERSION;
+    updateBusy_ = true;
+    updateFetch_ = std::async(std::launch::async, [url, agent] {
+        std::string body;
+        return httpGet(url, agent, 5000, body) ? body : std::string();  // empty = quiet failure
+    });
+}
+
+void App::pollUpdateCheck() {
+    if (!updateBusy_ || !updateFetch_.valid() || updateFetch_.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) return;
+    updateBusy_ = false;
+    const std::string body = updateFetch_.get();
+    state_.lastUpdateCheck = int64_t(std::time(nullptr));  // also after a failure: do not retry on every start while offline
+    UpdateInfo u;
+    if (!body.empty() && parseLatestRelease(body, u)) {
+        state_.latestTag = u.tag;
+        state_.latestUrl = u.url;
+    }
+    std::string err;
+    state_.save(model_.statePath(), err);  // a failed save only means we ask again next time
+    if (screen_ == Screen::Main && tab_ == Tab::Overview && !modalOpen_) render();
+}

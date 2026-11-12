@@ -22,6 +22,7 @@ struct Profile {
     std::string inputMapFile = "input_mapping.json";
     bool inputMapSupported = false;             // does the game build read the mapping file yet?
     std::string supportUrl = "https://github.com/replayrevival/ste-recomp/issues";  // where crash reports are sent
+    std::string updateRepo = "replayrevival/launcher";  // GitHub owner/repo whose releases the update check reads
     int returnToLauncherCode = 20;              // exit code of "Return to launcher" in the in-game overlay: a normal end, the launcher just reopens
     int vsyncVrrFixBuild = 0;                   // first game build with the V-Sync/VRR start-up fix (0 = none known)
 };

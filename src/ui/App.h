@@ -95,6 +95,11 @@ private:
     void onGameExit(int code, double secs);
     std::string supportDetails(int code, double secs) const;
     void saveCrashReport();
+    // update check: one quiet request to GitHub's release list on a worker thread, at most once a day
+    void startUpdateCheck();
+    void pollUpdateCheck();
+    std::future<std::string> updateFetch_;
+    bool updateBusy_ = false;
     int lastExitCode_ = 0;
     double lastRunSecs_ = 0;
     struct ModalButton { std::string label, action, arg; };

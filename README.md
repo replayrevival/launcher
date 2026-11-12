@@ -24,3 +24,6 @@ See [BUILD.md](BUILD.md). Windows, Visual Studio / Build Tools, CMake; all libra
 
 ## Licence
 GPL-2.0-or-later. `LICENSE` holds the GNU GPL version 2 text; you may also use any later version. Third-party code keeps its own licences (zlib, MIT, SIL OFL; FreeType under its GPLv2 option), see CREDITS.md.
+
+## Network use
+One optional, quiet update check once a day (can be switched off on the Overview tab). Details: `docs/NETWORK.md`.
