@@ -1,4 +1,5 @@
 {
+  "_comment_apply": "Optional per-row \"apply\": \"now\" (the running game applies it at once), \"match\" (next match or level) or \"restart\" (default, next game start). Only the in-game overlay shows it (docs/OVERLAY.md).",
   "_comment": "Game-specific settings schema. Derived from ste_video.ini.sample / ste_enhance.ini.sample and the Max/Low ini files (docs/INTERFACE_ASSUMPTIONS.md). Key ids are '<file>.<key>'; 'd' = the game's default when the key is absent (null = no default).",
   "keys": {
     "video.width": {"s": "video", "k": "width", "d": null},
@@ -78,7 +79,7 @@
 
   "pages": {
     "controls": [
-      {"id": "prompts", "label": "Button prompts", "hint": "Which button names the game and this launcher show.",
+      {"id": "prompts", "apply": "now", "label": "Button prompts", "hint": "Which button names the game and this launcher show.",
        "choices": [
          {"label": "Auto (match my controller)", "set": {"enhance.button_prompts": "auto"}},
          {"label": "Xbox", "set": {"enhance.button_prompts": "xbox"}},
@@ -93,7 +94,7 @@
          {"label": "Window", "set": {"video.mode": "window"}},
          {"label": "Borderless", "set": {"video.mode": "borderless"}},
          {"label": "Fullscreen", "set": {"video.mode": "fullscreen"}}]},
-      {"id": "aspect", "label": "Gameplay view", "hint": "Fit my screen shows more of the world. Menus always keep their original 4:3 shape",
+      {"id": "aspect", "apply": "now", "label": "Gameplay view", "hint": "Fit my screen shows more of the world. Menus always keep their original 4:3 shape",
        "choices": [
          {"label": "Original (4:3)", "set": {"video.aspect": "4:3-pillar"}},
          {"label": "Fit my screen", "set": {"video.aspect": "wide"}}]},
@@ -104,24 +105,24 @@
          {"label": "75%", "set": {"video.render_scale": "0.75", "video.upscale": "fsr1"}},
          {"label": "67%", "set": {"video.render_scale": "0.667", "video.upscale": "fsr1"}},
          {"label": "50%", "set": {"video.render_scale": "0.5", "video.upscale": "fsr1"}}]},
-      {"id": "fps", "label": "Frame rate", "hint": "The game keeps its original speed at any setting",
+      {"id": "fps", "apply": "now", "label": "Frame rate", "hint": "The game keeps its original speed at any setting",
        "choices": [
          {"label": "60", "set": {"video.fps_cap": "60"}},
          {"label": "30", "set": {"video.fps_cap": "30"}},
          {"label": "Uncapped", "set": {"video.fps_cap": "0"}}]},
-      {"id": "vsync", "type": "toggle", "label": "V-Sync", "hint": "On = no tearing (recommended). Off = lowest latency, may tear.",
+      {"id": "vsync", "apply": "now", "type": "toggle", "label": "V-Sync", "hint": "On = no tearing (recommended). Off = lowest latency, may tear.",
        "on": {"video.vsync": "on"}},
-      {"id": "vrr", "label": "Variable refresh rate", "hint": "Needs FreeSync/G-Sync enabled on your monitor and graphics driver.",
+      {"id": "vrr", "apply": "now", "label": "Variable refresh rate", "hint": "Needs FreeSync/G-Sync enabled on your monitor and graphics driver.",
        "choices": [
          {"label": "Auto", "set": {"video.vrr": "auto"}},
          {"label": "Off", "set": {"video.vrr": "off"}}]},
-      {"id": "draw", "label": "Draw distance", "hint": "Stops distant objects from vanishing",
+      {"id": "draw", "apply": "now", "label": "Draw distance", "hint": "Stops distant objects from vanishing",
        "choices": [
          {"label": "Original", "set": {"video.draw_distance": "1"}},
          {"label": "2x", "set": {"video.draw_distance": "2"}},
          {"label": "4x", "set": {"video.draw_distance": "4"}},
          {"label": "Unlimited", "set": {"video.draw_distance": "unlimited"}}]},
-      {"id": "fov", "label": "Field of view", "hint": "Wider shows more of the arena",
+      {"id": "fov", "apply": "now", "label": "Field of view", "hint": "Wider shows more of the arena",
        "choices": [
          {"label": "Original", "set": {"video.fov_scale": "1"}},
          {"label": "Wider", "set": {"video.fov_scale": "1.1"}},
@@ -136,21 +137,21 @@
     ],
     "enhance": [
       {"group": "UNLOCKS"},
-      {"id": "u_mon", "type": "toggle", "label": "Unlock all monsters", "hint": "The full 18-monster Versus grid. Not written to your save.", "on": {"enhance.unlock_all_monsters": "1"}},
-      {"id": "u_city", "type": "toggle", "label": "Unlock all cities", "hint": "Changes the city order. Not written to your save.", "on": {"enhance.unlock_all_cities": "1"}},
-      {"id": "u_chal", "type": "toggle", "label": "Unlock all challenges", "hint": "Not written to your save.", "on": {"enhance.unlock_all_challenges": "1"}},
-      {"id": "u_gal", "type": "toggle", "label": "Unlock the gallery", "hint": "All Gallery items.", "on": {"enhance.unlock_gallery": "1"}},
-      {"id": "u_fw", "type": "toggle", "label": "Unlock Final Wars items", "hint": "All Final Wars gallery items.", "on": {"enhance.unlock_final_wars": "1"}},
-      {"id": "u_bio", "type": "toggle", "label": "Unlock Biollante", "hint": "Needs the Biollante slot mod.", "on": {"enhance.unlock_biollante": "1"}},
+      {"id": "u_mon", "apply": "match", "type": "toggle", "label": "Unlock all monsters", "hint": "The full 18-monster Versus grid. Not written to your save.", "on": {"enhance.unlock_all_monsters": "1"}},
+      {"id": "u_city", "apply": "match", "type": "toggle", "label": "Unlock all cities", "hint": "Changes the city order. Not written to your save.", "on": {"enhance.unlock_all_cities": "1"}},
+      {"id": "u_chal", "apply": "match", "type": "toggle", "label": "Unlock all challenges", "hint": "Not written to your save.", "on": {"enhance.unlock_all_challenges": "1"}},
+      {"id": "u_gal", "apply": "match", "type": "toggle", "label": "Unlock the gallery", "hint": "All Gallery items.", "on": {"enhance.unlock_gallery": "1"}},
+      {"id": "u_fw", "apply": "match", "type": "toggle", "label": "Unlock Final Wars items", "hint": "All Final Wars gallery items.", "on": {"enhance.unlock_final_wars": "1"}},
+      {"id": "u_bio", "apply": "match", "type": "toggle", "label": "Unlock Biollante", "hint": "Needs the Biollante slot mod.", "on": {"enhance.unlock_biollante": "1"}},
       {"group": "GAMEPLAY RULES"},
-      {"id": "size", "label": "Monster size", "hint": "Camera and hit boxes follow the size.",
+      {"id": "size", "apply": "match", "label": "Monster size", "hint": "Camera and hit boxes follow the size.",
        "choices": [
          {"label": "Original", "set": {"enhance.stem_rule_player_size": "0"}},
          {"label": "150%", "set": {"enhance.stem_rule_player_size": "150"}},
          {"label": "200%", "set": {"enhance.stem_rule_player_size": "200"}},
          {"label": "300%", "set": {"enhance.stem_rule_player_size": "300"}}]},
-      {"id": "shake", "type": "toggle", "label": "Footstep camera shake", "hint": "Big monsters shake the screen.", "on": {"enhance.stem_footstep_camera_shake": "1"}},
-      {"id": "rage", "label": "Rage meter", "hint": "How the rage meter fills.",
+      {"id": "shake", "apply": "match", "type": "toggle", "label": "Footstep camera shake", "hint": "Big monsters shake the screen.", "on": {"enhance.stem_footstep_camera_shake": "1"}},
+      {"id": "rage", "apply": "match", "label": "Rage meter", "hint": "How the rage meter fills.",
        "choices": [
          {"label": "Original", "set": {"enhance.stem_rule_rage_meter": "0"}},
          {"label": "Damage taken", "set": {"enhance.stem_rule_rage_meter": "1"}},
@@ -158,21 +159,21 @@
          {"label": "Both", "set": {"enhance.stem_rule_rage_meter": "3"}},
          {"label": "Over time", "set": {"enhance.stem_rule_rage_meter": "4"}},
          {"label": "All", "set": {"enhance.stem_rule_rage_meter": "5"}}]},
-      {"id": "veh", "type": "toggle", "label": "More traffic", "hint": "Vehicles fill the city from the start.", "on": {"enhance.stem_more_ai_vehicles": "1"}},
-      {"id": "jug", "type": "toggle", "label": "No juggle limit", "hint": "Air combos are not capped.", "on": {"enhance.stem_no_juggle_limit": "1"}},
-      {"id": "knock", "type": "toggle", "label": "No knockback scaling", "hint": "", "on": {"enhance.stem_no_knockback_scaling": "1"}},
-      {"id": "minhp", "type": "toggle", "label": "No minimum health", "hint": "", "on": {"enhance.stem_no_min_health": "1"}},
-      {"id": "wvk", "type": "toggle", "label": "Weapon-independent vertical knockback", "hint": "", "on": {"enhance.stem_weapon_vertical_knockback": "1"}},
-      {"id": "dim", "type": "toggle", "label": "No results-screen dimming", "hint": "", "on": {"enhance.stem_no_results_dim": "1"}},
-      {"id": "empty", "type": "toggle", "label": "Empty arena", "hint": "Flat ground, no buildings.", "on": {"enhance.stem_rule_empty_arena": "1"}},
+      {"id": "veh", "apply": "match", "type": "toggle", "label": "More traffic", "hint": "Vehicles fill the city from the start.", "on": {"enhance.stem_more_ai_vehicles": "1"}},
+      {"id": "jug", "apply": "match", "type": "toggle", "label": "No juggle limit", "hint": "Air combos are not capped.", "on": {"enhance.stem_no_juggle_limit": "1"}},
+      {"id": "knock", "apply": "match", "type": "toggle", "label": "No knockback scaling", "hint": "", "on": {"enhance.stem_no_knockback_scaling": "1"}},
+      {"id": "minhp", "apply": "match", "type": "toggle", "label": "No minimum health", "hint": "", "on": {"enhance.stem_no_min_health": "1"}},
+      {"id": "wvk", "apply": "match", "type": "toggle", "label": "Weapon-independent vertical knockback", "hint": "", "on": {"enhance.stem_weapon_vertical_knockback": "1"}},
+      {"id": "dim", "apply": "match", "type": "toggle", "label": "No results-screen dimming", "hint": "", "on": {"enhance.stem_no_results_dim": "1"}},
+      {"id": "empty", "apply": "match", "type": "toggle", "label": "Empty arena", "hint": "Flat ground, no buildings.", "on": {"enhance.stem_rule_empty_arena": "1"}},
       {"group": "CHEATS"},
-      {"id": "inv1", "type": "toggle", "label": "Player 1 invulnerable", "hint": "Checked against the real game.", "on": {"enhance.cheat_invulnerable_p1": "1"}},
-      {"id": "invc", "type": "toggle", "label": "Computer player invulnerable", "hint": "", "on": {"enhance.cheat_invulnerable_com": "1"}},
-      {"id": "sdmg", "type": "toggle", "label": "Computer player super damage", "hint": "", "on": {"enhance.cheat_super_damage_com": "1"}},
-      {"id": "red1", "type": "toggle", "label": "Player 1 red", "hint": "", "on": {"enhance.cheat_red_p1": "1"}},
-      {"id": "redc", "type": "toggle", "label": "Computer player red", "hint": "", "on": {"enhance.cheat_red_com": "1"}},
+      {"id": "inv1", "apply": "match", "type": "toggle", "label": "Player 1 invulnerable", "hint": "Checked against the real game.", "on": {"enhance.cheat_invulnerable_p1": "1"}},
+      {"id": "invc", "apply": "match", "type": "toggle", "label": "Computer player invulnerable", "hint": "", "on": {"enhance.cheat_invulnerable_com": "1"}},
+      {"id": "sdmg", "apply": "match", "type": "toggle", "label": "Computer player super damage", "hint": "", "on": {"enhance.cheat_super_damage_com": "1"}},
+      {"id": "red1", "apply": "match", "type": "toggle", "label": "Player 1 red", "hint": "", "on": {"enhance.cheat_red_p1": "1"}},
+      {"id": "redc", "apply": "match", "type": "toggle", "label": "Computer player red", "hint": "", "on": {"enhance.cheat_red_com": "1"}},
       {"group": "SAVES"},
-      {"id": "seed", "type": "toggle", "label": "Start with the game folder's saves", "hint": "Off starts empty, like a new console.", "on": {"enhance.seed_from_game_dir": "1"}}
+      {"id": "seed", "apply": "match", "type": "toggle", "label": "Start with the game folder's saves", "hint": "Off starts empty, like a new console.", "on": {"enhance.seed_from_game_dir": "1"}}
     ]
   }
 }

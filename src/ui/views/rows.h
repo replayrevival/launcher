@@ -17,9 +17,11 @@ std::string glyphHtml(const std::string& stem);
 
 // One option row. `hint` has one line per '\n'; a line starting with '!' is shown as a warning. `chevrons` adds the
 // separate left/right click targets (the row value is a list, not a toggle).
-std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on, bool chevrons);
+// `apply` ("now" | "match" | "restart" | "") adds the small "applies now" / "next match" / "after restart" badge (overlay).
+std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on, bool chevrons,
+                    const std::string& apply = "");
 
 // All rows of a settings page ("video", "enhance", "controls"), including the monitor and resolution rows.
-std::string settingsRows(const LauncherModel& model, const std::string& page);
+std::string settingsRows(const LauncherModel& model, const std::string& page, bool badges = false);
 
 }  // namespace views

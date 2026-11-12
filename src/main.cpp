@@ -15,6 +15,7 @@
 #include "core/paths.h"
 #include "platform/UiBackend.h"
 #include "ui/App.h"
+#include "ui/Overlay.h"
 #include "ui/views/rows.h"
 #include "ui/ChamferDecorator.h"
 #include "ui/Navigation.h"
@@ -44,6 +45,7 @@ struct Args {
     double hold = 0.3;              // --hold <seconds>: wait this long after the script before the screenshot
     bool killGame = false;          // --kill-game: stop the game when the launcher exits
     bool fresh = false;             // --fresh: ignore the remembered game (first-start screen)
+    bool overlay = false;           // --overlay: open the in-game overlay (docs/OVERLAY.md) on top of the launcher (tests)
     std::string device;             // --device xbox|playstation|switch|generic|keyboard: pretend this input device is in use (tests)
     std::string fakeDisplays;       // --fake-displays <json>: use this monitor list instead of the real one (tests)
     int width = 1280, height = 820;
@@ -58,6 +60,7 @@ Args parseArgs(int argc, char** argv) {
         else if (s == "--hold" && i + 1 < argc) a.hold = std::atof(argv[++i]);
         else if (s == "--kill-game") a.killGame = true;
         else if (s == "--fresh") a.fresh = true;
+        else if (s == "--overlay") a.overlay = true;
         else if (s == "--device" && i + 1 < argc) a.device = argv[++i];
         else if (s == "--fake-displays" && i + 1 < argc) a.fakeDisplays = argv[++i];
         else if (s == "--content-scale" && i + 1 < argc) g_testContentScale = float(std::atof(argv[++i]));
@@ -164,6 +167,28 @@ int main(int argc, char** argv) {
     updateScale(ctx, backend->window(), app.uiScale());
     if (!args.drop.empty()) app.onDrop(args.drop);
 
+    Overlay overlay;
+    if (args.overlay) {
+        OverlayInit oi;
+        oi.resourceDir = exeDir;
+        oi.width = pw; oi.height = ph; oi.contentScale = app.uiScale();
+        OverlayCallbacks cb;
+        cb.applySetting = [](const std::string& k, const std::string& v) {
+            std::fprintf(stderr, "OVERLAY applySetting %s=%s\n", k.c_str(), v.c_str());
+            return Applied::Now;
+        };
+        cb.returnToLauncher = [] { std::fprintf(stderr, "OVERLAY returnToLauncher\n"); };
+        cb.quitGame = [] { std::fprintf(stderr, "OVERLAY quitGame\n"); };
+        cb.onShow = [] { std::fprintf(stderr, "OVERLAY shown\n"); };
+        cb.onHide = [] { std::fprintf(stderr, "OVERLAY hidden\n"); };
+        if (!overlay.init(app.model(), oi, cb, err)) {
+            std::fprintf(stderr, "%s\n", err.c_str());
+            return 1;
+        }
+        if (nav.device() != DeviceKind::Keyboard) overlay.navigation().forceDevice(nav.device());
+        overlay.show();
+    }
+
     size_t scriptPos = 0;
     int frame = 0, nextScript = 8;
     double doneAt = -1;
@@ -179,9 +204,12 @@ int main(int argc, char** argv) {
             else if (ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
                 backend->setViewport(ev.window.data1, ev.window.data2);
                 ctx->SetDimensions(Rml::Vector2i(ev.window.data1, ev.window.data2));
+                overlay.resize(ev.window.data1, ev.window.data2, app.uiScale(), 1.f);
                 updateScale(ctx, backend->window(), app.uiScale());
             } else if (ev.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED) {
                 updateScale(ctx, backend->window(), app.uiScale());  // moved to a monitor with another Windows scaling
+            } else if (overlay.feedEvent(ev)) {
+                // the overlay has it
             } else if (nav.handleEvent(ev)) {
                 // consumed
             } else {
@@ -191,7 +219,8 @@ int main(int argc, char** argv) {
 
         if (scaleDirty) { scaleDirty = false; updateScale(ctx, backend->window(), app.uiScale()); }
         const auto now = std::chrono::steady_clock::now();
-        nav.update(std::chrono::duration<double>(now - last).count());
+        const double dt = std::chrono::duration<double>(now - last).count();
+        nav.update(dt);
         last = now;
 
         // Scripted input: one step every 6 frames; "wait" pauses for 40 frames (e.g. for a game check).
@@ -270,13 +299,15 @@ int main(int argc, char** argv) {
             } else if (step.action == NavAction::None) {
                 nextScript = frame + 40;
             } else {
-                nav.push(step.action);
+                if (overlay.visible()) overlay.navigation().push(step.action);
+                else nav.push(step.action);
                 nextScript = frame + 6;
             }
         stepDone:;
         }
 
         app.update();
+        overlay.update(dt);
         for (NavAction a : nav.take()) {
             if (nav.perform(ctx, doc, a)) continue;
             app.handleAction(a);
@@ -286,6 +317,7 @@ int main(int argc, char** argv) {
         ctx->Update();
         backend->beginFrame();
         ctx->Render();
+        overlay.render();
         backend->endFrame();
 
         if (!args.shot.empty() && !shotTaken && scriptPos >= args.script.size() && frame >= nextScript && !app.busy()) {

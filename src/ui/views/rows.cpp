@@ -45,7 +45,8 @@ namespace { std::string g_glyphDir; }
 void setGlyphDir(const std::string& d) { g_glyphDir = d; for (auto& c : g_glyphDir) if (c == '\\') c = '/'; if (!g_glyphDir.empty() && g_glyphDir.back() != '/') g_glyphDir += '/'; }
 std::string glyphHtml(const std::string& stem) { return "<img class=\"glyph\" src=\"" + g_glyphDir + stem + ".png\"/>"; }
 
-std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on, bool chevrons) {
+std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on, bool chevrons,
+                    const std::string& apply) {
     std::string h = "<div class=\"setrow\"><div class=\"setlabel\"><div class=\"lbl\">" + esc(label) + "</div>";
     // One line per '\n'; a line starting with '!' is a warning (yellow).
     for (size_t pos = 0; pos < hint.size();) {
@@ -58,6 +59,10 @@ std::string rowHtml(const std::string& id, const std::string& label, const std::
         if (warn) line.erase(0, 1);
         h += std::string("<div class=\"small ") + (warn ? "warnline\" style=\"color: #FFD43B" : "muted") + "\">" + esc(line) + "</div>";
     }
+    if (!apply.empty()) {
+        const char* text = apply == "now" ? "applies now" : apply == "match" ? "next match" : "after restart";
+        h += "<div class=\"applybadge applybadge-" + apply + "\">" + text + "</div>";
+    }
     h += "</div><button class=\"nav val" + std::string(on ? " on" : "") + "\" data-action=\"cycle\" data-arg=\"" + id + "\" data-key=\"row-" + id +
          "\" data-adjust=\"1\"><span class=\"marker\"/>";
     if (chevrons)
@@ -68,7 +73,7 @@ std::string rowHtml(const std::string& id, const std::string& label, const std::
     return h + "</button></div>";
 }
 
-std::string settingsRows(const LauncherModel& m, const std::string& page) {
+std::string settingsRows(const LauncherModel& m, const std::string& page, bool badges) {
     std::string h;
     for (auto& row : m.settings.page(page)) {
         if (!row.group.empty()) { h += "<div class=\"section-label grouphead\">" + esc(row.group) + "</div>"; continue; }
@@ -82,7 +87,7 @@ std::string settingsRows(const LauncherModel& m, const std::string& page) {
             hint += ". Your screen is " + (a.empty() ? std::to_string(d.desktop.w) + " \xC3\x97 " + std::to_string(d.desktop.h) : a);
         }
         if (row.id == "vsync" && !m.vsyncFixPresent()) hint += "\n!If the game doesn\xE2\x80\x99t start, set Variable refresh to Off.";
-        h += rowHtml(row.id, row.label, hint, row.toggle ? (ci == 1 ? "ON" : "OFF") : val, row.toggle && ci == 1, !row.toggle);
+        h += rowHtml(row.id, row.label, hint, row.toggle ? (ci == 1 ? "ON" : "OFF") : val, row.toggle && ci == 1, !row.toggle, badges ? row.apply : "");
     }
     return h;
 }

@@ -1,0 +1,27 @@
+/* In-game overlay (src/ui/Overlay.*): the launcher theme on a dimmed game picture. Loaded after theme.rcss. */
+body#overlay {
+    background-color: #040C1BD9;
+    decorator: none;
+    justify-content: space-between;
+}
+#ov-panel {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    width: 760dp;
+    padding: 34dp 0 0 0;
+}
+#ov-title { font-size: 30dp; margin-bottom: 8dp; }
+#ov-note { font-size: 13dp; color: #FFD43B; min-height: 18dp; margin-bottom: 6dp; }
+#ov-page { flex: 1 1 0; min-height: 0; overflow-y: auto; padding-right: 12dp; }
+.ov-menu { display: flex; flex-direction: column; gap: 12dp; align-items: flex-start; padding-left: 26dp; }
+.ov-menu button.nav { width: 420dp; }
+.ov-text { margin: 10dp 0 20dp 26dp; width: 600dp; color: #A9C6E6; }
+
+/* when a setting takes effect */
+.applybadge { font-size: 11dp; letter-spacing: 1dp; margin-top: 2dp; }
+.applybadge-now { color: #7BE08F; }
+.applybadge-match { color: #FFD43B; }
+.applybadge-restart { color: #A9C6E6; }

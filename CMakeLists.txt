@@ -47,6 +47,7 @@ add_library(launcher_ui STATIC
     src/ui/AppStopped.cpp
     src/ui/ChamferDecorator.cpp
     src/ui/Navigation.cpp
+    src/ui/Overlay.cpp
     src/ui/views/rows.cpp
     src/ui/views/mods.cpp
     src/ui/views/controllers.cpp

@@ -1,0 +1,18 @@
+<rml>
+<head>
+    <title>Overlay</title>
+    <link type="text/rcss" href="../rcss/theme.rcss"/>
+    <link type="text/rcss" href="../rcss/overlay.rcss"/>
+</head>
+<body id="overlay">
+    <div id="ov-panel">
+        <div id="ov-title" class="title"></div>
+        <div id="ov-note"></div>
+        <div id="ov-page"></div>
+    </div>
+    <div id="hints">
+        <div id="legal"></div>
+        <div class="group" id="hint-group"></div>
+    </div>
+</body>
+</rml>

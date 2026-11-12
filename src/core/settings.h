@@ -13,6 +13,7 @@ struct SettingChoice {
 
 struct SettingRow {
     std::string id, label, hint;
+    std::string apply = "restart";  // when a change takes effect in a running game: "now" | "match" | "restart" (overlay badge)
     std::string group;  // non-empty: this entry is a group header, nothing else is used
     bool toggle = false;
     std::string special;  // "display" / "resolution": drawn by the app from the detected monitors, no fixed choices

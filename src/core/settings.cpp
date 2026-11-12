@@ -78,6 +78,7 @@ bool Settings::loadSchema(const fs::path& path, std::string& err) {
                     row.id = r.at("id").get<std::string>();
                     row.label = r.at("label").get<std::string>();
                     row.hint = r.value("hint", "");
+                    row.apply = r.value("apply", "restart");
                     const std::string type = r.value("type", "");
                     if (type == "display" || type == "resolution") {
                         row.special = type;
