@@ -34,6 +34,7 @@ add_library(ste_ui_core STATIC
     src/core/mods.cpp
     src/core/mod_patch.cpp
     src/core/launcher_model.cpp
+    src/core/crash_report.cpp
     src/core/display_modes.cpp
     src/platform/ExeVersion.cpp
     src/platform/png_decode.cpp
@@ -138,3 +139,6 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:overlay_test_host>/assets"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/config" "$<TARGET_FILE_DIR:overlay_test_host>/config")
 endif()
+
+# Stand-in game for testing the launcher's crash handling (tests/fake_game). Not shipped, not in the default build.
+add_executable(fake_game EXCLUDE_FROM_ALL tests/fake_game/fake_game.cpp)

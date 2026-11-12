@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "core/crash_report.h"
 #include "core/identify.h"
 #include "ui/App.h"
 
@@ -82,6 +83,8 @@ std::string App::supportDetails(int code, double secs) const {
 }
 
 void App::onGameExit(int code, double secs) {
+    lastExitCode_ = code;
+    lastRunSecs_ = secs;
     const unsigned ucode = unsigned(code);
     std::string title, body;
     const std::string after = " after " + std::to_string(int(secs)) + " seconds";
@@ -130,9 +133,50 @@ void App::onGameExit(int code, double secs) {
     if (settingsCouldMatter && !lastOriginal_) buttons.push_back({"TRY AGAIN WITH ORIGINAL SETTINGS", "modal-retry-original", ""});
     if (settingsCouldMatter && videoMode() == "fullscreen" && !lastBorderless_ && !lastOriginal_)
         buttons.push_back({"TRY BORDERLESS INSTEAD", "modal-retry-borderless", ""});
+    // A crash that left a dump or a [CRASH] line: offer a report the player can send (nothing is sent by the launcher).
+    if (code != 0 && findCrashEvidence(dumpDir(), game_.outLog(), game_.errLog(), secs + 120.0).any())
+        buttons.push_back({"SAVE CRASH REPORT", "modal-save-report", ""});
     buttons.push_back({"OPEN LOG FOLDER", "modal-open-logs", ""});
 
     std::string shown = game_.errorTail(5);
     if (shown.empty()) shown = game_.outputTail(4);
     showModalEx(title, body, shown, supportDetails(code, secs), buttons);
+}
+
+// Zips the newest crash dump, the game's logs and ini files (paths cleaned) to the desktop and says where to send it.
+void App::saveCrashReport() {
+    CrashReportInput in;
+    in.evidence = findCrashEvidence(dumpDir(), game_.outLog(), game_.errLog(), lastRunSecs_ + 120.0);
+    in.outLog = game_.outLog();
+    in.errLog = game_.errLog();
+    in.settingsDir = settingsDir();
+    in.info = supportDetails(lastExitCode_, lastRunSecs_);
+    in.supportText = "Please send this zip to the people working on the game: " + profile_.supportUrl +
+                     " (open a new issue there and attach the zip), or give it to whoever gave you the launcher.";
+    auto add = [&](const std::string& from, const std::string& to) { if (!from.empty()) in.redactions.push_back({from, to}); };
+    add(state_.gamePath, "<game folder>");
+    add(pathToUtf8(paths_.dataDir), "<launcher data>");
+    add(pathToUtf8(paths_.exeDir), "<launcher folder>");
+
+    std::string desktop;
+    if (const char* o = std::getenv("LAUNCHER_DESKTOP")) desktop = o;  // tests
+    else if (const char* d = SDL_GetUserFolder(SDL_FOLDER_DESKTOP)) desktop = d;
+    if (desktop.empty()) desktop = pathToUtf8(paths_.dataDir);
+    char stamp[32];
+    const std::time_t now = std::time(nullptr);
+    std::tm tmv{};
+    localtime_s(&tmv, &now);
+    std::strftime(stamp, sizeof stamp, "%Y%m%d-%H%M%S", &tmv);
+    in.outZip = pathFromUtf8(desktop) / (std::string("STE-crash-report-") + stamp + ".zip");
+
+    std::string err;
+    if (!writeCrashReport(in, err)) {
+        showModal("The crash report could not be saved", err, "");
+        return;
+    }
+    showModal("Crash report saved",
+              "The report is on your desktop: " + pathToUtf8(in.outZip.filename()) + "\n\n" + in.supportText +
+                  "\n\nIt holds the crash dump, the game's logs and your game settings, no game files. Your user name and folders are removed from the "
+                  "text files. The launcher sends nothing by itself.",
+              "");
 }

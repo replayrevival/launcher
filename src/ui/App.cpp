@@ -392,6 +392,8 @@ void App::act(const std::string& action, const std::string& arg) {
     } else if (action == "modal-retry-borderless") {
         closeModal();
         play(false, true);
+    } else if (action == "modal-save-report") {
+        saveCrashReport();
     } else if (action == "modal-open-logs") {
         std::error_code lec;
         const fs::path dir = paths_.dataDir / "logs";
@@ -812,6 +814,8 @@ void App::refreshHints() {
         l->SetInnerRML("made with " + esc(profile_.brand) + " · Open source (GPL-2.0-or-later). No game files included. Bring your own copy.");
 }
 
+static std::string resultHeadline(IdStatus s);
+
 std::string App::renderSetup() {
     std::string h = "<div class=\"center\">";
     const bool second = (step_ == SetupStep::Result && !checking_) || step_ == SetupStep::Unpack || step_ == SetupStep::Unpacking;
@@ -871,7 +875,7 @@ std::string App::renderSetup() {
             h += "<div class=\"row center-row\"><button class=\"nav default\" data-action=\"restart\" data-key=\"restart\"><span class=\"marker\"/>CANCEL</button></div>";
         } else {
             const bool ok = result_.status == IdStatus::Ok;
-            h += "<div class=\"title big-title" + std::string(ok ? "" : " warnhead") + "\">" + (ok ? "Found it" : "That is not quite right") + "</div>";
+            h += "<div class=\"title big-title" + std::string(ok ? "" : " warnhead") + "\">" + resultHeadline(result_.status) + "</div>";
             if (ok || !result_.title.empty()) {
                 h += "<div class=\"table\">";
                 auto row = [&](const std::string& k, const std::string& v, bool good) {
@@ -896,6 +900,21 @@ std::string App::renderSetup() {
     }
     h += "</div>";
     return h;
+}
+
+// Headline of the "game check" result, in plain words for each outcome.
+static std::string resultHeadline(IdStatus s) {
+    switch (s) {
+        case IdStatus::Ok: return "Found it";
+        case IdStatus::WrongVersion: return "This version is not supported";
+        case IdStatus::WrongGame: return "This is a different game";
+        case IdStatus::OtherPlatform: return "This is not the Xbox version";
+        case IdStatus::NotAGame:
+        case IdStatus::NoXbe: return "This is not a game";
+        case IdStatus::NotFound: return "Your game was not found";
+        case IdStatus::CantRead: return "The game could not be read";
+    }
+    return "That is not quite right";
 }
 
 std::string App::renderMain() {

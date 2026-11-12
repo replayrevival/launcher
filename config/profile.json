@@ -41,6 +41,7 @@
     },
     "_note": "Derived from play.bat / play_max.bat (docs/INTERFACE_ASSUMPTIONS.md). The exe name is a placeholder until the game session fixes one; LAUNCHER_GAME_EXE overrides it for development."
   },
+  "support": {"url": "https://github.com/replayrevival/ste-recomp/issues"},
   "exit_codes": {"return_to_launcher": 20, "_note": "Exit code 20 = the player chose Return to launcher in the in-game overlay; 2, 3, 6 and 10 are game errors (docs/OVERLAY.md)."},
   "compat": {
     "_note": "vsync_vrr_fix_build: first game build number (the N in 0.1.0+cN) that fixes the V-Sync / variable-refresh start-up problem. 0 = no such build known yet: the V-Sync row then shows the workaround.",

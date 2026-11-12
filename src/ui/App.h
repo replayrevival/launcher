@@ -94,6 +94,9 @@ private:
     void play(bool original = false, bool borderless = false);
     void onGameExit(int code, double secs);
     std::string supportDetails(int code, double secs) const;
+    void saveCrashReport();
+    int lastExitCode_ = 0;
+    double lastRunSecs_ = 0;
     struct ModalButton { std::string label, action, arg; };
     // `copyText` is what COPY DETAILS copies; `shown` is the short text drawn in the box.
     void showModalEx(const std::string& title, const std::string& body, const std::string& shown, const std::string& copyText,

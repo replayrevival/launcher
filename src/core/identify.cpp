@@ -83,9 +83,10 @@ IdResult finish(IdResult r, const XbeBytes& x, const IdExpect& expect) {
         r.message = "Found and verified. This matches a known good copy.";
     } else if (!expect.titleHint.empty() && lower(r.title).find(lower(expect.titleHint)) != std::string::npos) {
         r.status = IdStatus::WrongVersion;
-        r.message = "This is the right game, but not a version we support" +
+        r.message = "This is the right game, but not a version the launcher knows" +
                     (r.region.empty() ? std::string() : " (" + r.region + ")") +
-                    ". It may be another region, or a changed or damaged copy.";
+                    ". The launcher only supports original, unchanged copies of the version it lists. Yours may be another region, "
+                    "a patched or repacked copy, or damaged. Try the original disc image or a fresh copy of the game files.";
     } else {
         r.status = IdStatus::WrongGame;
         r.message = r.title.empty() ? "This is a different game." : "This is a different game: " + r.title + ".";
@@ -100,7 +101,7 @@ IdResult identifyGame(const fs::path& path, const IdExpect& expect) {
     std::error_code ec;
     if (!fs::exists(path, ec)) {
         r.status = IdStatus::NotFound;
-        r.message = "That file or folder could not be found. It may have moved, or its drive is not connected.";
+        r.message = "The launcher cannot find that file or folder any more. It may have been moved or renamed, or the drive it is on is not connected. Pick it again, or let the launcher search your drives.";
         return r;
     }
 
