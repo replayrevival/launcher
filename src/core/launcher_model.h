@@ -76,6 +76,10 @@ public:
     };
     // Steps one settings row by `dir` (+1 / -1) and saves. `nowTicks` (ms) lets held buttons accelerate the custom sizes.
     StepOutcome stepSetting(const std::string& id, int dir, uint64_t nowTicks);
+    // The settings-row actions the page markup produces (views/rows): "step" (arg "<row id>@<-1|1>", the chevrons) and
+    // "cycle" (arg "<row id>", clicking the value steps forward). Returns false when `action` is not one of them. The launcher
+    // and the overlay both route their clicks through this, so a row behaves the same in both.
+    bool rowAction(const std::string& action, const std::string& arg, uint64_t nowTicks, StepOutcome& out);
 
 private:
     std::string stepLastId_;

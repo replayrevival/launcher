@@ -340,9 +340,9 @@ void App::act(const std::string& action, const std::string& arg) {
     if (modalOpen_ && action != "modal-ok" && action != "copy-details" && action.rfind("modal-", 0) != 0) return;
     if (!listenAction_.empty() && action != "ctl-bind") endListen();
 
-    if (action == "step") {  // arg = "<row id>@<-1|1>": the left / right arrow of an option row
-        const size_t at = arg.rfind('@');
-        if (at != std::string::npos) stepRow(arg.substr(0, at), std::atoi(arg.c_str() + at + 1) < 0 ? -1 : +1);
+    if (action == "step" || action == "cycle") {  // option row: chevrons ("<row id>@<-1|1>") or a click on the value
+        LauncherModel::StepOutcome r;
+        if (model_.rowAction(action, arg, SDL_GetTicks(), r)) afterStep(r);
         return;
     }
     if (action == "ctl-step") {  // arg = "<kind>@<arg>@<dir>"
@@ -437,8 +437,6 @@ void App::act(const std::string& action, const std::string& arg) {
         applyPresetNoted(arg);
         saveSettings();
         render();
-    } else if (action == "cycle") {
-        stepRow(arg, +1);  // clicking the value itself steps forward
     } else if (action == "change-game") {
         canCancelSetup_ = true;
         screen_ = Screen::Setup;

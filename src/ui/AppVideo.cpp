@@ -26,8 +26,10 @@ void App::refreshDisplays() {
     model_.refreshDisplays([this] { return detectDisplays(window_); });
 }
 // Steps one row (mouse, keyboard or pad); the work is done by the model, then the screen is redrawn.
-void App::stepRow(const std::string& id, int dir) {
-    const auto r = model_.stepSetting(id, dir, SDL_GetTicks());
+void App::stepRow(const std::string& id, int dir) { afterStep(model_.stepSetting(id, dir, SDL_GetTicks())); }
+
+// What the launcher does after a row changed: UI size, a save failure box, redraw.
+void App::afterStep(const LauncherModel::StepOutcome& r) {
     if (r.uiSizeChanged && uiScaleChanged_) uiScaleChanged_();
     if (!r.saveError.empty()) showModal("Could not save", "Your choice could not be written.", r.saveError);
     render();

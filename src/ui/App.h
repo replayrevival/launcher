@@ -27,6 +27,8 @@
 #include "platform/DriveSearch.h"
 #include "platform/GameProcess.h"
 #include "ui/Navigation.h"
+#include "ui/views/controllers.h"
+#include "ui/views/mods.h"
 #include "ui/views/rows.h"
 
 struct SDL_Window;
@@ -126,6 +128,7 @@ private:
     bool resValid(int w, int h) const { return model_.resValid(w, h); }
     void setNative() { model_.setNative(); }
     void stepRow(const std::string& id, int dir);
+    void afterStep(const LauncherModel::StepOutcome& r);
 
     // controllers tab
     struct PortInfo {

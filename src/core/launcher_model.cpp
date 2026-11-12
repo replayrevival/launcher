@@ -258,3 +258,17 @@ done:
     if (!saveSettings(e)) out.saveError = e;
     return out;
 }
+
+bool LauncherModel::rowAction(const std::string& action, const std::string& arg, uint64_t nowTicks, StepOutcome& out) {
+    if (action == "step") {
+        const size_t at = arg.rfind('@');
+        if (at == std::string::npos) return true;  // ours, but malformed: nothing to do
+        out = stepSetting(arg.substr(0, at), std::atoi(arg.c_str() + at + 1) < 0 ? -1 : +1, nowTicks);
+        return true;
+    }
+    if (action == "cycle") {
+        out = stepSetting(arg, +1, nowTicks);
+        return true;
+    }
+    return false;
+}

@@ -48,6 +48,8 @@ add_library(launcher_ui STATIC
     src/ui/ChamferDecorator.cpp
     src/ui/Navigation.cpp
     src/ui/views/rows.cpp
+    src/ui/views/mods.cpp
+    src/ui/views/controllers.cpp
 )
 target_include_directories(launcher_ui PUBLIC src)
 target_compile_definitions(launcher_ui PUBLIC UNICODE _UNICODE PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
