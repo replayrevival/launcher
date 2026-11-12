@@ -42,3 +42,19 @@ Navigation graph: d-pad/stick/arrows move focus, A/Enter select, B/Esc back, LB/
 
 ## Portable mode
 `portable.txt` next to the launcher exe -> all launcher state, per-controller profiles and logs in `data\` beside the exe; otherwise the per-user pref dir. The game's own ini files always live next to the game exe.
+
+## Controller-only audit (2026-11-12)
+Developer script token `audit:<label>` (in `--script`, see `auditNav` in `src/main.cpp`) checks the current screen: is something focused, and can
+every focusable element be reached from it with Up / Down / Left / Right only. Results with a pad device pinned:
+
+| Screen | Focusable | Reached |
+|---|---|---|
+| First start, choose game | 3 | 3 |
+| Game check result (not a game / verified) | 2 / 2 | all |
+| Searching drives / results | 9 / 9 | all |
+| Overview / Video / Enhancements / Mods / Controllers tabs | 11 / 16 / 28 / 19 / 35 | all |
+| "The game crashed" box / the screen after closing it | 5 / 11 | all |
+
+Every focusable element is a `button.nav`, which has one shared focus style (glow + yellow arrow), so focus is visible everywhere. Not audited:
+the disc-image unpack step (no disc image at hand; it uses the same buttons). Limits that need more than a pad: the Windows file dialogs behind
+"CHOOSE DISC IMAGE", "CHOOSE A FOLDER" and "INSTALL FROM ZIP / FOLDER" (use SEARCH MY DRIVES for the game; put mod folders into the mods folder).

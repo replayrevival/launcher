@@ -2,10 +2,12 @@
 #include <RmlUi/Core.h>
 #include <SDL3/SDL.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -71,7 +73,7 @@ Args parseArgs(int argc, char** argv) {
             while (std::getline(ss, tok, ',')) {
                 NavAction act = NavAction::None;  // "wait" and unknown words just pause
                 const bool raw = tok.rfind("key:", 0) == 0 || tok.rfind("pad:", 0) == 0 || tok.rfind("trig:", 0) == 0 ||
-                                 tok.rfind("mclick:", 0) == 0 || tok.rfind("wheel:", 0) == 0 || tok.rfind("report:", 0) == 0;
+                                 tok.rfind("mclick:", 0) == 0 || tok.rfind("wheel:", 0) == 0 || tok.rfind("report:", 0) == 0 || tok.rfind("audit", 0) == 0;
                 if (!raw) Navigation::parseAction(tok, act);
                 a.script.push_back({act, raw ? tok : std::string()});
             }
@@ -84,6 +86,48 @@ void updateScale(Rml::Context* ctx, SDL_Window* win, float uiSize) {
     float s = g_testContentScale > 0 ? g_testContentScale : SDL_GetWindowDisplayScale(win);
     if (s <= 0.f) s = 1.f;
     ctx->SetDensityIndependentPixelRatio(s * uiSize);
+}
+
+// Pad-only audit of the current screen (developer tool, script token "audit"): is something focused, and can every focusable
+// element be reached from it with Up / Down / Left / Right alone? Prints one line per screen to stderr.
+void auditNav(Rml::Context* ctx, Rml::ElementDocument* doc, Navigation& nav, const std::string& label) {
+    Rml::ElementList all;
+    doc->QuerySelectorAll(all, ".modal .nav");
+    const bool modal = !all.empty();
+    if (!modal) doc->QuerySelectorAll(all, ".nav");
+    std::vector<Rml::Element*> items;
+    for (auto* e : all)
+        if (e->IsVisible(true) && !e->HasAttribute("disabled")) items.push_back(e);
+    auto key = [](Rml::Element* e) {
+        const std::string k = e->GetAttribute<Rml::String>("data-key", "");
+        return k.empty() ? e->GetTagName() + "#" + e->GetId() : k;
+    };
+    Rml::Element* start = ctx->GetFocusElement();
+    bool focusOk = start && std::find(items.begin(), items.end(), start) != items.end();
+    if (!focusOk && !items.empty()) {  // nothing sensible focused: the first Up/Down press picks one, like in the app
+        nav.perform(ctx, doc, NavAction::Down);
+        start = ctx->GetFocusElement();
+        focusOk = start && std::find(items.begin(), items.end(), start) != items.end();
+    }
+    std::set<Rml::Element*> seen;
+    std::vector<Rml::Element*> todo;
+    if (start) { seen.insert(start); todo.push_back(start); }
+    while (!todo.empty()) {
+        Rml::Element* e = todo.back();
+        todo.pop_back();
+        for (NavAction a : {NavAction::Up, NavAction::Down, NavAction::Left, NavAction::Right}) {
+            e->Focus();
+            if (!nav.perform(ctx, doc, a)) continue;  // Left/Right on a value row belong to the app (they change the value)
+            Rml::Element* n = ctx->GetFocusElement();
+            if (n && n != e && !seen.count(n) && std::find(items.begin(), items.end(), n) != items.end()) { seen.insert(n); todo.push_back(n); }
+        }
+    }
+    std::string missing;
+    for (auto* e : items)
+        if (!seen.count(e)) missing += (missing.empty() ? "" : ", ") + key(e);
+    if (start) start->Focus();
+    std::fprintf(stderr, "AUDIT %s%s: %zu focusable, first focus %s, reached %zu%s%s\n", label.c_str(), modal ? " (message box)" : "", items.size(),
+                 focusOk ? "ok" : "MISSING", seen.size(), missing.empty() ? "" : ", UNREACHABLE: ", missing.c_str());
 }
 
 }  // namespace
@@ -283,6 +327,10 @@ int main(int argc, char** argv) {
                     wv.wheel.mouse_x = float(ww) * 0.5f;
                     wv.wheel.mouse_y = float(wh) * 0.55f;
                     SDL_PushEvent(&wv);
+                    nextScript = frame + 6;
+                    goto stepDone;
+                } else if (step.raw.rfind("audit", 0) == 0) {
+                    auditNav(ctx, doc, nav, step.raw.size() > 6 ? step.raw.substr(6) : "screen");  // "audit:<label>"
                     nextScript = frame + 6;
                     goto stepDone;
                 } else if (step.raw.rfind("report:", 0) == 0) {
