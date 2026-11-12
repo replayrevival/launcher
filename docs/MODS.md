@@ -21,9 +21,20 @@ The Mods tab manages the game's file-override mods (format: the game project's `
 - A mod id may only contain letters, digits, `.`, `-`, `_` (it becomes the folder name).
 - Installing and removing run off the UI thread; they are refused while the game runs (files may be open).
 
+## Patch mods (manifest api 2; the game project's `docs/formats/mod_patch.md`, patch format `step1`)
+A patch mod never contains game data: it ships binary patches that turn the player's own file into the modded file.
+- **Prepare.** For every enabled mod that fits the game, the launcher reads the player's game file (read-only), checks its SHA-256 against `base_sha256`, applies the patch in memory, checks the result's SHA-256 (and `size` if given) and only then writes `mods\<id>\_built\<target>` (through a `.part` file and a rename). Nothing is written to the game folder.
+- **When.** PLAY prepares what is missing or stale first (a "Preparing your mods" box), then starts the game. The Mods tab has a PREPARE PATCHES button for doing it by hand and shows `Patches: n of m prepared`.
+- **Cache.** `_built\state.json` records base, result and patch hashes, the result size and the original's size and modification time, so later starts do not hash the game files again.
+- **Failures** are shown per patch in plain language: base mismatch (both hashes, "made for a different version of the game"), result mismatch (output discarded), damaged or unsupported patch, missing target file, conflict. A failing mod builds nothing more, and PLAY offers PLAY ANYWAY (the game skips that mod). After a failure PLAY does not retry by itself in the same session; opening the Mods tab or PREPARE PATCHES re-arms it.
+- **Chaining.** Two mods may patch the same file only when the later one's `base_sha256` is the earlier one's result; otherwise the later one is reported as a conflict.
+- **Safety.** The decoder checks every size before it reads or writes, bounds the decompressed op stream, verifies the patch's CRC-32 and both hashes, and cannot touch memory outside its buffers. Tested with 60,000 randomly damaged patches (CRC fixed up): each was rejected or reproduced the exact expected hash; no crash. One file is held in memory at a time (limit 1.9 GB).
+- **Tool.** `step_patch_tool` (`cmake --build build --target step_patch_tool`): `make <original> <modified> <out.step> [--raw]`, `check`, `hash`, `fuzz`. A simple starter encoder (shared start and end as COPY, the middle as INSERT), not the planned size-optimised one.
+- **Game side, as of c304: not done.** The game's `last_report.txt` lists `_built\...` as new files of the mod instead of mapping them onto the target path, so a built file does not override the original yet. The launcher passes nothing extra; the game has to treat `_built\` as the mod's file tree (mod_patch.md, section 1, rule 2).
+
 ## Not done yet
-- **Patch-based mods** (apply a patch to a *copy* of the player's game files, verified by hash). The game project's `mod_manifest.md` (dated 2026-10-23) describes only file overrides; no patch format is documented yet. When the game session adds one, the launcher needs: a `patches` manifest section, a copy-on-write working folder under `<data>\patched_game\`, hash checks before and after, and `STE_GAME_PATH` pointing at that copy.
+- `bsdiff40` patches (they need bzip2).
 - Texture packs (`texturepacks\`, `STE_TEXPACKS_ENABLE`) have their own folder and are not part of this tab yet.
 
 ## Code
-`src/core/mods.{h,cpp}` (scan, order, status, install, remove; no UI), `src/ui/AppMods.cpp` (tab and actions), miniz for zip reading (`cmake/Deps.cmake`).
+`src/core/mods.{h,cpp}` (scan, order, status, install, remove), `src/core/mod_patch.{h,cpp}` (step1 decoder, prepare, cache), `src/ui/AppMods.cpp` (tab and actions), `src/tools/step_patch_tool.cpp`; miniz for zip reading and zlib (`cmake/Deps.cmake`). No UI in `core`.

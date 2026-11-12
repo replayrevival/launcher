@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -10,7 +10,15 @@
 // The game's own files are never touched; the game redirects reads to the mod folders.
 // No UI and no window code in here.
 
+// One entry of "patches" in an api 2 manifest (hashes are lower-case hex without the "sha256:" prefix).
+struct ModPatchEntry {
+    std::string target;       // game-relative path, '/' separated
+    std::string baseSha256, resultSha256, patchRel, patchSha256, format = "step1";
+    unsigned long long size = 0;  // expected size of the result, 0 = not given
+};
+
 struct ModInfo {
+    std::vector<ModPatchEntry> patches;
     std::string id, name, version, description, game, profile, license;
     std::vector<std::string> authors, gameHashes, dependencies, optionalDependencies, conflicts;
     int priority = 100;
@@ -40,7 +48,8 @@ struct ModInstallResult {
 
 class ModStore {
 public:
-    static constexpr int kApi = 1;
+    static constexpr int kApi = 1;             // api written to order.json
+    static constexpr int kMaxManifestApi = 2;  // newest manifest api understood (2 = patch mods, see mod_patch.h)
 
     void setRoot(const std::filesystem::path& root) { root_ = root; }
     const std::filesystem::path& root() const { return root_; }

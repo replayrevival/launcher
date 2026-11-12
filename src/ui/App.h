@@ -6,7 +6,9 @@
 #include <filesystem>
 #include <functional>
 #include <future>
+#include <map>
 #include <memory>
+#include <set>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -17,6 +19,7 @@
 #include "core/identify.h"
 #include "core/input_map.h"
 #include "core/launcher_model.h"
+#include "core/mod_patch.h"
 #include "core/mods.h"
 #include "core/settings.h"
 #include "core/state.h"
@@ -146,6 +149,12 @@ private:
     bool modsAct(const std::string& action, const std::string& arg);  // true when the action was a mods action
     void startModInstall(const std::filesystem::path& src, bool replace);
     void pollModInstall();
+    // patch mods (mod_patch.md): states shown in the tab, and the "prepare" run that builds <mod>\_built before the game starts
+    void refreshPatchStates();
+    bool patchesNeedPrepare() const;
+    void startPatchPrepare(bool thenPlay, bool original, bool borderless);
+    void pollPatchPrepare();
+    void reloadMods() { mods_.setRoot(modsRoot()); mods_.reload(); patchFailed_.clear(); refreshPatchStates(); }
     std::filesystem::path modsRoot() const { return model_.modsRoot(); }
     static void SDLCALL modDialogDone(void* ud, const char* const* list, int filter);
 
@@ -242,6 +251,12 @@ private:
     std::future<ModInstallResult> modInstall_;
     bool modBusy_ = false;
     std::string modBusyName_, modsNote_;
+    std::map<std::string, std::vector<ModPatchReport>> patchReports_;  // mod id -> state of each of its patches
+    std::future<PatchRunResult> patchRun_;
+    std::atomic<bool> patchCancel_{false};
+    bool patchBusy_ = false, patchThenPlay_ = false, patchOrig_ = false, patchBorderless_ = false;
+    std::set<std::string> patchFailed_;  // mods whose patches failed this session: PLAY does not try again (the Mods tab or PREPARE PATCHES does)
+    bool skipPrepare_ = false;          // the next play() does not prepare again (it just did)
     std::filesystem::path modPending_;   // source waiting for the "replace it?" answer
 
     // modal message

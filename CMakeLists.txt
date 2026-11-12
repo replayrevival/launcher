@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.25)
 project(recomp_launcher LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -32,6 +32,7 @@ add_library(launcher_ui STATIC
     src/core/state.cpp
     src/core/input_map.cpp
     src/core/mods.cpp
+    src/core/mod_patch.cpp
     src/core/launcher_model.cpp
     src/core/display_modes.cpp
     src/platform/Displays.cpp
@@ -85,6 +86,9 @@ add_executable(xiso_unpack_tool EXCLUDE_FROM_ALL
 target_compile_definitions(xiso_unpack_tool PRIVATE UNICODE _UNICODE)
 target_include_directories(xiso_unpack_tool PRIVATE src)
 
-
-
-
+# Patch-mod helper (make / check step1 patches, print SHA-256). Not part of the default build.
+add_executable(step_patch_tool EXCLUDE_FROM_ALL src/tools/step_patch_tool.cpp)
+target_link_libraries(step_patch_tool PRIVATE launcher_ui)
+if(MSVC)
+    target_compile_options(step_patch_tool PRIVATE /utf-8)
+endif()

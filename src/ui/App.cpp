@@ -47,6 +47,8 @@ std::string gbText(uint64_t bytes) {
 
 App::~App() {
     nav_.capture = nullptr;
+    patchCancel_ = true;
+    if (patchRun_.valid()) patchRun_.wait();
     search_.cancel();
     if (unpackThread_.joinable()) { prog_.cancel = true; unpackThread_.join(); }
     if (killOnExit_) game_.terminate();
@@ -271,7 +273,7 @@ void App::onDrop(const std::string& utf8Path) {
     if (screen_ == Screen::Main && !modsRoot().empty() && !profile_.modsDirEnv.empty() && ModStore::looksLikeMod(pathFromUtf8(utf8Path))) {
         tab_ = Tab::Mods;  // a mod, not a game: install it
         mods_.setRoot(modsRoot());
-        mods_.reload();
+        reloadMods();
         startModInstall(pathFromUtf8(utf8Path), false);
         return;
     }
@@ -314,7 +316,7 @@ void App::takeDialogResult() {
 
 void App::setTab(Tab t) {
     tab_ = t;
-    if (t == Tab::Mods) { mods_.setRoot(modsRoot()); mods_.reload(); }  // folders may have changed by hand
+    if (t == Tab::Mods) reloadMods();  // folders may have changed by hand
     render();
 }
 
@@ -503,6 +505,8 @@ void App::play(bool original, bool borderless) {
         return;
     }
     if (!saveSettings()) return;
+    if (!skipPrepare_ && !patchBusy_ && patchesNeedPrepare()) { startPatchPrepare(true, original, borderless); return; }
+    skipPrepare_ = false;
 
     LaunchSpec spec;
     spec.exe = exePath();
@@ -577,6 +581,7 @@ void App::update() {
     takeDialogResult();
     pollUnpack();
     pollModInstall();
+    pollPatchPrepare();
 
     if (!listenAction_.empty()) {
         if (!captured_.empty() || listenCancelled_ || SDL_GetTicks() - listenSince_ > 6000) {

@@ -9,6 +9,11 @@ MODS (new tab)
 - Safety: a zip with unsafe file paths, a password or a damaged file is refused with a plain message, nothing is
   half-installed. Removing a mod moves it to data\mods\_removed\, so you can get it back.
 
+- Patch mods: a mod can ship small patches instead of game files. The launcher checks your own game file against the
+  patch, builds the changed file into the mod's own folder (your game files stay untouched) and tells you in plain
+  words if a mod was made for a different version. PLAY prepares them first; there is also a PREPARE PATCHES button.
+  (The game build must support loading the built files; see the game's own release notes.)
+
 CONTROLLERS
 - New "Button prompts" setting: Auto (match my controller), Xbox, Original Xbox (Black and White buttons) or
   PlayStation. The launcher's own button hints and the button names on the remap screen follow it. The choice is

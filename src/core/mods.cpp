@@ -1,4 +1,4 @@
-#include "core/mods.h"
+﻿#include "core/mods.h"
 
 #include <algorithm>
 #include <cctype>
@@ -33,6 +33,14 @@ std::string lower(std::string s) {
     return s;
 }
 
+// sha256:ABC... or ABC... -> lower-case hex; anything that is not 64 hex digits gives an empty string.
+std::string hexOf(std::string s) {
+    if (s.rfind("sha256:", 0) == 0) s.erase(0, 7);
+    for (auto& c : s) c = char(std::tolower((unsigned char)c));
+    if (s.size() != 64 || s.find_first_not_of("0123456789abcdef") != std::string::npos) return {};
+    return s;
+}
+
 bool validId(const std::string& id) {
     if (id.empty() || id.size() > 80 || id[0] == '.' || id[0] == '_') return false;
     for (unsigned char c : id)
@@ -53,6 +61,20 @@ std::vector<std::string> strList(const json& j, const char* key) {
         for (auto& v : j[key])
             if (v.is_string()) out.push_back(v.get<std::string>());
     return out;
+}
+
+// A relative path inside a mod: no "..", no drive or absolute part, no empty parts.
+bool safeRel(const std::string& rel) {
+    if (rel.empty() || rel[0] == '/' || rel.find(':') != std::string::npos || rel.find('\0') != std::string::npos) return false;
+    size_t pos = 0;
+    while (pos <= rel.size()) {
+        size_t sl = rel.find('/', pos);
+        if (sl == std::string::npos) sl = rel.size();
+        const std::string part = rel.substr(pos, sl - pos);
+        if (part.empty() || part == "." || part == "..") return false;
+        pos = sl + 1;
+    }
+    return true;
 }
 
 bool parseManifest(const std::string& text, ModInfo& m, std::string& err) {
@@ -77,6 +99,28 @@ bool parseManifest(const std::string& text, ModInfo& m, std::string& err) {
         if (j.contains("priority") && j["priority"].is_number()) m.priority = j["priority"].get<int>();
         if (j.contains("api") && j["api"].is_number()) m.api = j["api"].get<int>();
         if (j.contains("enabled") && j["enabled"].is_boolean()) m.enabledByManifest = j["enabled"].get<bool>();
+        if (j.contains("patches")) {
+            if (!j["patches"].is_array()) { err = "\"patches\" in manifest.json must be a list."; return false; }
+            for (auto& p : j["patches"]) {
+                ModPatchEntry e;
+                auto ps = [&](const char* k) { return p.is_object() && p.contains(k) && p[k].is_string() ? p[k].get<std::string>() : std::string(); };
+                e.target = ps("target");
+                e.patchRel = ps("patch");
+                e.baseSha256 = hexOf(ps("base_sha256"));
+                e.resultSha256 = hexOf(ps("result_sha256"));
+                e.patchSha256 = hexOf(ps("patch_sha256"));
+                if (!ps("format").empty()) e.format = ps("format");
+                if (p.is_object() && p.contains("size") && p["size"].is_number_unsigned()) e.size = p["size"].get<unsigned long long>();
+                std::replace(e.target.begin(), e.target.end(), '\\', '/');
+                std::replace(e.patchRel.begin(), e.patchRel.end(), '\\', '/');
+                if (e.target.empty() || e.patchRel.empty() || e.baseSha256.size() != 64 || e.resultSha256.size() != 64) {
+                    err = "A patch entry in manifest.json needs \"target\", \"patch\", \"base_sha256\" and \"result_sha256\".";
+                    return false;
+                }
+                if (!safeRel(e.target) || !safeRel(e.patchRel)) { err = "A patch entry in manifest.json has an unsafe file path."; return false; }
+                m.patches.push_back(std::move(e));
+            }
+        }
         return true;
     } catch (const std::exception& e) {
         err = std::string("manifest.json could not be read: ") + e.what();
@@ -90,20 +134,6 @@ std::string readText(const fs::path& p, bool& ok) {
     std::ostringstream s;
     s << f.rdbuf();
     return s.str();
-}
-
-// A relative path inside a mod: no "..", no drive or absolute part, no empty parts.
-bool safeRel(const std::string& rel) {
-    if (rel.empty() || rel[0] == '/' || rel.find(':') != std::string::npos || rel.find('\0') != std::string::npos) return false;
-    size_t pos = 0;
-    while (pos <= rel.size()) {
-        size_t sl = rel.find('/', pos);
-        if (sl == std::string::npos) sl = rel.size();
-        const std::string part = rel.substr(pos, sl - pos);
-        if (part.empty() || part == "." || part == "..") return false;
-        pos = sl + 1;
-    }
-    return true;
 }
 
 fs::path manifestIn(const fs::path& folder) {
@@ -299,7 +329,7 @@ bool ModStore::save(std::string& err) const {
 ModStatus ModStore::status(const ModInfo& m, const std::string& xbe, const std::string& expectedGame) const {
     ModStatus s;
     if (!m.problem.empty()) { s.fit = ModFit::BadManifest; s.text = m.problem; return s; }
-    if (m.api > kApi) { s.fit = ModFit::NewerApi; s.text = "Made for a newer mod format. Update the launcher."; return s; }
+    if (m.api > kMaxManifestApi) { s.fit = ModFit::NewerApi; s.text = "Made for a newer mod format. Update the launcher."; return s; }
     if (!m.game.empty() && !expectedGame.empty() && lower(m.game) != lower(expectedGame)) {
         s.fit = ModFit::WrongGame;
         s.text = "Made for a different game (" + m.game + ").";
