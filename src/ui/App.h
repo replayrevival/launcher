@@ -27,6 +27,7 @@
 #include "platform/DriveSearch.h"
 #include "platform/GameProcess.h"
 #include "ui/Navigation.h"
+#include "ui/views/rows.h"
 
 struct SDL_Window;
 
@@ -115,8 +116,9 @@ private:
 
     // video tab: monitors, resolution, option rows
     static std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on,
-                               bool chevrons);
-    std::string renderSpecialRow(const SettingRow& row);
+                               bool chevrons) {
+        return views::rowHtml(id, label, hint, val, on, chevrons);
+    }
     void refreshDisplays();
     const DisplayInfo& curDisplay() const { return model_.curDisplay(); }
     std::vector<ResOption> resOptions() const { return model_.resOptions(); }
@@ -163,7 +165,7 @@ private:
     std::filesystem::path settingsDir() const { return model_.settingsDir(); }
     std::string focusKey() const;
     void restoreFocus(const std::string& key);
-    static std::string esc(const std::string& s) { return Rml::StringUtilities::EncodeRml(s); }
+    static std::string esc(const std::string& s) { return views::esc(s); }
     static std::string shortPath(const std::string& p, size_t maxLen = 64);
     IdExpect expect() const { return {profile_.xbeSha256, profile_.titleHint}; }
 

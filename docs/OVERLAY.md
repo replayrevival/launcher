@@ -98,6 +98,10 @@ row change -> Overlay writes the key to the ini (same writer as the launcher, at
 - Rows are generated as RML strings (`rowHtml`, `renderRows`) from `config/settings.json`; the overlay can reuse them.
 - `config/controls.json`, `settings.json`, `profile.json` hold everything game-specific.
 
+## Refactor progress (2026-11-12)
+- Done: step 1 (`LauncherModel`, `src/core/launcher_model.*`: profile, settings, saved game, monitors and resolutions, input map, mods, `stepSetting()`; `App` is a view of it), step 2 for the settings pages (`src/ui/views/rows.*`: `views::settingsRows(model, page)` and `views::rowHtml`, no SDL and no window), step 4 (CMake target `launcher_ui` = everything except `main.cpp` and the GL backend; the executable links it).
+- Not done: the Controllers page (port list, remapping and capture still live in `App*` because they use SDL joystick handling), the Mods page, the overlay document and the `Overlay` class (step 3), the host API (step 4 header), `UiBackendD3D11` and the test host (steps 5-6). The row actions (`cycle`, `step`) are still dispatched by `App`; the overlay needs a small shared dispatcher that calls `LauncherModel::stepSetting()`.
+
 ## Refactor steps (in this order, each step keeps the launcher working)
 1. **Split `App`** into a window-free `LauncherModel` (settings, state, input map, mods, displays, game-process facts) and views. `App` today mixes both in `src/ui/App*.cpp`.
 2. **Move the row/page renderers** (`rowHtml`, `renderRows`, the controllers page, the video special rows) into `ui/views/` taking `LauncherModel&` and returning RML.

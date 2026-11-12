@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include "platform/ExeVersion.h"
+#include "ui/views/rows.h"
 
 namespace fs = std::filesystem;
 
@@ -943,21 +944,4 @@ std::string App::renderOverview() {
     return h;
 }
 
-std::string App::renderRows(const std::string& page) {
-    std::string h;
-    for (auto& row : settings_.page(page)) {
-        if (!row.group.empty()) { h += "<div class=\"section-label grouphead\">" + esc(row.group) + "</div>"; continue; }
-        if (!row.special.empty()) { h += renderSpecialRow(row); continue; }
-        const int ci = settings_.currentChoice(row);
-        const std::string val = ci >= 0 ? row.choices[ci].label : "Custom";
-        std::string hint = row.hint;
-        if (row.id == "aspect") {
-            const DisplayInfo& d = curDisplay();
-            const std::string a = aspectName(d.desktop.w, d.desktop.h);
-            hint += ". Your screen is " + (a.empty() ? std::to_string(d.desktop.w) + " \xC3\x97 " + std::to_string(d.desktop.h) : a);
-        }
-        if (row.id == "vsync" && !vsyncFixPresent()) hint += "\n!If the game doesn\xE2\x80\x99t start, set Variable refresh to Off.";
-        h += rowHtml(row.id, row.label, hint, row.toggle ? (ci == 1 ? "ON" : "OFF") : val, row.toggle && ci == 1, !row.toggle);
-    }
-    return h;
-}
+std::string App::renderRows(const std::string& page) { return views::settingsRows(model_, page); }
