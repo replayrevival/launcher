@@ -33,6 +33,7 @@ VIDEO SETTINGS
   - If the game stops, the launcher tells you what happened and offers "Try again with
     original settings" (your saved settings are not changed), "Try borderless instead",
     the log folder, and a Copy details button for bug reports.
+    After a crash it can also save a crash report zip to your desktop for you to send.
 
 MODS
   - The Mods tab installs a mod from a .zip or a folder (or drag it onto the launcher window),

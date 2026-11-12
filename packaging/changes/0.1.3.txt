@@ -20,6 +20,23 @@ CONTROLLERS
   saved in the game's settings and passed to the game when it starts; it takes effect in the game as soon as the
   game build supports it.
 
+BUTTON PICTURES
+- The hint bar and the remap screen show real button pictures that follow "Button prompts": Xbox, Original Xbox
+  (coloured A/B/X/Y, round Black and White buttons) or PlayStation; Auto follows the connected controller.
+  Switch and other pads, and the keyboard, still show text key caps. Pictures: Kenney "Input Prompts" (CC0).
+
+WHEN SOMETHING GOES WRONG
+- Plainer messages when your game is missing, is another game or another version, cannot be read, or the game
+  stops (what happened and what to do next).
+- After a crash that left a crash dump, "Save crash report" puts a zip on your desktop (crash dump, the game's
+  log, your ini files; your user name and folders are removed from the text files). You send it yourself; the
+  launcher sends nothing.
+
+UPDATES
+- Once a day the launcher can look up the newest release number on GitHub and say "A new version is available" with
+  a button that opens the download page. Nothing is downloaded. It stays quiet offline, and there is an ON/OFF row
+  on the Overview tab. See docs\NETWORK.md in the source release.
+
 PACKAGE
 - The download no longer contains the unused variable Pixelify Sans font file; every shipped font is credited
   in CREDITS.md. The Visual C++ runtime DLLs now come from the same Visual Studio version that built the launcher.
