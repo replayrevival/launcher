@@ -1,0 +1,52 @@
+﻿{
+  "brand": "Replay Revival",
+  "game": {
+    "id": "ste-xbox",
+    "title": "Godzilla: Save the Earth",
+    "exe": "ste-recomp.exe",
+    "identify": {
+      "kind": "xbe",
+      "xbe_name": "default.xbe",
+      "title_hint": "Save the Earth",
+      "sha256": [
+        "6966cc8a3a22d420d05362f24f3e68d7a462c481861189855f05583c0d6de500"
+      ]
+    },
+    "accept": [
+      "iso",
+      "xiso",
+      "folder"
+    ]
+  },
+  "launch": {
+    "game_path_env": "STE_GAME_PATH",
+    "button_prompts_env": "STE_BUTTON_PROMPTS",
+    "mods_dir_env": "STE_MODS_DIR",
+    "mod_game_id": "STE-Xbox",
+    "ini_env": {
+      "video": "STE_VIDEO_INI",
+      "enhance": "STE_ENHANCE_INI"
+    },
+    "input_map": {
+      "env": "STE_INPUT_MAP",
+      "supported": true,
+      "file": "input_mapping.json"
+    },
+    "env": {
+      "RECOMP_AC97_READY": "1",
+      "RECOMP_VBLANK": "1",
+      "RECOMP_KERNEL_LOG_BUDGET": "0",
+      "STE_SHOT_SEC": "0",
+      "STE_PB_LOG_EVERY": "3000"
+    },
+    "_note": "Derived from play.bat / play_max.bat (docs/INTERFACE_ASSUMPTIONS.md). The exe name is a placeholder until the game session fixes one; LAUNCHER_GAME_EXE overrides it for development."
+  },
+  "compat": {
+    "_note": "vsync_vrr_fix_build: first game build number (the N in 0.1.0+cN) that fixes the V-Sync / variable-refresh start-up problem. 0 = no such build known yet: the V-Sync row then shows the workaround.",
+    "vsync_vrr_fix_build": 257
+  },
+  "files": {
+    "mods_dir": "mods"
+  },
+  "portable_marker": "portable.txt"
+}

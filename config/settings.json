@@ -1,0 +1,178 @@
+{
+  "_comment": "Game-specific settings schema. Derived from ste_video.ini.sample / ste_enhance.ini.sample and the Max/Low ini files (docs/INTERFACE_ASSUMPTIONS.md). Key ids are '<file>.<key>'; 'd' = the game's default when the key is absent (null = no default).",
+  "keys": {
+    "video.width": {"s": "video", "k": "width", "d": null},
+    "video.height": {"s": "video", "k": "height", "d": null},
+    "video.mode": {"s": "video", "k": "mode", "d": "window"},
+    "video.aspect": {"s": "video", "k": "aspect", "d": "4:3-pillar"},
+    "video.menu_aspect": {"s": "video", "k": "menu_aspect", "d": "pillar"},
+    "video.display": {"s": "video", "k": "display", "d": null},
+    "video.fps_cap": {"s": "video", "k": "fps_cap", "d": "60"},
+    "video.vsync": {"s": "video", "k": "vsync", "d": "off"},
+    "video.vrr": {"s": "video", "k": "vrr", "d": "auto"},
+    "video.render_ahead": {"s": "video", "k": "render_ahead", "d": "1"},
+    "video.render_scale": {"s": "video", "k": "render_scale", "d": null},
+    "video.upscale": {"s": "video", "k": "upscale", "d": null},
+    "video.fsr_sharpness": {"s": "video", "k": "fsr_sharpness", "d": "0.25"},
+    "video.draw_distance": {"s": "video", "k": "draw_distance", "d": "1"},
+    "video.fog_scale": {"s": "video", "k": "fog_scale", "d": "1"},
+    "video.fov_scale": {"s": "video", "k": "fov_scale", "d": "1"},
+    "video.fov_min_zoom": {"s": "video", "k": "fov_min_zoom", "d": "0"},
+    "video.cull_margin": {"s": "video", "k": "cull_margin", "d": "1"},
+    "video.render_threads": {"s": "video", "k": "render_threads", "d": "0"},
+    "video.anisotropy": {"s": "video", "k": "anisotropy", "d": "0"},
+    "video.mip_bias": {"s": "video", "k": "mip_bias", "d": "0"},
+    "enhance.unlock_all_monsters": {"s": "enhance", "k": "unlock_all_monsters", "d": "0"},
+    "enhance.unlock_all_cities": {"s": "enhance", "k": "unlock_all_cities", "d": "0"},
+    "enhance.unlock_all_challenges": {"s": "enhance", "k": "unlock_all_challenges", "d": "0"},
+    "enhance.unlock_gallery": {"s": "enhance", "k": "unlock_gallery", "d": "0"},
+    "enhance.unlock_final_wars": {"s": "enhance", "k": "unlock_final_wars", "d": "0"},
+    "enhance.unlock_biollante": {"s": "enhance", "k": "unlock_biollante", "d": "0"},
+    "enhance.cheat_invulnerable_p1": {"s": "enhance", "k": "cheat_invulnerable_p1", "d": "0"},
+    "enhance.cheat_invulnerable_com": {"s": "enhance", "k": "cheat_invulnerable_com", "d": "0"},
+    "enhance.cheat_super_damage_com": {"s": "enhance", "k": "cheat_super_damage_com", "d": "0"},
+    "enhance.cheat_red_p1": {"s": "enhance", "k": "cheat_red_p1", "d": "0"},
+    "enhance.cheat_red_com": {"s": "enhance", "k": "cheat_red_com", "d": "0"},
+    "enhance.stem_no_juggle_limit": {"s": "enhance", "k": "stem_no_juggle_limit", "d": "0"},
+    "enhance.stem_no_knockback_scaling": {"s": "enhance", "k": "stem_no_knockback_scaling", "d": "0"},
+    "enhance.stem_no_min_health": {"s": "enhance", "k": "stem_no_min_health", "d": "0"},
+    "enhance.stem_no_results_dim": {"s": "enhance", "k": "stem_no_results_dim", "d": "0"},
+    "enhance.stem_more_ai_vehicles": {"s": "enhance", "k": "stem_more_ai_vehicles", "d": "0"},
+    "enhance.stem_weapon_vertical_knockback": {"s": "enhance", "k": "stem_weapon_vertical_knockback", "d": "0"},
+    "enhance.stem_rule_player_size": {"s": "enhance", "k": "stem_rule_player_size", "d": "0"},
+    "enhance.stem_footstep_camera_shake": {"s": "enhance", "k": "stem_footstep_camera_shake", "d": "0"},
+    "enhance.stem_rule_rage_meter": {"s": "enhance", "k": "stem_rule_rage_meter", "d": "0"},
+    "enhance.stem_rule_empty_arena": {"s": "enhance", "k": "stem_rule_empty_arena", "d": "0"},
+    "enhance.button_prompts": {"s": "input", "k": "button_prompts", "d": "auto"},
+    "enhance.seed_from_game_dir": {"s": "saves", "k": "seed_from_game_dir", "d": "0"}
+  },
+
+  "ignore_for_preset": ["video.width", "video.height", "video.mode", "video.display", "enhance.button_prompts"],
+  "forced": {"video.menu_aspect": "pillar"},
+  "migrate": {"video.aspect": {"stretch": "wide"}},
+
+  "presets": [
+    {"id": "original", "name": "ORIGINAL",
+     "description": "Exactly how it looked on the console: original aspect, original draw distance, nothing extra.",
+     "values": {"video.vsync": "on"}},
+    {"id": "max", "name": "MAX",
+     "description": "Widescreen, full resolution, unlimited draw distance, 16x filtering, and everything unlocked.",
+     "values": {
+       "video.aspect": "wide", "video.fps_cap": "60", "video.vsync": "on", "video.render_ahead": "1",
+       "video.draw_distance": "unlimited", "video.fog_scale": "4", "video.fov_scale": "1", "video.fov_min_zoom": "0.7854",
+       "video.cull_margin": "1", "video.anisotropy": "16", "video.mip_bias": "0",
+       "enhance.unlock_all_monsters": "1", "enhance.unlock_all_cities": "1", "enhance.unlock_all_challenges": "1"}},
+    {"id": "low", "name": "LOW-END",
+     "description": "1080p output rendered at 720p and sharpened with FSR 1.0, for older PCs and handhelds.",
+     "values": {
+       "video.aspect": "wide", "video.fps_cap": "60", "video.vsync": "on",
+       "video.render_ahead": "1", "video.render_scale": "0.667", "video.upscale": "fsr1", "video.fsr_sharpness": "0.25",
+       "video.draw_distance": "2", "video.fog_scale": "1", "video.fov_scale": "1", "video.cull_margin": "1",
+       "video.anisotropy": "0", "video.mip_bias": "0", "video.render_threads": "2"}}
+  ],
+
+  "env_by_preset": {
+    "max": {"STE_KELVIN_CULL": "2"},
+    "low": {"STE_KELVIN_CULL": "2", "STE_TEXPACKS": "0"}
+  },
+
+  "pages": {
+    "controls": [
+      {"id": "prompts", "label": "Button prompts", "hint": "Which button names the game and this launcher show.",
+       "choices": [
+         {"label": "Auto (match my controller)", "set": {"enhance.button_prompts": "auto"}},
+         {"label": "Xbox", "set": {"enhance.button_prompts": "xbox"}},
+         {"label": "Original Xbox (Black and White)", "set": {"enhance.button_prompts": "xbox_original"}},
+         {"label": "PlayStation", "set": {"enhance.button_prompts": "playstation"}}]}
+    ],
+    "video": [
+      {"id": "display", "type": "display", "label": "Display", "hint": "Which monitor the game opens on"},
+      {"id": "res", "type": "resolution", "label": "Resolution", "hint": "Native is your screen's own resolution"},
+      {"id": "mode", "label": "Window", "hint": "Borderless works best with variable refresh rate",
+       "choices": [
+         {"label": "Window", "set": {"video.mode": "window"}},
+         {"label": "Borderless", "set": {"video.mode": "borderless"}},
+         {"label": "Fullscreen", "set": {"video.mode": "fullscreen"}}]},
+      {"id": "aspect", "label": "Gameplay view", "hint": "Fit my screen shows more of the world. Menus always keep their original 4:3 shape",
+       "choices": [
+         {"label": "Original (4:3)", "set": {"video.aspect": "4:3-pillar"}},
+         {"label": "Fit my screen", "set": {"video.aspect": "wide"}}]},
+      {"id": "scale", "label": "Render scale", "hint": "Lower is faster, upscaled with FSR 1.0",
+       "choices": [
+         {"label": "100%", "set": {"video.render_scale": null, "video.upscale": null}},
+         {"label": "85%", "set": {"video.render_scale": "0.85", "video.upscale": "fsr1"}},
+         {"label": "75%", "set": {"video.render_scale": "0.75", "video.upscale": "fsr1"}},
+         {"label": "67%", "set": {"video.render_scale": "0.667", "video.upscale": "fsr1"}},
+         {"label": "50%", "set": {"video.render_scale": "0.5", "video.upscale": "fsr1"}}]},
+      {"id": "fps", "label": "Frame rate", "hint": "The game keeps its original speed at any setting",
+       "choices": [
+         {"label": "60", "set": {"video.fps_cap": "60"}},
+         {"label": "30", "set": {"video.fps_cap": "30"}},
+         {"label": "Uncapped", "set": {"video.fps_cap": "0"}}]},
+      {"id": "vsync", "type": "toggle", "label": "V-Sync", "hint": "On = no tearing (recommended). Off = lowest latency, may tear.",
+       "on": {"video.vsync": "on"}},
+      {"id": "vrr", "label": "Variable refresh rate", "hint": "Needs FreeSync/G-Sync enabled on your monitor and graphics driver.",
+       "choices": [
+         {"label": "Auto", "set": {"video.vrr": "auto"}},
+         {"label": "Off", "set": {"video.vrr": "off"}}]},
+      {"id": "draw", "label": "Draw distance", "hint": "Stops distant objects from vanishing",
+       "choices": [
+         {"label": "Original", "set": {"video.draw_distance": "1"}},
+         {"label": "2x", "set": {"video.draw_distance": "2"}},
+         {"label": "4x", "set": {"video.draw_distance": "4"}},
+         {"label": "Unlimited", "set": {"video.draw_distance": "unlimited"}}]},
+      {"id": "fov", "label": "Field of view", "hint": "Wider shows more of the arena",
+       "choices": [
+         {"label": "Original", "set": {"video.fov_scale": "1"}},
+         {"label": "Wider", "set": {"video.fov_scale": "1.1"}},
+         {"label": "Widest", "set": {"video.fov_scale": "1.2"}}]},
+      {"id": "aniso", "label": "Texture filtering", "hint": "Sharper surfaces at an angle",
+       "choices": [
+         {"label": "Off", "set": {"video.anisotropy": "0"}},
+         {"label": "2x", "set": {"video.anisotropy": "2"}},
+         {"label": "4x", "set": {"video.anisotropy": "4"}},
+         {"label": "8x", "set": {"video.anisotropy": "8"}},
+         {"label": "16x", "set": {"video.anisotropy": "16"}}]}
+    ],
+    "enhance": [
+      {"group": "UNLOCKS"},
+      {"id": "u_mon", "type": "toggle", "label": "Unlock all monsters", "hint": "The full 18-monster Versus grid. Not written to your save.", "on": {"enhance.unlock_all_monsters": "1"}},
+      {"id": "u_city", "type": "toggle", "label": "Unlock all cities", "hint": "Changes the city order. Not written to your save.", "on": {"enhance.unlock_all_cities": "1"}},
+      {"id": "u_chal", "type": "toggle", "label": "Unlock all challenges", "hint": "Not written to your save.", "on": {"enhance.unlock_all_challenges": "1"}},
+      {"id": "u_gal", "type": "toggle", "label": "Unlock the gallery", "hint": "All Gallery items.", "on": {"enhance.unlock_gallery": "1"}},
+      {"id": "u_fw", "type": "toggle", "label": "Unlock Final Wars items", "hint": "All Final Wars gallery items.", "on": {"enhance.unlock_final_wars": "1"}},
+      {"id": "u_bio", "type": "toggle", "label": "Unlock Biollante", "hint": "Needs the Biollante slot mod.", "on": {"enhance.unlock_biollante": "1"}},
+      {"group": "GAMEPLAY RULES"},
+      {"id": "size", "label": "Monster size", "hint": "Camera and hit boxes follow the size.",
+       "choices": [
+         {"label": "Original", "set": {"enhance.stem_rule_player_size": "0"}},
+         {"label": "150%", "set": {"enhance.stem_rule_player_size": "150"}},
+         {"label": "200%", "set": {"enhance.stem_rule_player_size": "200"}},
+         {"label": "300%", "set": {"enhance.stem_rule_player_size": "300"}}]},
+      {"id": "shake", "type": "toggle", "label": "Footstep camera shake", "hint": "Big monsters shake the screen.", "on": {"enhance.stem_footstep_camera_shake": "1"}},
+      {"id": "rage", "label": "Rage meter", "hint": "How the rage meter fills.",
+       "choices": [
+         {"label": "Original", "set": {"enhance.stem_rule_rage_meter": "0"}},
+         {"label": "Damage taken", "set": {"enhance.stem_rule_rage_meter": "1"}},
+         {"label": "Damage dealt", "set": {"enhance.stem_rule_rage_meter": "2"}},
+         {"label": "Both", "set": {"enhance.stem_rule_rage_meter": "3"}},
+         {"label": "Over time", "set": {"enhance.stem_rule_rage_meter": "4"}},
+         {"label": "All", "set": {"enhance.stem_rule_rage_meter": "5"}}]},
+      {"id": "veh", "type": "toggle", "label": "More traffic", "hint": "Vehicles fill the city from the start.", "on": {"enhance.stem_more_ai_vehicles": "1"}},
+      {"id": "jug", "type": "toggle", "label": "No juggle limit", "hint": "Air combos are not capped.", "on": {"enhance.stem_no_juggle_limit": "1"}},
+      {"id": "knock", "type": "toggle", "label": "No knockback scaling", "hint": "", "on": {"enhance.stem_no_knockback_scaling": "1"}},
+      {"id": "minhp", "type": "toggle", "label": "No minimum health", "hint": "", "on": {"enhance.stem_no_min_health": "1"}},
+      {"id": "wvk", "type": "toggle", "label": "Weapon-independent vertical knockback", "hint": "", "on": {"enhance.stem_weapon_vertical_knockback": "1"}},
+      {"id": "dim", "type": "toggle", "label": "No results-screen dimming", "hint": "", "on": {"enhance.stem_no_results_dim": "1"}},
+      {"id": "empty", "type": "toggle", "label": "Empty arena", "hint": "Flat ground, no buildings.", "on": {"enhance.stem_rule_empty_arena": "1"}},
+      {"group": "CHEATS"},
+      {"id": "inv1", "type": "toggle", "label": "Player 1 invulnerable", "hint": "Checked against the real game.", "on": {"enhance.cheat_invulnerable_p1": "1"}},
+      {"id": "invc", "type": "toggle", "label": "Computer player invulnerable", "hint": "", "on": {"enhance.cheat_invulnerable_com": "1"}},
+      {"id": "sdmg", "type": "toggle", "label": "Computer player super damage", "hint": "", "on": {"enhance.cheat_super_damage_com": "1"}},
+      {"id": "red1", "type": "toggle", "label": "Player 1 red", "hint": "", "on": {"enhance.cheat_red_p1": "1"}},
+      {"id": "redc", "type": "toggle", "label": "Computer player red", "hint": "", "on": {"enhance.cheat_red_com": "1"}},
+      {"group": "SAVES"},
+      {"id": "seed", "type": "toggle", "label": "Start with the game folder's saves", "hint": "Off starts empty, like a new console.", "on": {"enhance.seed_from_game_dir": "1"}}
+    ]
+  }
+}

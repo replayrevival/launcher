@@ -1,0 +1,8 @@
+﻿build/
+.deps/
+*.user
+*.obj
+*.pdb
+*.ilk
+/data/
+/release-out/

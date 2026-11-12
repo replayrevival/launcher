@@ -1,0 +1,25 @@
+{
+  "_note": "The game's logical controls (original Xbox pad). 'default' is an SDL gamepad source name (SDL_GetGamepadStringForButton / Axis). kind: button = any button or trigger, trigger = analog trigger (a button works as a full press), stick = leftstick|rightstick. 'key_default' is the keyboard default (SDL key name, from the game's docs/KEYBOARD.md; sticks are listed as text only).",
+  "ports": 4,
+  "deadzone": {"default": 0.15, "min": 0.0, "max": 0.5, "step": 0.05},
+  "actions": [
+    {"id": "a",             "label": "A",              "kind": "button",  "default": "a",             "key_default": "Z"},
+    {"id": "b",             "label": "B",              "kind": "button",  "default": "b",             "key_default": "X"},
+    {"id": "x",             "label": "X",              "kind": "button",  "default": "x",             "key_default": "C"},
+    {"id": "y",             "label": "Y",              "kind": "button",  "default": "y",             "key_default": "V"},
+    {"id": "black",         "label": "Black",          "kind": "button",  "default": "leftshoulder",  "key_default": "E"},
+    {"id": "white",         "label": "White",          "kind": "button",  "default": "rightshoulder", "key_default": "Q"},
+    {"id": "left_trigger",  "label": "Left trigger",   "kind": "trigger", "default": "lefttrigger",   "key_default": "1"},
+    {"id": "right_trigger", "label": "Right trigger",  "kind": "trigger", "default": "righttrigger",  "key_default": "3"},
+    {"id": "start",         "label": "Start",          "kind": "button",  "default": "start",         "key_default": "Return"},
+    {"id": "back",          "label": "Back",           "kind": "button",  "default": "back",          "key_default": "Backspace"},
+    {"id": "left_thumb",    "label": "Left stick click",  "kind": "button", "default": "leftstick",   "key_default": "Left Shift"},
+    {"id": "right_thumb",   "label": "Right stick click", "kind": "button", "default": "rightstick",  "key_default": "Left Ctrl"},
+    {"id": "dpad_up",       "label": "D-pad up",       "kind": "button",  "default": "dpup",          "key_default": "Up"},
+    {"id": "dpad_down",     "label": "D-pad down",     "kind": "button",  "default": "dpdown",        "key_default": "Down"},
+    {"id": "dpad_left",     "label": "D-pad left",     "kind": "button",  "default": "dpleft",        "key_default": "Left"},
+    {"id": "dpad_right",    "label": "D-pad right",    "kind": "button",  "default": "dpright",       "key_default": "Right"},
+    {"id": "move",          "label": "Move",           "kind": "stick",   "default": "leftstick",     "key_default": "W A S D"},
+    {"id": "look",          "label": "Look",           "kind": "stick",   "default": "rightstick",    "key_default": "I J K L"}
+  ]
+}

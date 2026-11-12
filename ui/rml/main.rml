@@ -1,0 +1,23 @@
+<rml>
+<head>
+    <title>Launcher</title>
+    <link type="text/rcss" href="../rcss/theme.rcss"/>
+</head>
+<body>
+    <div id="header">
+        <div class="stack">
+            <div id="game-title" class="title"></div>
+            <div id="game-meta" class="muted"></div>
+        </div>
+        <div id="header-right"></div>
+    </div>
+
+    <div id="screen"></div>
+    <div id="modal-host"></div>
+
+    <div id="hints">
+        <div id="legal"></div>
+        <div class="group" id="hint-group"></div>
+    </div>
+</body>
+</rml>

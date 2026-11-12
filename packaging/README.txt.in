@@ -1,0 +1,76 @@
+Godzilla: Save the Earth (Xbox) - recompiled for Windows - v@VERSION@
+a Replay Revival recomp                       https://replayrevival.com
+
+EARLY ALPHA - WORK IN PROGRESS. Development continues. Expect bugs.
+
+Not affiliated with or endorsed by Toho, Atari or Pipeworks. You must own the game.
+This download contains no game files. You need your own copy of the Xbox game,
+as a disc image (.iso) or an extracted folder.
+
+WHAT YOU NEED
+  - Windows 10 or 11, 64-bit, a GPU with Direct3D 11.
+  - Your own copy of Godzilla: Save the Earth (Xbox), as a disc image (.iso)
+    or an extracted folder that contains default.xbe. An .iso is unpacked once on first use
+    (about 0.8 GB of free space needed).
+  - Windows "N" editions need the Media Feature Pack (the game uses Media Foundation).
+  - The Visual C++ runtime DLLs are included; no separate install needed.
+  - Unzip to a folder you can write to (not Program Files). The game keeps its saves and
+    caches next to the program.
+
+HOW TO START
+  1. Run launcher.exe.
+  2. Choose your disc image (.iso) or extracted game folder.
+  3. Pick a preset (Original, Max, Low-end), adjust settings if you like, press Play.
+  Your disc image or game folder is only read and never changed. An .iso is unpacked
+  once into data\game\ and reused from then on.
+
+VIDEO SETTINGS
+  - Resolution starts at your screen's own (native) resolution, including ultrawide
+    (21:9, 32:9). With several monitors, the Display row picks the monitor.
+  - Gameplay view: "Original (4:3)" or "Fit my screen". Menus always keep their 4:3 shape.
+  - V-Sync is On by default (no tearing). Variable refresh rate is Auto and needs
+    FreeSync/G-Sync enabled on your monitor and graphics driver.
+  - If the game stops, the launcher tells you what happened and offers "Try again with
+    original settings" (your saved settings are not changed), "Try borderless instead",
+    the log folder, and a Copy details button for bug reports.
+
+MODS
+  - The Mods tab installs a mod from a .zip or a folder (or drag it onto the launcher window),
+    turns mods on and off, sets their load order and removes them. Mods live in data\mods\.
+    Your game files are never changed. Removed mods are moved to data\mods\_removed\.
+  - A mod made for a different version of the game is marked and skipped.
+
+WHERE THINGS GO (this download runs portable)
+  saves\          the game's save data (starts empty, like a new console)
+  shadercache\    compiled shaders (created on first start; the first start is slower)
+  data\           launcher settings, the ini files it passes to the game, mods, and logs
+  data\game\      the unpacked copy of your disc, if you chose an .iso (about 0.8 GB)
+  Delete these folders to reset (deleting data\ means an .iso is unpacked again and mods are gone).
+
+CONTROLS
+  Keyboard: arrows = d-pad, Enter = Start, Backspace = Back, Z X C V = A B X Y,
+  Q / E = White / Black, 1 / 3 = triggers, W A S D / I J K L = sticks.
+  Gamepads work (Xbox tested; PlayStation, Switch and generic pads untested). The
+  launcher's Controllers tab shows connected pads and lets you set dead zone, rumble and
+  button mapping, and which button names the game shows (Button prompts: Auto, Xbox,
+  Original Xbox, PlayStation). The game reads these when it starts.
+  Black = left shoulder, White = right shoulder.
+
+KNOWN ISSUES (alpha)
+  - Some distant buildings still pop in and out in a few places.
+  - The in-game overlay (opened with the Guide button / F1) is not finished.
+  - Windows only; Linux and Mac are untested.
+  - Only Xbox controllers have been tested so far.
+
+BUG REPORTS
+  https://github.com/replayrevival/ste-recomp/issues
+  Include your Windows version, GPU, and what you did before the problem happened.
+  When the launcher shows "The game stopped", press Copy details and paste it into the report.
+
+LICENCE
+  The recompilation runtime, tools and launcher are free software under the GNU General
+  Public License, version 2 or (at your option) any later version (GPL-2.0-or-later).
+  LICENSE holds the GPL version 2 text. See CREDITS.md and THIRD_PARTY_NOTICES.md for the
+  third-party components and their licences.
+  Portions of this software are copyright (c) The FreeType Project (www.freetype.org).
+  All rights reserved.

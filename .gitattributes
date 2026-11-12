@@ -1,0 +1,5 @@
+﻿* text=auto
+*.png binary
+*.ttf binary
+*.cmd text eol=crlf
+third_party/** -text

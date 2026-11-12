@@ -1,0 +1,21 @@
+Everything in v0.1.2d is in it, plus:
+
+MODS (new tab)
+- Install a mod from a .zip or a folder (buttons, or drag it onto the launcher window). Turn mods on and off,
+  change their load order (the one lower in the list wins when two change the same file) and remove them.
+  Mods are kept in data\mods\. Your game files are never changed; the game loads the mods itself.
+- Each mod says whether it works with your copy of the game. A mod made for another version of the game, one that
+  needs another mod, or one that does not work together with another is marked, and the game skips it.
+- Safety: a zip with unsafe file paths, a password or a damaged file is refused with a plain message, nothing is
+  half-installed. Removing a mod moves it to data\mods\_removed\, so you can get it back.
+
+CONTROLLERS
+- New "Button prompts" setting: Auto (match my controller), Xbox, Original Xbox (Black and White buttons) or
+  PlayStation. The launcher's own button hints and the button names on the remap screen follow it. The choice is
+  saved in the game's settings and passed to the game when it starts; it takes effect in the game as soon as the
+  game build supports it.
+
+PACKAGE
+- The download no longer contains the unused variable Pixelify Sans font file; every shipped font is credited
+  in CREDITS.md. The Visual C++ runtime DLLs now come from the same Visual Studio version that built the launcher.
+- miniz (MIT) is added for reading mod zips; see THIRD_PARTY_NOTICES.md.
