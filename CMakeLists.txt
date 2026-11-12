@@ -97,3 +97,32 @@ target_link_libraries(step_patch_tool PRIVATE launcher_ui)
 if(MSVC)
     target_compile_options(step_patch_tool PRIVATE /utf-8)
 endif()
+
+# ---- In-game overlay (docs/OVERLAY.md), Windows / Direct3D 11 only. Not part of the default build:
+#   cmake --build build --target ste_overlay overlay_test_host
+# ste_overlay: static library with include/ste_overlay_host.h as its API (launcher_ui + RmlUi's DX11 renderer on the game's device).
+# overlay_test_host: a D3D11 window that draws tests/overlay/test_scene.png and the overlay on top of it. Not shipped.
+if(WIN32)
+    add_library(ste_overlay STATIC EXCLUDE_FROM_ALL
+        src/overlay_host/ste_overlay_host.cpp
+        src/platform/UiBackendD3D11.cpp
+        "${RMLUI_SOURCE_DIR}/Backends/RmlUi_Renderer_DX11.cpp")
+    target_include_directories(ste_overlay PUBLIC include PRIVATE "${RMLUI_SOURCE_DIR}/Backends")
+    target_link_libraries(ste_overlay PUBLIC launcher_ui d3d11 dxgi d3dcompiler)
+    if(MSVC)
+        target_compile_options(ste_overlay PRIVATE /utf-8 /W3)
+    endif()
+
+    add_executable(overlay_test_host EXCLUDE_FROM_ALL tools/overlay_test_host.cpp)
+    target_link_libraries(overlay_test_host PRIVATE ste_overlay)
+    target_compile_definitions(overlay_test_host PRIVATE OVERLAY_TEST_SCENE="${CMAKE_SOURCE_DIR}/tests/overlay/test_scene.png")
+    set_target_properties(overlay_test_host PROPERTIES WIN32_EXECUTABLE FALSE)
+    if(MSVC)
+        target_compile_options(overlay_test_host PRIVATE /utf-8 /W3)
+    endif()
+    # resources next to the exe, like the launcher's dev layout
+    add_custom_command(TARGET overlay_test_host POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/ui" "$<TARGET_FILE_DIR:overlay_test_host>/ui"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:overlay_test_host>/assets"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/config" "$<TARGET_FILE_DIR:overlay_test_host>/config")
+endif()

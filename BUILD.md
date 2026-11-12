@@ -25,6 +25,9 @@ Pick your own copy of the game (an .iso or an extracted folder). To start a game
 
 Handy test flags (used for the screenshots in `docs\screenshots`): `--script up,down,confirm,...` to play back key presses, `--shot out.png` to save a screenshot and quit, `--hold <seconds>`, `--size WxH`, `--fresh` (ignore the remembered game), `--fake-displays tests\displays\fake_21x9.json` (pretend to have other monitors), `--content-scale 1.5`.
 
+## In-game overlay library (optional, Windows)
+Not part of the default build. `cmake --build build --target ste_overlay overlay_test_host` builds the static library behind `include/ste_overlay_host.h` (the in-game overlay for a game that uses Direct3D 11, see `docs\OVERLAY.md` and `docs\OVERLAY_FOR_GAME_SESSION.md`) and a small test window that draws it over a test picture. Run `overlay_test_host.exe` from `build\bin` (F1 opens the overlay).
+
 ## Pinned dependencies
 `cmake\Deps.cmake` pins every dependency by URL and SHA-256; `third_party\README.md` lists what is vendored. If `third_party\` is missing, CMake downloads the pinned archives instead (needs network). Force either way with `-DLAUNCHER_VENDORED=ON|OFF`.
 
