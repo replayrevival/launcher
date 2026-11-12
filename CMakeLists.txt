@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.25)
 project(recomp_launcher LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -17,44 +17,55 @@ set(RMLUI_BACKEND_SRC
     "${RMLUI_SOURCE_DIR}/Backends/RmlUi_Platform_SDL.cpp"
     "${RMLUI_SOURCE_DIR}/Backends/RmlUi_Renderer_GL3.cpp")
 
-add_executable(launcher
-    src/main.cpp
+# launcher_ui: the window-free launcher (settings, input, mods, screens, navigation, decorators). No main(), no GL/D3D
+# backend, no window creation: the planned in-game overlay (docs/OVERLAY.md) links this library and supplies its own
+# renderer backend. The executable below adds main.cpp and the GL3 backend.
+add_library(launcher_ui STATIC
     src/core/config.cpp
     src/core/paths.cpp
     src/core/sha256.cpp
     src/core/xiso.cpp
-src/core/xdvdfs.cpp
+    src/core/xdvdfs.cpp
     src/core/identify.cpp
     src/core/ini.cpp
     src/core/settings.cpp
     src/core/state.cpp
     src/core/input_map.cpp
     src/core/mods.cpp
-    src/ui/AppMods.cpp
-    src/ui/AppControllers.cpp
-    src/ui/AppVideo.cpp
-    src/ui/AppStopped.cpp
     src/core/display_modes.cpp
     src/platform/Displays.cpp
     src/platform/GameProcess.cpp
     src/platform/DriveSearch.cpp
     src/platform/ExeVersion.cpp
     src/ui/App.cpp
-    src/platform/UiBackend.cpp
+    src/ui/AppMods.cpp
+    src/ui/AppControllers.cpp
+    src/ui/AppVideo.cpp
+    src/ui/AppStopped.cpp
     src/ui/ChamferDecorator.cpp
     src/ui/Navigation.cpp
+)
+target_include_directories(launcher_ui PUBLIC src)
+target_compile_definitions(launcher_ui PUBLIC UNICODE _UNICODE PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
+target_link_libraries(launcher_ui PUBLIC RmlUi::RmlUi SDL3::SDL3-static nlohmann_json::nlohmann_json miniz)
+if(MSVC)
+    target_compile_options(launcher_ui PRIVATE /utf-8 /W3)
+endif()
+if(WIN32)
+    target_link_libraries(launcher_ui PUBLIC version)
+endif()
+
+add_executable(launcher
+    src/main.cpp
+    src/platform/UiBackend.cpp
     ${RMLUI_BACKEND_SRC}
 )
-target_include_directories(launcher PRIVATE src "${RMLUI_SOURCE_DIR}/Backends")
-target_compile_definitions(launcher PRIVATE RMLUI_SDL_VERSION_MAJOR=3 UNICODE _UNICODE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
-target_link_libraries(launcher PRIVATE RmlUi::RmlUi SDL3::SDL3-static nlohmann_json::nlohmann_json miniz)
+target_include_directories(launcher PRIVATE "${RMLUI_SOURCE_DIR}/Backends")
+target_compile_definitions(launcher PRIVATE RMLUI_SDL_VERSION_MAJOR=3 LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
+target_link_libraries(launcher PRIVATE launcher_ui)
 if(MSVC)
     target_compile_options(launcher PRIVATE /utf-8 /W3)
 endif()
-if(WIN32)
-    target_link_libraries(launcher PRIVATE version)
-endif()
-
 # Dev layout: resources sit next to the exe.
 add_custom_target(copy_resources ALL)
 foreach(dir ui assets config)
