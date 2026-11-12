@@ -73,7 +73,7 @@ std::string rowHtml(const std::string& id, const std::string& label, const std::
     return h + "</button></div>";
 }
 
-std::string settingsRows(const LauncherModel& m, const std::string& page, bool badges) {
+std::string settingsRows(const LauncherModel& m, const std::string& page, bool badges, const std::map<std::string, std::string>* applied) {
     std::string h;
     for (auto& row : m.settings.page(page)) {
         if (!row.group.empty()) { h += "<div class=\"section-label grouphead\">" + esc(row.group) + "</div>"; continue; }
@@ -87,7 +87,7 @@ std::string settingsRows(const LauncherModel& m, const std::string& page, bool b
             hint += ". Your screen is " + (a.empty() ? std::to_string(d.desktop.w) + " \xC3\x97 " + std::to_string(d.desktop.h) : a);
         }
         if (row.id == "vsync" && !m.vsyncFixPresent()) hint += "\n!If the game doesn\xE2\x80\x99t start, set Variable refresh to Off.";
-        h += rowHtml(row.id, row.label, hint, row.toggle ? (ci == 1 ? "ON" : "OFF") : val, row.toggle && ci == 1, !row.toggle, badges ? row.apply : "");
+        h += rowHtml(row.id, row.label, hint, row.toggle ? (ci == 1 ? "ON" : "OFF") : val, row.toggle && ci == 1, !row.toggle, badges ? (applied && applied->count(row.id) ? applied->at(row.id) : row.apply) : "");
     }
     return h;
 }

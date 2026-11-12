@@ -1,5 +1,6 @@
 #include "ui/Overlay.h"
 
+#include <algorithm>
 #include <chrono>
 #include <set>
 
@@ -18,6 +19,7 @@ std::string navButton(const char* label, const char* action, const char* arg, co
 bool Overlay::init(LauncherModel& model, const OverlayInit& init, OverlayCallbacks cb, std::string& err) {
     shutdown();
     model_ = &model;
+    ctl_.attach(model);
     init_ = init;
     cb_ = std::move(cb);
     views::setGlyphDir(pathToUtf8(init.resourceDir / "assets" / "glyphs"));
@@ -63,14 +65,42 @@ void Overlay::show() {
 
 void Overlay::hide() {
     if (!visible_) return;
+    ctl_.endListen();
     visible_ = false;
     if (cb_.onHide) cb_.onHide();
 }
 
 bool Overlay::feedNav(NavAction a) {
     if (!visible_ || !ctx_) return false;
+    if (listening()) return true;  // the next press is a binding, not navigation (the host sends it with feedSource)
     nav_.push(a);
     return true;
+}
+
+bool Overlay::feedSource(const std::string& source) {
+    if (!visible_ || !ctx_) return false;
+    if (!listening()) return false;
+    if (source == "guide") return true;  // reserved for opening the overlay
+    std::string err;
+    if (source != "cancel") {
+        ctl_.applyCapture(source, err);
+        saveInputNote(err);
+    } else {
+        ctl_.endListen();
+    }
+    renderScreen();
+    return true;
+}
+
+void Overlay::setPads(std::vector<PadDesc> pads) {
+    ctl_.setPads(std::move(pads));
+    if (visible_ && screen_ == Screen::Controls) renderScreen();
+}
+
+// After input_mapping.json was written: tell the game it can re-read it, or show why it could not be saved.
+void Overlay::saveInputNote(const std::string& err) {
+    if (!err.empty()) { note_ = "Could not save controller settings: " + err; return; }
+    if (cb_.applySetting) cb_.applySetting("input.mapping", pathToUtf8(model_->inputMapPath()));
 }
 
 bool Overlay::feedMouseMove(int x, int y) {
@@ -94,6 +124,11 @@ bool Overlay::feedMouseWheel(float up) {
 
 void Overlay::update(double dt) {
     if (!visible_ || !ctx_) return;
+    nowMs_ += dt * 1000.0;
+    if (listening() && uint64_t(nowMs_) - ctl_.listenSince > ControllersUi::kListenTimeoutMs) {
+        ctl_.endListen();
+        renderScreen();
+    }
     for (NavAction a : nav_.take()) {
         if (!visible_) break;
         if (nav_.perform(ctx_, doc_, a)) continue;
@@ -110,10 +145,19 @@ void Overlay::render() {
 void Overlay::handleNav(NavAction a) {
     Rml::Element* f = ctx_->GetFocusElement();
     if ((a == NavAction::Left || a == NavAction::Right) && f && f->HasAttribute("data-adjust")) {
-        step(f->GetAttribute<Rml::String>("data-arg", ""), a == NavAction::Right ? +1 : -1);
+        const std::string kind = f->GetAttribute<Rml::String>("data-adjust", ""), id = f->GetAttribute<Rml::String>("data-arg", "");
+        const int dir = a == NavAction::Right ? +1 : -1;
+        if (kind.rfind("ctl-", 0) == 0) {
+            std::string err;
+            if (ctl_.adjust(kind, id, dir, err)) saveInputNote(err);
+            renderScreen();
+        } else {
+            step(id, dir);
+        }
         return;
     }
     if (a == NavAction::Back) {
+        if (listening()) { ctl_.endListen(); renderScreen(); return; }
         if (screen_ == Screen::Main) hide();
         else go(Screen::Main);
     }
@@ -146,12 +190,47 @@ void Overlay::act(const std::string& action, const std::string& arg) {
         hide();
         if (toLauncher) { if (cb_.returnToLauncher) cb_.returnToLauncher(); }
         else if (cb_.quitGame) cb_.quitGame();
+    } else if (action.rfind("ctl-", 0) == 0) {
+        controllerAction(action, arg);
     } else if (action == "step") {  // chevrons: "<row id>@<-1|1>"
         const size_t at = arg.rfind('@');
         if (at != std::string::npos) step(arg.substr(0, at), std::atoi(arg.c_str() + at + 1) < 0 ? -1 : +1);
     } else if (action == "cycle") {  // click on the value
         step(arg, +1);
     }
+}
+
+void Overlay::controllerAction(const std::string& action, const std::string& arg) {
+    std::string err;
+    if (action != "ctl-bind" && listening()) ctl_.endListen();
+    if (action == "ctl-step") {
+        if (ctl_.adjustFromStep(arg, err)) saveInputNote(err);
+    } else if (action == "ctl-port") {
+        ctl_.selectPort(std::atoi(arg.c_str()));
+    } else if (action == "ctl-bind") {
+        if (ctl_.listenAction == arg) ctl_.endListen();
+        else ctl_.beginListen(arg, uint64_t(nowMs_));
+    } else if (action == "ctl-reset") {
+        ctl_.resetBindings(err);
+        saveInputNote(err);
+    } else if (action == "ctl-swap") {
+        ctl_.toggleSwapConfirmBack(err);
+        nav_.swapConfirmBack = model_->input.swapConfirmBack;
+        saveInputNote(err);
+    } else if (action == "ctl-test") {
+        const auto info = ctl_.resolvePorts();
+        const std::string pid = ctl_.profileIdOf(info, ctl_.port);
+        const auto& pi = info[size_t(ctl_.port)];
+        if (pi.padId == 0) note_ = "No controller on this port. Connect one, or choose the controller for this port.";
+        else if (pid.empty() || model_->input.profile(pid).rumble == 0) note_ = "Rumble is off for this controller. Turn it on first.";
+        else if (!cb_.rumble || !cb_.rumble(pi.padId, model_->input.profile(pid).rumble / 100.f, 700)) note_ = "This controller cannot rumble.";
+        else note_.clear();
+        renderScreen();
+        return;
+    } else if (ctl_.adjust(action, arg, +1, err)) {  // ctl-device / ctl-deadzone / ctl-rumble / ctl-stick by click
+        saveInputNote(err);
+    }
+    renderScreen();
 }
 
 // One row stepped (chevron, click on the value, or Left/Right): the model changes and saves it, the game is told.
@@ -171,10 +250,14 @@ void Overlay::notifyGame(const std::string& rowId) {
             for (auto& c : row.choices)
                 for (auto& kv : c.set) keys.insert(kv.first);
             bool refused = false;
+            int worst = 0;  // 0 now, 1 next match, 2 after restart
             for (auto& k : keys) {
                 const auto v = model_->settings.value(k);
-                if (cb_.applySetting(k, v ? *v : "") == Applied::Refused) refused = true;
+                const Applied a = cb_.applySetting(k, v ? *v : "");
+                if (a == Applied::Refused) refused = true;
+                worst = std::max(worst, a == Applied::Now ? 0 : a == Applied::NextMatch ? 1 : 2);
             }
+            applied_[rowId] = worst == 0 ? "now" : worst == 1 ? "match" : "restart";
             if (refused && note_.empty())
                 note_ = "The game could not apply that right now. It is saved and used the next time you start the game.";
             return;
@@ -213,12 +296,11 @@ void Overlay::renderScreen() {
                 navButton("ENHANCEMENTS", "ov-go", "enhance", "ov-enhance") + navButton("CONTROLLERS", "ov-go", "controls", "ov-controls") +
                 navButton("RETURN TO LAUNCHER", "ov-go", "launcher", "ov-launcher") + navButton("QUIT GAME", "ov-go", "quit", "ov-quit") + "</div>";
             break;
-        case Screen::Video: title = "VIDEO"; h = views::settingsRows(*model_, "video", true); break;
-        case Screen::Enhance: title = "ENHANCEMENTS"; h = views::settingsRows(*model_, "enhance", true); break;
+        case Screen::Video: title = "VIDEO"; h = views::settingsRows(*model_, "video", true, &applied_); break;
+        case Screen::Enhance: title = "ENHANCEMENTS"; h = views::settingsRows(*model_, "enhance", true, &applied_); break;
         case Screen::Controls:
             title = "CONTROLLERS";
-            h = views::settingsRows(*model_, "controls", true) +
-                "<p class=\"muted small\" style=\"padding-left: 26dp; margin-top: 12dp\">Remapping buttons is in the launcher (Controllers tab).</p>";
+            h = views::controllersPage(*model_, ctl_.viewState());
             break;
         case Screen::ConfirmLauncher:
         case Screen::ConfirmQuit:
@@ -246,6 +328,10 @@ void Overlay::renderHints() {
     struct Item { const std::string& key; const char* text; const std::vector<std::string>& pics; };
     const Item items[] = {{h.confirm, "select", h.confirmG}, {h.back, screen_ == Screen::Main ? "resume" : "back", h.backG}};
     std::string html;
+    if (listening()) {
+        if (auto* g = doc_->GetElementById("hint-group")) g->SetInnerRML("<div class=\"hint\"><span class=\"key\">Press the new button</span><span>Esc or wait to cancel</span></div>");
+        return;
+    }
     for (auto& x : items) {
         std::string cap;
         if (x.pics.empty()) cap = "<span class=\"key\">" + views::esc(x.key) + "</span>";

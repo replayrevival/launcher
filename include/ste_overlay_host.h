@@ -17,6 +17,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct ID3D11Device;
 struct ID3D11RenderTargetView;
@@ -42,6 +43,9 @@ struct Callbacks {
     std::function<void()> on_hide;  // the overlay closed (Back, Resume, or hide()): resume
     std::function<void()> return_to_launcher;  // the player confirmed "Return to launcher": exit with the launcher's exit code
     std::function<void()> quit_game;           // the player confirmed "Quit game"
+    // Controller vibration test from the Controllers screen: the `Pad::id` you gave to set_pads(), strength 0..1, milliseconds.
+    // Return false if that pad cannot rumble. May be empty.
+    std::function<bool(unsigned pad_id, float strength, unsigned ms)> rumble;
 };
 
 struct InitInfo {
@@ -56,12 +60,24 @@ struct InitInfo {
 // Input in neutral form so the game does not have to use SDL. Coordinates are back buffer pixels.
 enum class Nav { Up, Down, Left, Right, Confirm, Back };
 struct Input {
-    enum class Type { Nav, MouseMove, MouseButton, MouseWheel } type = Type::Nav;
+    enum class Type { Nav, MouseMove, MouseButton, MouseWheel, Source } type = Type::Nav;
     Nav nav = Nav::Up;     // Type::Nav: a key / D-pad / stick step / A / B press; send key repeats too (not releases)
     float x = 0, y = 0;    // MouseMove, MouseButton: pointer position
     int button = 0;        // MouseButton: 0 left, 1 right, 2 middle
     bool down = false;     // MouseButton
     float wheel = 0;       // MouseWheel: notches, positive = up
+    // Source (only while Host::listening()): the raw press to bind, in SDL3's names: a gamepad button string
+    // (SDL_GetGamepadStringForButton: "a", "leftshoulder", "start", "dpup", ...), "lefttrigger" / "righttrigger" when the trigger passes
+    // about 60 %, "key:<SDL_GetKeyName>" for the keyboard, or "cancel" (Esc). Do not also send it as Nav.
+    std::string source;
+};
+
+// A connected controller, for the Controllers screen.
+struct Pad {
+    std::string guid;                          // SDL_GUIDToString(SDL_GetGamepadGUIDForID(id)) or any stable id of the device model
+    std::string name;
+    DeviceKind kind = DeviceKind::Generic;
+    unsigned id = 0;                           // your own handle, passed back in Callbacks::rumble (0 = none)
 };
 
 class Host {
@@ -78,6 +94,11 @@ public:
     bool feed(const Input& in);
     // Which pad / keyboard the player is using, so the hint bar shows matching buttons (see "Button prompts" in the launcher).
     void set_input_device(DeviceKind kind);
+    // Connected controllers in connection order; call when they change and once before show(). The first one fills port 1, and so on
+    // (the player can pick other devices per port). Without any, the Controllers screen says "No controller found".
+    void set_pads(const std::vector<Pad>& pads);
+    // True while the Controllers screen waits for a button to bind: send raw presses as Input::Type::Source instead of Nav.
+    bool listening() const;
 
     void update(double seconds);                        // once per frame (key repeat, animation)
     void render(ID3D11RenderTargetView* back_buffer);   // no-op while hidden

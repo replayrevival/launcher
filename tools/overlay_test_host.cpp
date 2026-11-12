@@ -3,7 +3,9 @@
 // the game. Developer tool, not shipped.
 //
 //   overlay_test_host [--data <dir>] [--size WxH] [--device keyboard|xbox|playstation|switch|generic]
-//                     [--script f1,up,down,left,right,confirm,back,wait] [--shot out.png]
+//                     [--fake-pad xbox|playstation]   (pretend one controller is connected)
+//                     [--script f1,up,down,left,right,confirm,back,wait,src:<button>,...] [--shot out.png]
+// Script `src:<name>` sends a raw press (SDL button name, e.g. src:leftshoulder) while the overlay is waiting for a button to bind.
 // Keys: F1 opens / closes the overlay, arrows + Enter + Esc navigate, F2 cycles the hint device, mouse works.
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -29,13 +31,24 @@ using Microsoft::WRL::ComPtr;
 namespace {
 
 ste_overlay::Host* g_host = nullptr;
+HWND g_hwnd = nullptr;
+UINT g_dpi = 96;
 bool g_quit = false;
 int g_w = 1280, g_h = 720;
 bool g_resize = false;
 ste_overlay::DeviceKind g_device = ste_overlay::DeviceKind::Keyboard;
 
+void feedSource(const std::string& s) {
+    if (!g_host || !g_host->visible()) return;
+    ste_overlay::Input in;
+    in.type = ste_overlay::Input::Type::Source;
+    in.source = s;
+    g_host->feed(in);
+}
+
 void feedNav(ste_overlay::Nav n) {
     if (!g_host || !g_host->visible()) return;
+    if (g_host->listening()) { feedSource(n == ste_overlay::Nav::Confirm ? "a" : n == ste_overlay::Nav::Back ? "b" : n == ste_overlay::Nav::Up ? "dpup" : n == ste_overlay::Nav::Down ? "dpdown" : n == ste_overlay::Nav::Left ? "dpleft" : "dpright"); return; }
     ste_overlay::Input in;
     in.type = ste_overlay::Input::Type::Nav;
     in.nav = n;
@@ -69,6 +82,16 @@ LRESULT CALLBACK wndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
     using ste_overlay::Nav;
     switch (m) {
         case WM_CLOSE: g_quit = true; return 0;
+        case WM_DPICHANGED: {
+            // Per-monitor DPI (the process opts in at start): Windows hands us the window rect that keeps the same logical size on
+            // the new monitor. The back buffer follows through WM_SIZE; the overlay scales by the back buffer height, so no extra
+            // content scale is passed to it (that is the player's own "UI size" choice).
+            g_dpi = HIWORD(w);
+            const RECT* r = reinterpret_cast<const RECT*>(l);
+            SetWindowPos(h, nullptr, r->left, r->top, r->right - r->left, r->bottom - r->top, SWP_NOZORDER | SWP_NOACTIVATE);
+            std::fprintf(stderr, "HOST dpi changed to %u\n", g_dpi);
+            return 0;
+        }
         case WM_SIZE:
             if (w != SIZE_MINIMIZED) { g_w = LOWORD(l); g_h = HIWORD(l); g_resize = true; }
             return 0;
@@ -81,7 +104,10 @@ LRESULT CALLBACK wndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
                 case VK_LEFT: feedNav(Nav::Left); return 0;
                 case VK_RIGHT: feedNav(Nav::Right); return 0;
                 case VK_RETURN: feedNav(Nav::Confirm); return 0;
-                case VK_ESCAPE: if (g_host && g_host->visible()) feedNav(Nav::Back); else g_quit = true; return 0;
+                case VK_ESCAPE:
+                    if (g_host && g_host->visible()) { if (g_host->listening()) feedSource("cancel"); else feedNav(Nav::Back); }
+                    else g_quit = true;
+                    return 0;
             }
             break;
         case WM_MOUSEMOVE: mouse(ste_overlay::Input::Type::MouseMove, l); return 0;
@@ -121,7 +147,13 @@ std::string exeDir() {
 }  // namespace
 
 int main(int argc, char** argv) {
-    std::string dataDir = exeDir() + "\\data_overlay_test", shot, device;
+    // Per-monitor DPI awareness v2, set before any window exists, the way a game would (a manifest does the same).
+    using SetCtx = BOOL(WINAPI*)(DPI_AWARENESS_CONTEXT);
+    if (auto fn = reinterpret_cast<SetCtx>(GetProcAddress(GetModuleHandleW(L"user32.dll"), "SetProcessDpiAwarenessContext")))
+        fn(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    else
+        SetProcessDPIAware();
+    std::string dataDir = exeDir() + "\\data_overlay_test", shot, device, fakePad;
     std::vector<std::string> script;
     for (int i = 1; i < argc; ++i) {
         const std::string a = argv[i];
@@ -129,6 +161,7 @@ int main(int argc, char** argv) {
         else if (a == "--shot" && i + 1 < argc) shot = argv[++i];
         else if (a == "--size" && i + 1 < argc) std::sscanf(argv[++i], "%dx%d", &g_w, &g_h);
         else if (a == "--device" && i + 1 < argc) device = argv[++i];
+        else if (a == "--fake-pad" && i + 1 < argc) fakePad = argv[++i];
         else if (a == "--script" && i + 1 < argc) {
             std::stringstream ss(argv[++i]);
             std::string t;
@@ -146,6 +179,10 @@ int main(int argc, char** argv) {
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
     HWND hwnd = CreateWindowW(wc.lpszClassName, L"Overlay test host (F1 = overlay, F2 = hint device)", WS_OVERLAPPEDWINDOW, 100, 100,
                               r.right - r.left, r.bottom - r.top, nullptr, nullptr, wc.hInstance, nullptr);
+    g_hwnd = hwnd;
+    using GetDpi = UINT(WINAPI*)(HWND);
+    if (auto fn = reinterpret_cast<GetDpi>(GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetDpiForWindow"))) g_dpi = fn(hwnd);
+    std::fprintf(stderr, "HOST window dpi %u\n", g_dpi);
     ShowWindow(hwnd, SW_SHOW);
     GetClientRect(hwnd, &r);
     g_w = r.right;
@@ -216,6 +253,7 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "HOST apply_setting %s=%s\n", k.c_str(), v.c_str());
         return ste_overlay::Applied::Now;
     };
+    info.callbacks.rumble = [](unsigned id, float s, unsigned ms) { std::fprintf(stderr, "HOST rumble pad %u strength %.2f %u ms\n", id, s, ms); return true; };
     info.callbacks.on_show = [] { std::fprintf(stderr, "HOST on_show\n"); };
     info.callbacks.on_hide = [] { std::fprintf(stderr, "HOST on_hide\n"); };
     info.callbacks.return_to_launcher = [] { std::fprintf(stderr, "HOST return_to_launcher\n"); g_quit = true; };
@@ -231,6 +269,14 @@ int main(int argc, char** argv) {
     else if (device == "switch") g_device = ste_overlay::DeviceKind::Switch;
     else if (device == "generic") g_device = ste_overlay::DeviceKind::Generic;
     g_host->set_input_device(g_device);
+    if (!fakePad.empty()) {
+        ste_overlay::Pad pad;
+        pad.guid = "0300aaaa5e040000ff02000000007801";
+        pad.id = 7;
+        if (fakePad == "playstation") { pad.name = "Test PlayStation Controller"; pad.kind = ste_overlay::DeviceKind::PlayStation; }
+        else { pad.name = "Test Xbox Controller"; pad.kind = ste_overlay::DeviceKind::Xbox; }
+        g_host->set_pads({pad});
+    }
 
     size_t pos = 0;
     int frame = 0, next = 10, waitFrames = 0;
@@ -249,6 +295,7 @@ int main(int argc, char** argv) {
             swap->ResizeBuffers(0, g_w, g_h, DXGI_FORMAT_UNKNOWN, 0);
             makeTarget();
             g_host->resize(g_w, g_h, 1.f);
+            std::fprintf(stderr, "HOST resized to %dx%d\n", g_w, g_h);
         }
         const auto now = std::chrono::steady_clock::now();
         const double dt = std::chrono::duration<double>(now - last).count();
@@ -265,6 +312,21 @@ int main(int argc, char** argv) {
             else if (t == "right") feedNav(Nav::Right);
             else if (t == "confirm") feedNav(Nav::Confirm);
             else if (t == "back") feedNav(Nav::Back);
+            else if (t.rfind("src:", 0) == 0) feedSource(t.substr(4));
+            else if (t.rfind("size:", 0) == 0) {  // size:WxH: resize the client area
+                int nw = 0, nh = 0;
+                if (std::sscanf(t.c_str() + 5, "%dx%d", &nw, &nh) == 2) {
+                    RECT rr{0, 0, nw, nh};
+                    AdjustWindowRectExForDpi(&rr, WS_OVERLAPPEDWINDOW, FALSE, 0, g_dpi);
+                    SetWindowPos(g_hwnd, nullptr, 0, 0, rr.right - rr.left, rr.bottom - rr.top, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+                }
+            } else if (t.rfind("dpi:", 0) == 0) {  // dpi:N: send the message Windows sends when the window lands on a monitor with another DPI
+                const UINT nd = UINT(std::atoi(t.c_str() + 4));
+                RECT wr;
+                GetWindowRect(g_hwnd, &wr);
+                RECT sug{wr.left, wr.top, wr.left + LONG((wr.right - wr.left) * double(nd) / g_dpi), wr.top + LONG((wr.bottom - wr.top) * double(nd) / g_dpi)};
+                SendMessageW(g_hwnd, WM_DPICHANGED, MAKEWPARAM(nd, nd), reinterpret_cast<LPARAM>(&sug));
+            }
             next = frame + (t == "wait" ? 30 : 6);
         }
 

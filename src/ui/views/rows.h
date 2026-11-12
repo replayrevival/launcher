@@ -2,6 +2,7 @@
 // Settings rows as RmlUi markup, built from a LauncherModel. Shared by the launcher screens (App) and the planned
 // in-game overlay (docs/OVERLAY.md). No window, no SDL, no input handling: the actions are `data-action` attributes
 // ("cycle", "step") that the host turns into LauncherModel::stepSetting().
+#include <map>
 #include <string>
 
 #include "core/launcher_model.h"
@@ -22,6 +23,8 @@ std::string rowHtml(const std::string& id, const std::string& label, const std::
                     const std::string& apply = "");
 
 // All rows of a settings page ("video", "enhance", "controls"), including the monitor and resolution rows.
-std::string settingsRows(const LauncherModel& model, const std::string& page, bool badges = false);
+// `applied` (row id -> "now" | "match" | "restart") overrides the schema's badge with what the game really answered.
+std::string settingsRows(const LauncherModel& model, const std::string& page, bool badges = false,
+                         const std::map<std::string, std::string>* applied = nullptr);
 
 }  // namespace views

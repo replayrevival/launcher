@@ -117,6 +117,7 @@ std::unique_ptr<Host> Host::create(const InitInfo& info, std::string& err) {
     cb.onHide = [impl] { if (impl->cb.on_hide) impl->cb.on_hide(); };
     cb.returnToLauncher = [impl] { if (impl->cb.return_to_launcher) impl->cb.return_to_launcher(); };
     cb.quitGame = [impl] { if (impl->cb.quit_game) impl->cb.quit_game(); };
+    cb.rumble = [impl](uint32_t id, float s, unsigned ms) { return impl->cb.rumble ? impl->cb.rumble(id, s, ms) : false; };
     if (!m.overlay.init(*m.model, oi, cb, err)) return nullptr;
     return h;
 }
@@ -135,6 +136,7 @@ bool Host::feed(const Input& in) {
         case Input::Type::MouseMove: return o.feedMouseMove(int(in.x), int(in.y));
         case Input::Type::MouseButton: return o.feedMouseButton(in.button, in.down);
         case Input::Type::MouseWheel: return o.feedMouseWheel(in.wheel);
+        case Input::Type::Source: return o.feedSource(in.source);
     }
     return false;
 }
@@ -143,6 +145,15 @@ void Host::set_input_device(DeviceKind k) {
     static const ::DeviceKind map[] = {::DeviceKind::Keyboard, ::DeviceKind::Xbox, ::DeviceKind::PlayStation, ::DeviceKind::Switch, ::DeviceKind::Generic};
     impl_->overlay.navigation().forceDevice(map[int(k)]);
 }
+
+void Host::set_pads(const std::vector<Pad>& pads) {
+    static const ::DeviceKind map[] = {::DeviceKind::Keyboard, ::DeviceKind::Xbox, ::DeviceKind::PlayStation, ::DeviceKind::Switch, ::DeviceKind::Generic};
+    std::vector<PadDesc> out;
+    for (auto& p : pads) out.push_back({p.guid, p.name, map[int(p.kind)], p.id});
+    impl_->overlay.setPads(std::move(out));
+}
+
+bool Host::listening() const { return impl_->overlay.listening(); }
 
 void Host::update(double dt) { impl_->overlay.update(dt); }
 

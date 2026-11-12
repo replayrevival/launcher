@@ -5,10 +5,13 @@
 #include <RmlUi/Core.h>
 
 #include <filesystem>
+#include <cstdint>
 #include <functional>
+#include <map>
 #include <string>
 
 #include "core/launcher_model.h"
+#include "ui/ControllersUi.h"
 #include "ui/NavCore.h"
 
 enum class Applied { Now, NextMatch, AfterRestart, Refused };
@@ -19,6 +22,8 @@ struct OverlayCallbacks {
     std::function<void()> onShow, onHide;  // the game pauses / resumes
     std::function<void()> returnToLauncher;
     std::function<void()> quitGame;
+    // Controller vibration test: pad handle (PadDesc::id) and strength 0..1; false when the pad cannot rumble. May be empty.
+    std::function<bool(uint32_t padId, float strength, unsigned ms)> rumble;
 };
 
 struct OverlayInit {
@@ -45,6 +50,12 @@ public:
     bool feedMouseMove(int x, int y);
     bool feedMouseButton(int button, bool down);  // 0 left, 1 right, 2 middle
     bool feedMouseWheel(float notchesUp);
+    // Remapping. While listening() the host sends the raw press instead of Nav: a gamepad button as SDL's name ("a", "leftshoulder",
+    // "start", ...), "lefttrigger" / "righttrigger", a key as "key:<SDL key name>", or "cancel" (Esc). Returns true when it was used.
+    bool feedSource(const std::string& source);
+    bool listening() const { return !ctl_.listenAction.empty(); }
+    // Connected controllers (call when they change, and once before show()).
+    void setPads(std::vector<PadDesc> pads);
     void update(double dt);  // once per frame
     void render();           // after the game's frame, inside the host's backend begin/end; no-op while hidden
     void resize(int width, int height, float contentScale);
@@ -60,6 +71,7 @@ private:
     void renderScreen();
     void renderHints();
     void act(const std::string& action, const std::string& arg);
+    void controllerAction(const std::string& action, const std::string& arg);
     void step(const std::string& id, int dir);
     void notifyGame(const std::string& rowId);
     void handleNav(NavAction a);
@@ -70,9 +82,13 @@ private:
     OverlayInit init_;
     OverlayCallbacks cb_;
     NavCore nav_;
+    ControllersUi ctl_;
+    double nowMs_ = 0;  // advanced by update(); the remap timeout runs on it
+    void saveInputNote(const std::string& err);
     Rml::Context* ctx_ = nullptr;
     Rml::ElementDocument* doc_ = nullptr;
     Screen screen_ = Screen::Main;
     bool visible_ = false;
     std::string note_;
+    std::map<std::string, std::string> applied_;  // row id -> what the game answered (badge override)
 };
