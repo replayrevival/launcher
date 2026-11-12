@@ -30,11 +30,10 @@ bool App::modsAct(const std::string& action, const std::string& arg) {
     };
     if (action == "mods-install-zip") {
         if (modBusy_) return busyNote(), true;
-        static const SDL_DialogFileFilter filters[] = {{"Mod archives", "zip"}, {"All files", "*"}};
-        SDL_ShowOpenFileDialog(&App::modDialogDone, this, window_, filters, 2, nullptr, false);
+        openBrowser(BrowseFor::ModZip);
     } else if (action == "mods-install-folder") {
         if (modBusy_) return busyNote(), true;
-        SDL_ShowOpenFolderDialog(&App::modDialogDone, this, window_, nullptr, false);
+        openBrowser(BrowseFor::ModFolder);
     } else if (action == "mods-open") {
         std::error_code ec;
         fs::create_directories(modsRoot(), ec);

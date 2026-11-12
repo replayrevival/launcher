@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "core/config.h"
+#include "core/file_browser.h"
 #include "core/display_modes.h"
 #include "core/identify.h"
 #include "core/input_map.h"
@@ -96,6 +97,18 @@ private:
     void onGameExit(int code, double secs);
     std::string supportDetails(int code, double secs) const;
     void saveCrashReport();
+    // In-launcher file browser (pad, keyboard and mouse); the Windows dialog stays available behind a button.
+    enum class BrowseFor { Game, GameFolder, UnpackParent, ModZip, ModFolder };
+    void openBrowser(BrowseFor what);
+    void renderBrowser(const std::string& focusKey = "");
+    bool browserAct(const std::string& action, const std::string& arg);   // true when it was a browser action
+    void browserBack();                                                   // Back key: up one folder, or close
+    void browserPicked(const std::filesystem::path& p);
+    void closeBrowser();
+    void openNativeDialog(BrowseFor what);
+    FileBrowser browser_;
+    BrowseFor browseFor_ = BrowseFor::Game;
+    bool browserOpen_ = false;
     bool gameConsole_ = false;  // developer: --game-console / LAUNCHER_GAME_CONSOLE=1 / dev_game_console in launcher_state.json
     // update check: one quiet request to GitHub's release list on a worker thread, at most once a day
     void startUpdateCheck();

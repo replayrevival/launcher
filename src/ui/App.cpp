@@ -386,6 +386,7 @@ void App::act(const std::string& action, const std::string& arg) {
         return;
     }
 
+    if (browserAct(action, arg)) return;
     if (modsAct(action, arg)) return;
     if (action == "modal-ok") {
         closeModal();
@@ -407,12 +408,11 @@ void App::act(const std::string& action, const std::string& arg) {
     } else if (action == "copy-details") {
         SDL_SetClipboardText(modalDetails_.c_str());
     } else if (action == "choose-file") {
-        static const SDL_DialogFileFilter filters[] = {{"Xbox disc images", "iso;xiso"}, {"All files", "*"}};
-        SDL_ShowOpenFileDialog(&App::fileDialogDone, this, window_, filters, 2, nullptr, false);
+        openBrowser(BrowseFor::Game);
     } else if (action == "choose-folder") {
-        SDL_ShowOpenFolderDialog(&App::fileDialogDone, this, window_, nullptr, false);
+        openBrowser(BrowseFor::GameFolder);
     } else if (action == "unpack-folder") {
-        SDL_ShowOpenFolderDialog(&App::unpackDirDone, this, window_, nullptr, false);
+        openBrowser(BrowseFor::UnpackParent);
     } else if (action == "unpack") {
         startUnpack();
     } else if (action == "unpack-cancel") {
@@ -457,7 +457,11 @@ void App::act(const std::string& action, const std::string& arg) {
 
 bool App::handleAction(NavAction a) {
     if (modalOpen_) {
-        if (a == NavAction::Back) { closeModal(); return true; }
+        if (a == NavAction::Back) {
+            if (browserOpen_) browserBack();
+            else closeModal();
+            return true;
+        }
         return false;
     }
     Rml::Element* f = doc_->GetContext()->GetFocusElement();
@@ -796,7 +800,9 @@ void App::refreshHints() {
     nav_.promptStyle = buttonPromptsValue();
     const HintLabels h = nav_.hints();
     std::vector<Hint> hints;
-    if (modalOpen_) {
+    if (modalOpen_ && browserOpen_) {
+        hints = {{h.confirm, "open", false, h.confirmG}, {h.back, "up / cancel", false, h.backG}};
+    } else if (modalOpen_) {
         hints = {{h.confirm, "ok", false, h.confirmG}};
     } else if (screen_ == Screen::Setup) {
         hints.push_back({h.confirm, "select", false, h.confirmG});

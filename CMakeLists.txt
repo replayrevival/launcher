@@ -36,6 +36,7 @@ add_library(ste_ui_core STATIC
     src/core/launcher_model.cpp
     src/core/crash_report.cpp
     src/core/update_check.cpp
+    src/core/file_browser.cpp
     src/core/display_modes.cpp
     src/platform/ExeVersion.cpp
     src/platform/png_decode.cpp
@@ -46,6 +47,7 @@ add_library(ste_ui_core STATIC
     src/ui/views/rows.cpp
     src/ui/views/mods.cpp
     src/ui/views/controllers.cpp
+    src/ui/views/browser.cpp
 )
 target_include_directories(ste_ui_core PUBLIC src)
 target_compile_definitions(ste_ui_core PUBLIC UNICODE _UNICODE PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
@@ -69,6 +71,7 @@ add_library(launcher_ui STATIC
     src/ui/AppControllers.cpp
     src/ui/AppVideo.cpp
     src/ui/AppStopped.cpp
+    src/ui/AppBrowser.cpp
     src/ui/Navigation.cpp
 )
 target_compile_definitions(launcher_ui PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")

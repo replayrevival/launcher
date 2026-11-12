@@ -58,3 +58,11 @@ every focusable element be reached from it with Up / Down / Left / Right only. R
 Every focusable element is a `button.nav`, which has one shared focus style (glow + yellow arrow), so focus is visible everywhere. Not audited:
 the disc-image unpack step (no disc image at hand; it uses the same buttons). Limits that need more than a pad: the Windows file dialogs behind
 "CHOOSE DISC IMAGE", "CHOOSE A FOLDER" and "INSTALL FROM ZIP / FOLDER" (use SEARCH MY DRIVES for the game; put mod folders into the mods folder).
+
+## File browser (2026-11-12)
+"Choose disc image", "Choose a folder", "Unpack to" and "Install a mod from zip / folder" open the launcher's own browser (a message-box style
+panel, so pad, keyboard and mouse all work and Back closes it). Buttons: USE THIS FOLDER (folder choices), UP, CANCEL, WINDOWS DIALOG (the
+operating system's own dialog, for mouse users), THIS PC (drive list), Desktop / Documents / Downloads, and RECENT (the last 8 folders you chose,
+kept in `launcher_state.json`). The list shows folders first, then only the files of the wanted type (.iso / .xiso, .zip); Back goes up one folder
+and closes the browser from the drive list. Audit (`audit:` token): the start screen and a folder with files reach every button (19 and 10 focusable).
+Screenshots: `screenshots/browser_*.png`.

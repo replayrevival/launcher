@@ -190,3 +190,14 @@ button.val.on .valtext { color: #3FD4FF; }
 
 /* disc image unpacking */
 .progress { width: 500dp; height: 16dp; margin: 14dp 0 8dp 0; border: 1dp #1E3A63; background-color: #0D2142; }
+
+/* ---- file browser (message-box panel) ---- */
+.browser-panel { width: 780dp; max-height: 700dp; }
+.browser-panel .br-path { word-break: break-all; margin: 0; }
+.browser-panel .br-actions, .browser-panel .br-places { margin-left: 0dp; flex-wrap: wrap; gap: 14dp; margin-top: 4dp; }
+.browser-panel .br-label { margin: 10dp 0 4dp 0; }
+.br-list { display: flex; flex-direction: column; gap: 4dp; max-height: 330dp; overflow-y: auto; padding-right: 8dp; }
+button.br-entry { display: flex; flex-direction: row; justify-content: space-between; text-align: left; min-height: 34dp; padding: 5dp 18dp; }
+button.br-entry .br-name { flex: 1 1 auto; }
+button.br-entry .br-size { flex: 0 0 auto; color: #7C9CC4; margin-left: 16dp; }
+button.br-dir .br-name { color: #FFD43B; }
