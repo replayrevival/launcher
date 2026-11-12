@@ -6,9 +6,15 @@
 #include <fstream>
 #include <string>
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 int main() {
     const char* env = std::getenv("FAKE_GAME_MODE");
     const std::string m = env ? env : "crash";
+    std::printf("console window: %s, args:", GetConsoleWindow() ? "YES" : "none");
+    for (int i = 1; i < __argc; ++i) std::printf(" %s", __argv[i]);
+    std::printf("\n");
     std::printf("fake game started, path C:\\Users\\SomeoneReal\\Documents\\x\n");
     if (m == "code") {
         const char* c = std::getenv("FAKE_GAME_CODE");

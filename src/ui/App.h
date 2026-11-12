@@ -53,6 +53,7 @@ public:
     void onDrop(const std::string& utf8Path);     // a file or folder dropped on the window
     void refreshHints();
     void killGameOnExit(bool v) { killOnExit_ = v; }
+    void gameConsole(bool v) { gameConsole_ = v; }
     void setGpuInfo(const std::string& s) { gpuInfo_ = s; }
     void setUiScaleListener(std::function<void()> f) { uiScaleChanged_ = std::move(f); }
     float uiScale() const;                       // user's "UI size" multiplier (1.0 = normal)
@@ -95,6 +96,7 @@ private:
     void onGameExit(int code, double secs);
     std::string supportDetails(int code, double secs) const;
     void saveCrashReport();
+    bool gameConsole_ = false;  // developer: --game-console / LAUNCHER_GAME_CONSOLE=1 / dev_game_console in launcher_state.json
     // update check: one quiet request to GitHub's release list on a worker thread, at most once a day
     void startUpdateCheck();
     void pollUpdateCheck();

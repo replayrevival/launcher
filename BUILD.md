@@ -17,6 +17,9 @@ The result is `build\bin\launcher.exe`. The build also copies `ui\`, `assets\` a
 
 Variables for `scripts\build.cmd`: `CMAKE` (path of cmake.exe), `BUILD_DIR` (default `build`). Extra arguments go to the CMake configure step.
 
+## Console builds
+By default `launcher.exe` is a Windows program without a console window. For development, pass `-DLAUNCHER_CONSOLE=ON` to `scripts\build.cmd` to get a console program: test output on stderr stays visible and a shell waits for the exe.
+
 ## Try it
 ```
 build\bin\launcher.exe

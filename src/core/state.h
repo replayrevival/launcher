@@ -19,6 +19,7 @@ struct LauncherState {
 
     bool vrrDefaultedOff = false;  // variable refresh was set to Off by the launcher's own default, not by the user
     int uiSize = 100;       // "UI size" percentage of the launcher (on top of the system's display scaling)
+    bool devGameConsole = false;  // hidden developer toggle ("dev_game_console" in launcher_state.json): the game opens its own console
     bool updateCheck = true;      // look for a newer launcher release now and then (a quiet request to GitHub)
     int64_t lastUpdateCheck = 0;  // unix seconds of the last request
     std::string latestTag, latestUrl;  // newest release seen, kept so the note shows even when offline later

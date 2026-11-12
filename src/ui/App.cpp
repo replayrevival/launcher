@@ -528,6 +528,14 @@ void App::play(bool original, bool borderless) {
         spec.args.push_back(state_.gamePath);
     }
     spec.env = profile_.env;
+    // Hidden developer toggle: the game opens its own console (--console, STE_CONSOLE=1) and the launcher does not hide it.
+    // Normally the game runs with no console window at all.
+    const char* ce = std::getenv("LAUNCHER_GAME_CONSOLE");
+    spec.showConsole = gameConsole_ || state_.devGameConsole || (ce && *ce && std::string(ce) != "0");
+    if (spec.showConsole) {
+        spec.args.push_back("--console");
+        spec.env["STE_CONSOLE"] = "1";
+    }
     // A one-off "original settings" start uses its own clean ini files; the user's saved ones are never touched.
     fs::path iniDir = settingsDir();
     if (original) {

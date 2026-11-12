@@ -12,6 +12,9 @@ struct LaunchSpec {
     std::map<std::string, std::string> env;  // added to / overriding the launcher's own environment
     std::vector<std::string> args;
     std::filesystem::path logOut, logErr;
+    // Developer toggle: let the game open its own console window (the game gets --console and STE_CONSOLE=1 from the caller).
+    // Normally the game runs with no console window at all.
+    bool showConsole = false;
 };
 
 // Starts the game and watches it. stdout/stderr go to log files (like the .bat launchers did).
@@ -21,7 +24,7 @@ public:
     bool start(const LaunchSpec& spec, std::string& err);
     // Non-blocking. Returns true once the game has ended and fills exitCode.
     bool pollExited(int& exitCode);
-    bool running() const { return process_ != nullptr; }
+    bool running() const { return process_ != nullptr || winProcess_ != nullptr; }
     double secondsRunning() const;
     // Last lines of the error log, for "why did it stop" messages.
     std::string errorTail(int maxLines = 8) const;
@@ -32,7 +35,9 @@ public:
 
 private:
     void closeStreams();
+    bool startWindows(const LaunchSpec& spec, std::string& err);
     SDL_Process* process_ = nullptr;
+    void* winProcess_ = nullptr;  // Windows: the process handle (own CreateProcess, see GameProcess.cpp)
     SDL_IOStream* out_ = nullptr;
     SDL_IOStream* err_ = nullptr;
     static std::string tailOf(const std::filesystem::path& file, int maxLines);

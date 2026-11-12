@@ -38,6 +38,7 @@ bool LauncherState::load(const fs::path& file) {
         displayChoice = j.value("display_choice", -1);
         uiSize = j.value("ui_size", 100);
         vrrDefaultedOff = j.value("vrr_defaulted_off", false);
+        devGameConsole = j.value("dev_game_console", false);
         updateCheck = j.value("update_check", true);
         lastUpdateCheck = j.value("last_update_check", int64_t(0));
         latestTag = j.value("latest_tag", "");
@@ -55,7 +56,7 @@ bool LauncherState::save(const fs::path& file, std::string& err) const {
               {"sha256", sha256}, {"path_size", pathSize}, {"path_mtime", pathMtime},
               {"source_image", sourceImage}, {"source_size", sourceSize}, {"source_mtime", sourceMtime},
               {"display_choice", displayChoice}, {"ui_size", uiSize},
-              {"vrr_defaulted_off", vrrDefaultedOff}, {"update_check", updateCheck}, {"last_update_check", lastUpdateCheck},
+              {"vrr_defaulted_off", vrrDefaultedOff}, {"update_check", updateCheck}, {"dev_game_console", devGameConsole}, {"last_update_check", lastUpdateCheck},
               {"latest_tag", latestTag}, {"latest_url", latestUrl}};
     const fs::path tmp = file.string() + ".tmp";
     {

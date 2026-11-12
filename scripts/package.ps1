@@ -70,7 +70,7 @@ if (-not $Previous) {
 # ---- build
 if (-not $NoBuild) {
     $env:BUILD_DIR = $BuildDir
-    & (Join-Path $PSScriptRoot 'build.cmd') "-DLAUNCHER_VERSION_STRING=$Version"
+    & (Join-Path $PSScriptRoot 'build.cmd') "-DLAUNCHER_VERSION_STRING=$Version" "-DLAUNCHER_CONSOLE=OFF"  # Windows-subsystem launcher: no console window
     if ($LASTEXITCODE -ne 0) { Fail 'The build failed.' }
 }
 $launcherExe = Join-Path $BuildDir 'bin\launcher.exe'

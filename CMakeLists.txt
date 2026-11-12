@@ -85,6 +85,13 @@ add_executable(launcher
 target_include_directories(launcher PRIVATE "${RMLUI_SOURCE_DIR}/Backends")
 target_compile_definitions(launcher PRIVATE RMLUI_SDL_VERSION_MAJOR=3 LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
 target_link_libraries(launcher PRIVATE launcher_ui)
+# Players get a Windows-subsystem program: no console window behind the launcher. Developer builds (scripts\build.cmd) turn
+# LAUNCHER_CONSOLE on so test output on stderr stays visible and `launcher.exe` can be waited for in a shell.
+option(LAUNCHER_CONSOLE "Build launcher.exe as a console program (developer builds)" OFF)
+if(WIN32 AND NOT LAUNCHER_CONSOLE)
+    set_target_properties(launcher PROPERTIES WIN32_EXECUTABLE TRUE)
+    target_link_options(launcher PRIVATE /ENTRY:mainCRTStartup)  # keep int main(); no WinMain needed
+endif()
 if(MSVC)
     target_compile_options(launcher PRIVATE /utf-8 /W3)
 endif()

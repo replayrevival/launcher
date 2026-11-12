@@ -47,6 +47,7 @@ struct Args {
     double hold = 0.3;              // --hold <seconds>: wait this long after the script before the screenshot
     bool killGame = false;          // --kill-game: stop the game when the launcher exits
     bool fresh = false;             // --fresh: ignore the remembered game (first-start screen)
+    bool gameConsole = false;       // --game-console: developer toggle, the game opens its own console window
     bool overlay = false;           // --overlay: open the in-game overlay (docs/OVERLAY.md) on top of the launcher (tests)
     std::string device;             // --device xbox|playstation|switch|generic|keyboard: pretend this input device is in use (tests)
     std::string fakeDisplays;       // --fake-displays <json>: use this monitor list instead of the real one (tests)
@@ -63,6 +64,7 @@ Args parseArgs(int argc, char** argv) {
         else if (s == "--kill-game") a.killGame = true;
         else if (s == "--fresh") a.fresh = true;
         else if (s == "--overlay") a.overlay = true;
+        else if (s == "--game-console") a.gameConsole = true;
         else if (s == "--device" && i + 1 < argc) a.device = argv[++i];
         else if (s == "--fake-displays" && i + 1 < argc) a.fakeDisplays = argv[++i];
         else if (s == "--content-scale" && i + 1 < argc) g_testContentScale = float(std::atof(argv[++i]));
@@ -199,6 +201,7 @@ int main(int argc, char** argv) {
     }
     App app(profile, paths, nav, backend->window());
     app.killGameOnExit(args.killGame);
+    app.gameConsole(args.gameConsole);
     app.ignoreSavedGame(args.fresh);
     if (!args.fakeDisplays.empty()) app.useFakeDisplays(args.fakeDisplays);
     app.setGpuInfo(backend->gpuInfo());
