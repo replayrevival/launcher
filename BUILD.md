@@ -42,5 +42,5 @@ Not part of the default build. `cmake --build build --target ste_overlay overlay
   Some CMake generators (notably "NMake Makefiles") can miss that a source file includes a changed header, so the old object file is
   linked against the new layout. Delete the `build` folder and build again, or use the Ninja generator, which asks the compiler for the
   real include list: `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release` (Ninja ships with the Visual Studio C++ tools and with
-  CMake's installer). `scripts" + bs + "build.cmd` uses whatever it finds; the project's own developer script uses Ninja.
+  CMake's installer). `scripts\build.cmd` now picks Ninja when it can find it and falls back to NMake.
 - **A build folder made with another generator**: CMake refuses to switch generators in the same folder. Use a new folder (set `BUILD_DIR`).
