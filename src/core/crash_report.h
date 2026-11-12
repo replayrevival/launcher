@@ -18,7 +18,7 @@ struct CrashEvidence {
 CrashEvidence findCrashEvidence(const std::filesystem::path& dumpDir, const std::filesystem::path& outLog, const std::filesystem::path& errLog,
                                 double maxAgeSeconds);
 
-// Replaces each `from` (case-insensitive, both slash styles) by its `to`, then any C:\Users\<name> by C:\Users\<user>.
+// Replaces each `from` (case-insensitive, both slash styles) by its `to`, then the user-profile folder name in any other path by <user>.
 std::string redactPaths(const std::string& text, const std::vector<std::pair<std::string, std::string>>& replacements);
 
 struct CrashReportInput {
