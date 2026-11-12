@@ -204,12 +204,21 @@ int main(int argc, char** argv) {
             else if (ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
                 backend->setViewport(ev.window.data1, ev.window.data2);
                 ctx->SetDimensions(Rml::Vector2i(ev.window.data1, ev.window.data2));
-                overlay.resize(ev.window.data1, ev.window.data2, app.uiScale(), 1.f);
+                overlay.resize(ev.window.data1, ev.window.data2, app.uiScale());
                 updateScale(ctx, backend->window(), app.uiScale());
             } else if (ev.type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED) {
                 updateScale(ctx, backend->window(), app.uiScale());  // moved to a monitor with another Windows scaling
-            } else if (overlay.feedEvent(ev)) {
-                // the overlay has it
+            } else if (overlay.visible() && (ev.type == SDL_EVENT_MOUSE_MOTION || ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+                                             ev.type == SDL_EVENT_MOUSE_BUTTON_UP || ev.type == SDL_EVENT_MOUSE_WHEEL)) {
+                // The overlay is SDL-free: translate the mouse here (keys and pads go through `nav` below and reach it as actions).
+                int ww = 1, wh = 1, pw2 = 1, ph2 = 1;
+                SDL_GetWindowSize(backend->window(), &ww, &wh);
+                SDL_GetWindowSizeInPixels(backend->window(), &pw2, &ph2);
+                const float sx = float(pw2) / float(ww), sy = float(ph2) / float(wh);
+                if (ev.type == SDL_EVENT_MOUSE_MOTION) overlay.feedMouseMove(int(ev.motion.x * sx), int(ev.motion.y * sy));
+                else if (ev.type == SDL_EVENT_MOUSE_WHEEL) overlay.feedMouseWheel(ev.wheel.y);
+                else overlay.feedMouseButton(ev.button.button == SDL_BUTTON_LEFT ? 0 : ev.button.button == SDL_BUTTON_RIGHT ? 1 : 2,
+                                             ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN);
             } else if (nav.handleEvent(ev)) {
                 // consumed
             } else {
@@ -299,14 +308,17 @@ int main(int argc, char** argv) {
             } else if (step.action == NavAction::None) {
                 nextScript = frame + 40;
             } else {
-                if (overlay.visible()) overlay.navigation().push(step.action);
-                else nav.push(step.action);
+                nav.push(step.action);
                 nextScript = frame + 6;
             }
         stepDone:;
         }
 
         app.update();
+        if (overlay.visible()) {
+            if (overlay.navigation().device() != nav.device()) overlay.navigation().forceDevice(nav.device());
+            for (NavAction a : nav.take()) overlay.feedNav(a);
+        }
         overlay.update(dt);
         for (NavAction a : nav.take()) {
             if (nav.perform(ctx, doc, a)) continue;

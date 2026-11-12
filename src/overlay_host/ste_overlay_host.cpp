@@ -2,7 +2,6 @@
 #include "ste_overlay_host.h"
 
 #include <RmlUi/Core.h>
-#include <SDL3/SDL.h>
 
 #include <filesystem>
 #include <vector>
@@ -127,30 +126,17 @@ void Host::hide() { impl_->overlay.hide(); }
 bool Host::visible() const { return impl_->overlay.visible(); }
 
 bool Host::feed(const Input& in) {
-    if (!impl_->overlay.visible()) return false;
-    SDL_Event e{};
+    Overlay& o = impl_->overlay;
     switch (in.type) {
         case Input::Type::Nav: {
             static const NavAction map[] = {NavAction::Up, NavAction::Down, NavAction::Left, NavAction::Right, NavAction::Confirm, NavAction::Back};
-            impl_->overlay.navigation().push(map[int(in.nav)]);
-            return true;
+            return o.feedNav(map[int(in.nav)]);
         }
-        case Input::Type::MouseMove:
-            e.type = SDL_EVENT_MOUSE_MOTION;
-            e.motion.x = in.x;
-            e.motion.y = in.y;
-            break;
-        case Input::Type::MouseButton:
-            e.type = in.down ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
-            e.button.button = in.button == 0 ? SDL_BUTTON_LEFT : in.button == 1 ? SDL_BUTTON_RIGHT : SDL_BUTTON_MIDDLE;
-            e.button.down = in.down;
-            break;
-        case Input::Type::MouseWheel:
-            e.type = SDL_EVENT_MOUSE_WHEEL;
-            e.wheel.y = in.wheel;
-            break;
+        case Input::Type::MouseMove: return o.feedMouseMove(int(in.x), int(in.y));
+        case Input::Type::MouseButton: return o.feedMouseButton(in.button, in.down);
+        case Input::Type::MouseWheel: return o.feedMouseWheel(in.wheel);
     }
-    return impl_->overlay.feedEvent(e);
+    return false;
 }
 
 void Host::set_input_device(DeviceKind k) {
@@ -169,7 +155,7 @@ void Host::render(ID3D11RenderTargetView* rtv) {
 
 void Host::resize(int w, int h, float scale) {
     impl_->backend.setViewport(w, h);
-    impl_->overlay.resize(w, h, scale, 1.f);
+    impl_->overlay.resize(w, h, scale);
 }
 
 }  // namespace ste_overlay

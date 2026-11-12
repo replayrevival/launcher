@@ -1,6 +1,6 @@
 ﻿#include "core/launcher_model.h"
 
-#include <SDL3/SDL.h>
+#include <cstdio>
 
 #include <algorithm>
 #include <cstdlib>
@@ -20,7 +20,7 @@ std::string sizeText(int w, int h) { return std::to_string(w) + " \xC3\x97 " + s
 }  // namespace
 
 fs::path LauncherModel::exePath() const {
-    if (const char* o = SDL_getenv("LAUNCHER_GAME_EXE")) return pathFromUtf8(o);
+    if (const char* o = std::getenv("LAUNCHER_GAME_EXE")) return pathFromUtf8(o);
     return paths.exeDir / pathFromUtf8(profile.exe);
 }
 
@@ -133,7 +133,7 @@ void LauncherModel::refreshDisplays(const DisplayDetector& detect) {
     std::string err;
     if (!fakeDisplays.empty()) {
         if (!loadFakeDisplays(fakeDisplays, list, err)) {
-            SDL_Log("%s", err.c_str());
+            std::fprintf(stderr, "%s\n", err.c_str());
             list = {};
         }
     }
@@ -148,7 +148,7 @@ void LauncherModel::refreshDisplays(const DisplayDetector& detect) {
     disp = std::move(list);
 
     const std::string text = describeDisplays(disp);
-    SDL_Log("Displays detected:\n%s", text.c_str());
+    std::fprintf(stderr, "Displays detected:\n%s\n", text.c_str());
     {
         std::error_code ec;
         fs::create_directories(paths.dataDir / "logs", ec);

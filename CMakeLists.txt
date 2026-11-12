@@ -20,7 +20,7 @@ set(RMLUI_BACKEND_SRC
 # launcher_ui: the window-free launcher (settings, input, mods, screens, navigation, decorators). No main(), no GL/D3D
 # backend, no window creation: the planned in-game overlay (docs/OVERLAY.md) links this library and supplies its own
 # renderer backend. The executable below adds main.cpp and the GL3 backend.
-add_library(launcher_ui STATIC
+add_library(ste_ui_core STATIC
     src/core/config.cpp
     src/core/paths.cpp
     src/core/sha256.cpp
@@ -35,31 +35,42 @@ add_library(launcher_ui STATIC
     src/core/mod_patch.cpp
     src/core/launcher_model.cpp
     src/core/display_modes.cpp
+    src/platform/ExeVersion.cpp
+    src/platform/png_decode.cpp
+    src/ui/NavCore.cpp
+    src/ui/Overlay.cpp
+    src/ui/ChamferDecorator.cpp
+    src/ui/views/rows.cpp
+    src/ui/views/mods.cpp
+    src/ui/views/controllers.cpp
+)
+target_include_directories(ste_ui_core PUBLIC src)
+target_compile_definitions(ste_ui_core PUBLIC UNICODE _UNICODE PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
+target_link_libraries(ste_ui_core PUBLIC RmlUi::RmlUi nlohmann_json::nlohmann_json miniz)
+if(MSVC)
+    target_compile_options(ste_ui_core PRIVATE /utf-8 /W3)
+endif()
+if(WIN32)
+    target_link_libraries(ste_ui_core PUBLIC version)
+endif()
+
+# launcher_ui: the launcher screens and everything that needs SDL (events, pads, game process, monitors). The overlay does
+# not use it: ste_overlay links ste_ui_core only, so a game that ships its own SDL gets no second copy.
+add_library(launcher_ui STATIC
     src/platform/Displays.cpp
     src/platform/GameProcess.cpp
     src/platform/DriveSearch.cpp
-    src/platform/ExeVersion.cpp
-    src/platform/png_decode.cpp
     src/ui/App.cpp
     src/ui/AppMods.cpp
     src/ui/AppControllers.cpp
     src/ui/AppVideo.cpp
     src/ui/AppStopped.cpp
-    src/ui/ChamferDecorator.cpp
     src/ui/Navigation.cpp
-    src/ui/Overlay.cpp
-    src/ui/views/rows.cpp
-    src/ui/views/mods.cpp
-    src/ui/views/controllers.cpp
 )
-target_include_directories(launcher_ui PUBLIC src)
-target_compile_definitions(launcher_ui PUBLIC UNICODE _UNICODE PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
-target_link_libraries(launcher_ui PUBLIC RmlUi::RmlUi SDL3::SDL3-static nlohmann_json::nlohmann_json miniz)
+target_compile_definitions(launcher_ui PRIVATE LAUNCHER_VERSION="${LAUNCHER_VERSION_STRING}")
+target_link_libraries(launcher_ui PUBLIC ste_ui_core SDL3::SDL3-static)
 if(MSVC)
     target_compile_options(launcher_ui PRIVATE /utf-8 /W3)
-endif()
-if(WIN32)
-    target_link_libraries(launcher_ui PUBLIC version)
 endif()
 
 add_executable(launcher
@@ -93,7 +104,7 @@ target_include_directories(xiso_unpack_tool PRIVATE src)
 
 # Patch-mod helper (make / check step1 patches, print SHA-256). Not part of the default build.
 add_executable(step_patch_tool EXCLUDE_FROM_ALL src/tools/step_patch_tool.cpp)
-target_link_libraries(step_patch_tool PRIVATE launcher_ui)
+target_link_libraries(step_patch_tool PRIVATE ste_ui_core)
 if(MSVC)
     target_compile_options(step_patch_tool PRIVATE /utf-8)
 endif()
@@ -108,7 +119,7 @@ if(WIN32)
         src/platform/UiBackendD3D11.cpp
         "${RMLUI_SOURCE_DIR}/Backends/RmlUi_Renderer_DX11.cpp")
     target_include_directories(ste_overlay PUBLIC include PRIVATE "${RMLUI_SOURCE_DIR}/Backends")
-    target_link_libraries(ste_overlay PUBLIC launcher_ui d3d11 dxgi d3dcompiler)
+    target_link_libraries(ste_overlay PUBLIC ste_ui_core d3d11 dxgi d3dcompiler)
     if(MSVC)
         target_compile_options(ste_overlay PRIVATE /utf-8 /W3)
     endif()

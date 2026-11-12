@@ -1,7 +1,6 @@
 #include "ui/Overlay.h"
 
-#include <SDL3/SDL.h>
-
+#include <chrono>
 #include <set>
 
 #include "core/identify.h"
@@ -24,7 +23,7 @@ bool Overlay::init(LauncherModel& model, const OverlayInit& init, OverlayCallbac
     views::setGlyphDir(pathToUtf8(init.resourceDir / "assets" / "glyphs"));
     ctx_ = Rml::CreateContext(kCtx, Rml::Vector2i(init.width, init.height));
     if (!ctx_) { err = "Could not create the overlay screen"; return false; }
-    resize(init.width, init.height, init.contentScale, init.mouseScale);
+    resize(init.width, init.height, init.contentScale);
     doc_ = ctx_->LoadDocument(pathToUtf8(init.resourceDir / "ui" / "rml" / "overlay.rml"));
     if (!doc_) {
         err = "Could not load the overlay screen";
@@ -46,11 +45,10 @@ void Overlay::shutdown() {
     visible_ = false;
 }
 
-void Overlay::resize(int w, int h, float contentScale, float mouseScale) {
+void Overlay::resize(int w, int h, float contentScale) {
     init_.width = w;
     init_.height = h;
     init_.contentScale = contentScale;
-    init_.mouseScale = mouseScale;
     if (!ctx_) return;
     ctx_->SetDimensions(Rml::Vector2i(w, h));
     ctx_->SetDensityIndependentPixelRatio(float(h) / 820.f * contentScale);
@@ -69,41 +67,33 @@ void Overlay::hide() {
     if (cb_.onHide) cb_.onHide();
 }
 
-bool Overlay::feedEvent(const SDL_Event& ev) {
+bool Overlay::feedNav(NavAction a) {
     if (!visible_ || !ctx_) return false;
-    switch (ev.type) {
-        case SDL_EVENT_MOUSE_MOTION:
-            ctx_->ProcessMouseMove(int(ev.motion.x * init_.mouseScale), int(ev.motion.y * init_.mouseScale), 0);
-            return true;
-        case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        case SDL_EVENT_MOUSE_BUTTON_UP: {
-            const int b = ev.button.button == SDL_BUTTON_LEFT ? 0 : ev.button.button == SDL_BUTTON_RIGHT ? 1 : 2;
-            if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN) ctx_->ProcessMouseButtonDown(b, 0);
-            else ctx_->ProcessMouseButtonUp(b, 0);
-            return true;
-        }
-        case SDL_EVENT_MOUSE_WHEEL:
-            ctx_->ProcessMouseWheel(Rml::Vector2f(-ev.wheel.x, -ev.wheel.y), 0);
-            return true;
-        case SDL_EVENT_KEY_DOWN:
-        case SDL_EVENT_KEY_UP:
-        case SDL_EVENT_TEXT_INPUT:
-        case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-        case SDL_EVENT_GAMEPAD_BUTTON_UP:
-        case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-            nav_.handleEvent(ev);
-            return true;  // consumed either way: the game must not see it
-        case SDL_EVENT_GAMEPAD_ADDED:
-        case SDL_EVENT_GAMEPAD_REMOVED:
-            nav_.handleEvent(ev);
-            return false;  // the host still wants to know about pads coming and going
-        default: return false;
-    }
+    nav_.push(a);
+    return true;
+}
+
+bool Overlay::feedMouseMove(int x, int y) {
+    if (!visible_ || !ctx_) return false;
+    ctx_->ProcessMouseMove(x, y, 0);
+    return true;
+}
+
+bool Overlay::feedMouseButton(int button, bool down) {
+    if (!visible_ || !ctx_) return false;
+    if (down) ctx_->ProcessMouseButtonDown(button, 0);
+    else ctx_->ProcessMouseButtonUp(button, 0);
+    return true;
+}
+
+bool Overlay::feedMouseWheel(float up) {
+    if (!visible_ || !ctx_) return false;
+    ctx_->ProcessMouseWheel(Rml::Vector2f(0, -up), 0);
+    return true;
 }
 
 void Overlay::update(double dt) {
     if (!visible_ || !ctx_) return;
-    nav_.update(dt);
     for (NavAction a : nav_.take()) {
         if (!visible_) break;
         if (nav_.perform(ctx_, doc_, a)) continue;
@@ -166,7 +156,7 @@ void Overlay::act(const std::string& action, const std::string& arg) {
 
 // One row stepped (chevron, click on the value, or Left/Right): the model changes and saves it, the game is told.
 void Overlay::step(const std::string& id, int dir) {
-    const auto r = model_->stepSetting(id, dir, SDL_GetTicks());
+    const auto r = model_->stepSetting(id, dir, uint64_t(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count()));
     note_ = r.saveError.empty() ? "" : "Could not save: " + r.saveError;
     notifyGame(id);
     renderScreen();

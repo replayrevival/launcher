@@ -9,7 +9,7 @@
 #include <string>
 
 #include "core/launcher_model.h"
-#include "ui/Navigation.h"
+#include "ui/NavCore.h"
 
 enum class Applied { Now, NextMatch, AfterRestart, Refused };
 
@@ -25,7 +25,6 @@ struct OverlayInit {
     std::filesystem::path resourceDir;  // folder with ui\ and assets\ (next to the game exe)
     int width = 1280, height = 720;     // back buffer size in pixels
     float contentScale = 1.f;           // user / OS scale on top of height / 820
-    float mouseScale = 1.f;             // pixels per SDL window coordinate (SDL_GetWindowSizeInPixels / SDL_GetWindowSize)
 };
 
 class Overlay : public Rml::EventListener {
@@ -39,14 +38,18 @@ public:
     void hide();
     bool visible() const { return visible_; }
 
-    // Raw input from the host. While visible the overlay consumes every input event (returns true) so the game gets none;
-    // while hidden it returns false. The host decides when F1 / Guide / Back+Start opens it.
-    bool feedEvent(const SDL_Event& ev);
+    // Input from the host, already translated (the library has no SDL, Win32 or other input code). Each returns true when the
+    // overlay used it, i.e. always while visible and never while hidden: the game must not see input while the overlay is open.
+    // Mouse positions are back buffer pixels.
+    bool feedNav(NavAction a);
+    bool feedMouseMove(int x, int y);
+    bool feedMouseButton(int button, bool down);  // 0 left, 1 right, 2 middle
+    bool feedMouseWheel(float notchesUp);
     void update(double dt);  // once per frame
     void render();           // after the game's frame, inside the host's backend begin/end; no-op while hidden
-    void resize(int width, int height, float contentScale, float mouseScale);
+    void resize(int width, int height, float contentScale);
 
-    Navigation& navigation() { return nav_; }  // tests: pin the device kind, push actions
+    NavCore& navigation() { return nav_; }  // pin the device kind (hint bar)
     Rml::Context* context() { return ctx_; }
 
     void ProcessEvent(Rml::Event& ev) override;
@@ -66,7 +69,7 @@ private:
     LauncherModel* model_ = nullptr;
     OverlayInit init_;
     OverlayCallbacks cb_;
-    Navigation nav_;
+    NavCore nav_;
     Rml::Context* ctx_ = nullptr;
     Rml::ElementDocument* doc_ = nullptr;
     Screen screen_ = Screen::Main;
