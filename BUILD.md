@@ -36,3 +36,11 @@ Not part of the default build. `cmake --build build --target ste_overlay overlay
 
 ## Releases
 `powershell -File scripts\package.ps1 -Version 0.1.3 -GameExe <path to the game's ste-recomp.exe> -Out <output folder>` builds a distribution zip, a manifest with SHA-256 of every file, and a changelog (the user-facing text comes from `packaging\changes\<version>.txt`). Run `Get-Help .\scripts\package.ps1 -Full` for the options and the checks it makes.
+
+## Troubleshooting
+- **A change to a header seems to have no effect, or the program crashes right after starting after you edited a struct in a header.**
+  Some CMake generators (notably "NMake Makefiles") can miss that a source file includes a changed header, so the old object file is
+  linked against the new layout. Delete the `build` folder and build again, or use the Ninja generator, which asks the compiler for the
+  real include list: `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release` (Ninja ships with the Visual Studio C++ tools and with
+  CMake's installer). `scripts" + bs + "build.cmd` uses whatever it finds; the project's own developer script uses Ninja.
+- **A build folder made with another generator**: CMake refuses to switch generators in the same folder. Use a new folder (set `BUILD_DIR`).

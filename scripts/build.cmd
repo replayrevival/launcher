@@ -31,8 +31,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
-rem NMake Makefiles works with every Visual Studio / CMake combination.
-"%CMAKE%" -S "%ROOT%" -B "%BUILD_DIR%" -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release %*
+rem Ninja (shipped with the Visual Studio C++ tools) rebuilds everything that includes a changed header reliably; the older
+rem "NMake Makefiles" generator works with every Visual Studio / CMake combination and is the fallback.
+set "GEN=NMake Makefiles"
+where ninja >nul 2>nul
+if not errorlevel 1 (
+    set "GEN=Ninja"
+) else if exist "%VSDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja\ninja.exe" (
+    set "PATH=%VSDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;%PATH%"
+    set "GEN=Ninja"
+)
+"%CMAKE%" -S "%ROOT%" -B "%BUILD_DIR%" -G "%GEN%" -DCMAKE_BUILD_TYPE=Release %*
 if errorlevel 1 exit /b 1
 "%CMAKE%" --build "%BUILD_DIR%"
 exit /b %errorlevel%
