@@ -15,6 +15,7 @@
 #include "core/paths.h"
 #include "platform/UiBackend.h"
 #include "ui/App.h"
+#include "ui/views/rows.h"
 #include "ui/ChamferDecorator.h"
 #include "ui/Navigation.h"
 
@@ -43,6 +44,7 @@ struct Args {
     double hold = 0.3;              // --hold <seconds>: wait this long after the script before the screenshot
     bool killGame = false;          // --kill-game: stop the game when the launcher exits
     bool fresh = false;             // --fresh: ignore the remembered game (first-start screen)
+    std::string device;             // --device xbox|playstation|switch|generic|keyboard: pretend this input device is in use (tests)
     std::string fakeDisplays;       // --fake-displays <json>: use this monitor list instead of the real one (tests)
     int width = 1280, height = 820;
 };
@@ -56,6 +58,7 @@ Args parseArgs(int argc, char** argv) {
         else if (s == "--hold" && i + 1 < argc) a.hold = std::atof(argv[++i]);
         else if (s == "--kill-game") a.killGame = true;
         else if (s == "--fresh") a.fresh = true;
+        else if (s == "--device" && i + 1 < argc) a.device = argv[++i];
         else if (s == "--fake-displays" && i + 1 < argc) a.fakeDisplays = argv[++i];
         else if (s == "--content-scale" && i + 1 < argc) g_testContentScale = float(std::atof(argv[++i]));
         else if (s == "--size" && i + 1 < argc) std::sscanf(argv[++i], "%dx%d", &a.width, &a.height);
@@ -119,6 +122,7 @@ int main(int argc, char** argv) {
     }
     registerDecorators();
 
+    views::setGlyphDir(pathToUtf8(exeDir / "assets" / "glyphs"));
     const std::string fontDir = pathToUtf8(exeDir / "assets" / "fonts") + "/";
     Rml::LoadFontFace(fontDir + "PixelifySans-Bold.ttf", false, Rml::Style::FontWeight::Bold);
     const struct { const char* file; int weight; } chakra[] = {
@@ -140,6 +144,12 @@ int main(int argc, char** argv) {
     doc->Show();
 
     Navigation nav;
+    if (!args.device.empty()) {
+        static const std::pair<const char*, DeviceKind> kinds[] = {{"keyboard", DeviceKind::Keyboard}, {"xbox", DeviceKind::Xbox},
+            {"playstation", DeviceKind::PlayStation}, {"switch", DeviceKind::Switch}, {"generic", DeviceKind::Generic}};
+        for (auto& k : kinds)
+            if (args.device == k.first) nav.forceDevice(k.second);
+    }
     App app(profile, paths, nav, backend->window());
     app.killGameOnExit(args.killGame);
     app.ignoreSavedGame(args.fresh);

@@ -1,15 +1,47 @@
 #include "platform/UiBackend.h"
 
-#include <RmlUi/Core/Log.h>
+#include <RmlUi/Core.h>
 #include <SDL3/SDL.h>
 
 #include <vector>
+
+#include "platform/png_decode.h"
 
 #include "RmlUi_Include_GL3.h"
 #include "RmlUi_Platform_SDL.h"
 #include "RmlUi_Renderer_GL3.h"
 
 namespace {
+
+// RmlUi's stock GL3 renderer only reads TGA files. The button pictures are PNG (Kenney Input Prompts), so decode those
+// ourselves (platform/png_decode) and hand the pixels over premultiplied, as RmlUi expects.
+class GL3Renderer final : public RenderInterface_GL3 {
+public:
+    Rml::TextureHandle LoadTexture(Rml::Vector2i& dims, const Rml::String& source) override {
+        if (source.size() > 4 && source.compare(source.size() - 4, 4, ".png") == 0) {
+            Rml::FileInterface* fi = Rml::GetFileInterface();
+            Rml::FileHandle fh = fi->Open(source);
+            if (!fh) return {};
+            fi->Seek(fh, 0, SEEK_END);
+            std::vector<uint8_t> file(fi->Tell(fh));
+            fi->Seek(fh, 0, SEEK_SET);
+            fi->Read(file.data(), file.size(), fh);
+            fi->Close(fh);
+            int w = 0, h = 0;
+            std::vector<uint8_t> px;
+            std::string err;
+            if (!decodePng(file, w, h, px, err)) {
+                Rml::Log::Message(Rml::Log::LT_WARNING, "Picture %s: %s", source.c_str(), err.c_str());
+                return {};
+            }
+            for (size_t i = 0; i < px.size(); i += 4)
+                for (int c = 0; c < 3; ++c) px[i + c] = uint8_t(px[i + c] * px[i + 3] / 255);
+            dims = {w, h};
+            return GenerateTexture(Rml::Span<const Rml::byte>(reinterpret_cast<const Rml::byte*>(px.data()), px.size()), dims);
+        }
+        return RenderInterface_GL3::LoadTexture(dims, source);
+    }
+};
 
 class GL3Backend final : public UiBackend {
 public:
@@ -53,7 +85,7 @@ public:
         glReady_ = true;
 
         system_ = std::make_unique<SystemInterface_SDL>(window_);
-        render_ = std::make_unique<RenderInterface_GL3>();
+        render_ = std::make_unique<GL3Renderer>();
         if (!*render_) {
             err = "Could not set up the OpenGL renderer";
             return false;
@@ -112,7 +144,7 @@ private:
     SDL_GLContext glContext_ = nullptr;
     bool glReady_ = false;
     std::unique_ptr<SystemInterface_SDL> system_;
-    std::unique_ptr<RenderInterface_GL3> render_;
+    std::unique_ptr<GL3Renderer> render_;
 };
 
 }  // namespace

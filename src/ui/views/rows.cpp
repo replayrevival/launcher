@@ -41,6 +41,10 @@ std::string specialRow(const LauncherModel& m, const SettingRow& row) {
 
 std::string esc(const std::string& s) { return Rml::StringUtilities::EncodeRml(s); }
 
+namespace { std::string g_glyphDir; }
+void setGlyphDir(const std::string& d) { g_glyphDir = d; for (auto& c : g_glyphDir) if (c == '\\') c = '/'; if (!g_glyphDir.empty() && g_glyphDir.back() != '/') g_glyphDir += '/'; }
+std::string glyphHtml(const std::string& stem) { return "<img class=\"glyph\" src=\"" + g_glyphDir + stem + ".png\"/>"; }
+
 std::string rowHtml(const std::string& id, const std::string& label, const std::string& hint, const std::string& val, bool on, bool chevrons) {
     std::string h = "<div class=\"setrow\"><div class=\"setlabel\"><div class=\"lbl\">" + esc(label) + "</div>";
     // One line per '\n'; a line starting with '!' is a warning (yellow).

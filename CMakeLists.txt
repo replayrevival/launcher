@@ -39,6 +39,7 @@ add_library(launcher_ui STATIC
     src/platform/GameProcess.cpp
     src/platform/DriveSearch.cpp
     src/platform/ExeVersion.cpp
+    src/platform/png_decode.cpp
     src/ui/App.cpp
     src/ui/AppMods.cpp
     src/ui/AppControllers.cpp

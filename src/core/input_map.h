@@ -32,6 +32,10 @@ enum class PadFamily { Xbox, PlayStation, Switch, Generic };
 // "Button prompts" setting ([input] button_prompts in the game's ini): which button names to show.
 enum class PromptStyle { Auto, Xbox, XboxOriginal, PlayStation };
 PromptStyle parsePromptStyle(const std::string& value);  // unknown = Auto
+// File stem of the button picture (assets/glyphs/<stem>.png, Kenney "Input Prompts", CC0) for a controller source under the
+// given family and "Button prompts" style; "" = no picture (keyboard keys, Switch pads, the original Xbox Black/White buttons),
+// the caller then shows the text label.
+std::string glyphFile(const std::string& source, PadFamily family, PromptStyle style);
 
 class InputMap {
 public:

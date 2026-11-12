@@ -81,7 +81,7 @@ New-Item -ItemType Directory -Force $stage | Out-Null
 Copy-Item $launcherExe $stage
 Copy-Item $GameExe (Join-Path $stage 'ste-recomp.exe')
 foreach ($c in $crtFiles) { Copy-Item (Join-Path $CrtDir $c) $stage }
-foreach ($d in 'ui', 'assets', 'config') { robocopy (Join-Path $repo $d) (Join-Path $stage $d) /E /XF *.bak /NFL /NDL /NJH /NJS /NP | Out-Null }
+foreach ($d in 'ui', 'assets', 'config') { robocopy (Join-Path $repo $d) (Join-Path $stage $d) /E /XF *.bak *.zip /NFL /NDL /NJH /NJS /NP | Out-Null }
 robocopy $FsrDir (Join-Path $stage 'fsr1') /E /NFL /NDL /NJH /NJS /NP | Out-Null
 foreach ($f in 'LICENSE', 'CREDITS.md') { Copy-Item (Join-Path $repo $f) $stage }
 Copy-Item (Join-Path $repo 'packaging\THIRD_PARTY_NOTICES.md') $stage

@@ -269,6 +269,12 @@ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
+--- Kenney Input Prompts 1.5 (CC0 1.0, public domain; controller button pictures) ---
+
+Created by Kenney, www.kenney.nl. The 36 pictures in assets\glyphs\ (Xbox Series and PlayStation Series sets, "Default"
+size) are used unchanged. CC0 needs no credit; it is given as a courtesy. Licence text: assets\glyphs\License.txt
+(http://creativecommons.org/publicdomain/zero/1.0/).
+
 --- glad OpenGL loader ---
 
 glad-generated OpenGL loader code is included through RmlUi GL3 integration. The generated loader is MIT-licensed; Khronos headers are Apache License 2.0. The RmlUi license above applies to the bundled integration.

@@ -183,6 +183,8 @@ button.val.on .valtext { color: #3FD4FF; }
 }
 #hints .group { display: flex; flex-direction: row; gap: 20dp; }
 #hints .hint { display: flex; flex-direction: row; align-items: center; gap: 8dp; }
+.glyph { width: 24dp; height: 24dp; vertical-align: middle; margin-right: 8dp; }
+#hints .glyph { width: 28dp; height: 28dp; margin-right: 0dp; }
 .key { padding: 1dp 8dp; border: 1dp #3FD4FF; color: #3FD4FF; font-weight: 700; font-size: 12dp; }
 .key.start { border-color: #FFD43B; color: #FFD43B; }
 #legal { font-size: 12dp; color: #7C9CC4; }

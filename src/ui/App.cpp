@@ -34,6 +34,7 @@ std::string lowerStr(std::string s) {
 struct Hint {
     std::string key, text;
     bool yellow = false;
+    std::vector<std::string> pics;  // button pictures (glyph stems); empty = text key cap
 };
 
 std::string gbText(uint64_t bytes) {
@@ -781,28 +782,32 @@ void App::refreshHints() {
     const HintLabels h = nav_.hints();
     std::vector<Hint> hints;
     if (modalOpen_) {
-        hints = {{h.confirm, "ok"}};
+        hints = {{h.confirm, "ok", false, h.confirmG}};
     } else if (screen_ == Screen::Setup) {
-        hints.push_back({h.confirm, "select"});
+        hints.push_back({h.confirm, "select", false, h.confirmG});
         if (step_ == SetupStep::Choose) {
-            hints.push_back({h.x, "search drives"});
-            if (canCancelSetup_) hints.push_back({h.back, "back"});
+            hints.push_back({h.x, "search drives", false, h.xG});
+            if (canCancelSetup_) hints.push_back({h.back, "back", false, h.backG});
         } else if (step_ == SetupStep::Unpacking) {
             hints.clear();
-            hints.push_back({h.confirm, "select"});
-            hints.push_back({h.back, "cancel"});
+            hints.push_back({h.confirm, "select", false, h.confirmG});
+            hints.push_back({h.back, "cancel", false, h.backG});
         } else {
-            hints.push_back({h.back, step_ == SetupStep::Searching && search_.running() ? "stop" : "back"});
+            hints.push_back({h.back, step_ == SetupStep::Searching && search_.running() ? "stop" : "back", false, h.backG});
         }
     } else if (!listenAction_.empty()) {
         hints = {{"Press the new button", "Esc or wait to cancel"}};
     } else {
-        hints = {{h.confirm, "select"}, {h.back, "back"}, {h.tabs, "tabs"}, {h.start, "play", true}};
+        hints = {{h.confirm, "select", false, h.confirmG}, {h.back, "back", false, h.backG}, {h.tabs, "tabs", false, h.tabsG}, {h.start, "play", true, h.startG}};
     }
     std::string html;
     for (auto& x : hints)
-        html += "<div class=\"hint\"><span class=\"key" + std::string(x.yellow ? " start" : "") + "\">" + esc(x.key) +
-                "</span><span>" + esc(x.text) + "</span></div>";
+    {
+        std::string cap;
+        if (x.pics.empty()) cap = "<span class=\"key" + std::string(x.yellow ? " start" : "") + "\">" + esc(x.key) + "</span>";
+        else for (auto& g : x.pics) cap += views::glyphHtml(g);
+        html += "<div class=\"hint\">" + cap + "<span>" + esc(x.text) + "</span></div>";
+    }
     if (auto* g = doc_->GetElementById("hint-group")) g->SetInnerRML(html);
     if (auto* l = doc_->GetElementById("legal"))
         l->SetInnerRML("made with " + esc(profile_.brand) + " · Open source (GPL-2.0-or-later). No game files included. Bring your own copy.");

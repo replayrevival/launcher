@@ -7,6 +7,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <map>
 
 namespace fs = std::filesystem;
 using nlohmann::json;
@@ -167,6 +168,38 @@ PromptStyle parsePromptStyle(const std::string& v) {
     if (v == "xbox_original") return PromptStyle::XboxOriginal;
     if (v == "playstation") return PromptStyle::PlayStation;
     return PromptStyle::Auto;
+}
+
+std::string glyphFile(const std::string& s, PadFamily f, PromptStyle style) {
+    if (InputMap::isKeySource(s)) return "";
+    if (style == PromptStyle::Xbox || style == PromptStyle::XboxOriginal) f = PadFamily::Xbox;
+    if (style == PromptStyle::PlayStation) f = PadFamily::PlayStation;
+    if (f == PadFamily::Xbox) {
+        static const std::map<std::string, std::string> x = {
+            {"a", "xbox_button_a"}, {"b", "xbox_button_b"}, {"x", "xbox_button_x"}, {"y", "xbox_button_y"},
+            {"back", "xbox_button_back"}, {"start", "xbox_button_start"}, {"leftshoulder", "xbox_lb"}, {"rightshoulder", "xbox_rb"},
+            {"lefttrigger", "xbox_lt"}, {"righttrigger", "xbox_rt"}, {"leftstick", "xbox_ls"}, {"rightstick", "xbox_rs"},
+            {"dpup", "xbox_dpad_up"}, {"dpdown", "xbox_dpad_down"}, {"dpleft", "xbox_dpad_left"}, {"dpright", "xbox_dpad_right"}};
+        if (style == PromptStyle::XboxOriginal) {
+            if (s == "leftshoulder" || s == "rightshoulder") return "";  // Black / White: no picture in the set, text label
+            if (s == "a" || s == "b" || s == "x" || s == "y") return "xbox_button_color_" + s;  // coloured, like the original pad
+        }
+        auto it = x.find(s);
+        return it == x.end() ? "" : it->second;
+    }
+    if (f == PadFamily::PlayStation) {
+        static const std::map<std::string, std::string> p = {
+            {"a", "playstation_button_cross"}, {"b", "playstation_button_circle"}, {"x", "playstation_button_square"},
+            {"y", "playstation_button_triangle"}, {"back", "playstation5_button_create"}, {"start", "playstation5_button_options"},
+            {"leftshoulder", "playstation_trigger_l1"}, {"rightshoulder", "playstation_trigger_r1"},
+            {"lefttrigger", "playstation_trigger_l2"}, {"righttrigger", "playstation_trigger_r2"},
+            {"leftstick", "playstation_button_l3"}, {"rightstick", "playstation_button_r3"},
+            {"dpup", "playstation_dpad_up"}, {"dpdown", "playstation_dpad_down"}, {"dpleft", "playstation_dpad_left"},
+            {"dpright", "playstation_dpad_right"}};
+        auto it = p.find(s);
+        return it == p.end() ? "" : it->second;
+    }
+    return "";
 }
 
 std::string InputMap::label(const std::string& s, PadFamily f, PromptStyle style) {

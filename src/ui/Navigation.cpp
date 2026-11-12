@@ -2,6 +2,8 @@
 
 #include <RmlUi/Core.h>
 
+#include "core/input_map.h"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -54,7 +56,7 @@ bool Navigation::parseAction(const std::string& n, NavAction& out) {
 }
 
 void Navigation::setDevice(DeviceKind k) {
-    if (k != device_) { device_ = k; deviceChanged_ = true; }
+    if (!deviceLocked_ && k != device_) { device_ = k; deviceChanged_ = true; }
 }
 
 bool Navigation::takeDeviceChanged() {
@@ -100,6 +102,27 @@ HintLabels Navigation::hints() const {
         h.confirm = swapConfirmBack ? "Circle" : "Cross";
         h.back = swapConfirmBack ? "Cross" : "Circle";
         h.x = "Square"; h.y = "Triangle"; h.start = "OPTIONS"; h.tabs = "L1 R1";
+    }
+    // Pictures: forced styles, or Auto with an Xbox / PlayStation pad. Switch and unknown pads keep the text key caps.
+    const PromptStyle ps = parsePromptStyle(promptStyle);
+    PadFamily fam = PadFamily::Generic;
+    if (ps == PromptStyle::Auto) {
+        if (device_ == DeviceKind::PlayStation) fam = PadFamily::PlayStation;
+        else if (device_ == DeviceKind::Xbox) fam = PadFamily::Xbox;
+    }
+    auto pic = [&](const char* src) {
+        const std::string g = glyphFile(src, fam, ps);
+        return g.empty() ? std::vector<std::string>{} : std::vector<std::string>{g};
+    };
+    auto both = [&](const char* a, const char* b) {
+        const std::string ga = glyphFile(a, fam, ps), gb = glyphFile(b, fam, ps);
+        return ga.empty() || gb.empty() ? std::vector<std::string>{} : std::vector<std::string>{ga, gb};
+    };
+    if (ps != PromptStyle::Auto || fam != PadFamily::Generic) {
+        h.confirmG = pic(swapConfirmBack ? "b" : "a");
+        h.backG = pic(swapConfirmBack ? "a" : "b");
+        h.xG = pic("x"); h.yG = pic("y"); h.startG = pic("start");
+        h.tabsG = both("leftshoulder", "rightshoulder");
     }
     return h;
 }

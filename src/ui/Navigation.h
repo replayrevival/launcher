@@ -13,6 +13,9 @@ enum class DeviceKind { Keyboard, Xbox, PlayStation, Switch, Generic };
 
 struct HintLabels {
     std::string confirm, back, tabs, start, x, y;
+    // Button pictures (glyph file stems, assets/glyphs) for the same hints; empty = show the text above as a key cap.
+    // `tabs` has two (previous, next tab). Keyboard hints never have pictures.
+    std::vector<std::string> confirmG, backG, tabsG, startG, xG, yG;
 };
 
 // Turns keyboard and gamepad input into NavActions and moves RmlUi focus between
@@ -53,6 +56,7 @@ public:
     std::function<bool(const SDL_Event&)> capture;
 
     DeviceKind device() const { return device_; }
+    void forceDevice(DeviceKind k) { device_ = k; deviceChanged_ = true; deviceLocked_ = true; }  // tests: stop following the real input device
     HintLabels hints() const;
     // True once after the device kind (and so the hint bar) changed.
     bool takeDeviceChanged();
@@ -69,6 +73,7 @@ private:
     std::vector<SDL_Gamepad*> pads_;
     SDL_Gamepad* activePad_ = nullptr;
     DeviceKind device_ = DeviceKind::Keyboard;
+    bool deviceLocked_ = false;
     bool deviceChanged_ = true;
     bool padsChanged_ = false;
 

@@ -231,6 +231,10 @@ std::string App::renderControllers() {
                  "<button class=\"nav\" data-action=\"ctl-test\" data-key=\"ctl-test\"><span class=\"marker\"/>TEST RUMBLE</button></div>";
         }
         h += "<div class=\"section-label grouphead\">BUTTONS · select one, then press the new button</div>";
+        auto bindGlyph = [&](const std::string& src) {
+            const std::string g = glyphFile(src, fam, style);
+            return g.empty() ? std::string() : views::glyphHtml(g);
+        };
         for (auto& a : input_.actions()) {
             const auto it = p.bindings.find(a.id);
             const std::string src = it == p.bindings.end() ? "" : it->second;
@@ -243,7 +247,8 @@ std::string App::renderControllers() {
             h += row(a.label, "",
                      "<button class=\"nav val" + std::string(listening ? " on" : "") + "\" data-action=\"ctl-bind\" data-arg=\"" + a.id +
                      "\" data-key=\"bind-" + a.id + "\"><span class=\"marker\"/><span class=\"valtext\">" +
-                     esc(listening ? "PRESS A BUTTON..." : InputMap::label(src, fam, style)) + "</span></button>");
+                     (listening ? "" : bindGlyph(src)) + esc(listening ? "PRESS A BUTTON..." : InputMap::label(src, fam, style)) +
+                     "</span></button>");
         }
         h += "<div class=\"row filerow\"><span class=\"muted small\">Go back to the original layout:</span>"
              "<button class=\"nav\" data-action=\"ctl-reset\" data-key=\"ctl-reset\"><span class=\"marker\"/>RESET BUTTONS</button></div>";
