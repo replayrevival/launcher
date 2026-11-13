@@ -439,6 +439,7 @@ void App::act(const std::string& action, const std::string& arg) {
         for (auto& t : tabs)
             if (arg == t.n) setTab(t.t);
     } else if (action == "preset") {
+        dismissFirstStartNote();
         applyPresetNoted(arg);
         saveSettings();
         render();
@@ -507,6 +508,7 @@ bool App::handleAction(NavAction a) {
 
 void App::play(bool original, bool borderless) {
     if (screen_ != Screen::Main || game_.running()) return;
+    dismissFirstStartNote();
     refreshDisplays();  // monitors may have changed since the launcher started
     if (!pendingNotice_.empty()) { render(); return; }  // shows the notice; press PLAY again to start
     if (!fs::is_directory(state_.gamePath.empty() ? fs::path() : pathFromUtf8(state_.gamePath))) {
@@ -580,6 +582,13 @@ void App::play(bool original, bool borderless) {
     spec.logErr = paths_.dataDir / "logs" / (std::string("play_") + stamp + ".err");
 
     std::error_code ec;
+    if (!fs::exists(spec.exe, ec)) {
+        showModal("The game program is missing",
+                  "The launcher cannot find the game program (" + pathToUtf8(spec.exe.filename()) + ") next to it. It may have been deleted by your virus scanner, "
+                  "or the download was not fully unzipped. Unzip the download again into a fresh folder, and keep all its files together.",
+                  pathToUtf8(spec.exe));
+        return;
+    }
     if (!fs::exists(state_.gamePath.empty() ? fs::path() : pathFromUtf8(state_.gamePath), ec)) {
         showModal("Your game file is missing",
                   "The launcher can no longer find your game file. It may have moved, or its drive is not connected. "
@@ -965,6 +974,10 @@ std::string App::renderOverview() {
              "\" data-key=\"preset-" + p.id + "\"><span class=\"marker\"/>" + esc(p.name) + "</button>";
     h += "</div>";
     const SettingPreset* cur = settings_.preset(active);
+    if (state_.firstStartNote)
+        h += "<div class=\"note\" style=\"margin-top: 10dp\">Welcome. Your settings start on the <b>MAX</b> preset (widescreen, full resolution, everything unlocked). "
+             "Pick <b>ORIGINAL</b> for the game exactly as it was, or change single settings on the other tabs. Then press PLAY. "
+             "Your game files are never changed.</div>";
     h += "<p id=\"preset-desc\" class=\"secondary\">" +
          esc(cur ? cur->description : "Custom. You changed individual settings. Pick a preset to start over.") + "</p>";
 

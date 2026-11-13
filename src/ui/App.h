@@ -97,6 +97,7 @@ private:
     void onGameExit(int code, double secs);
     std::string supportDetails(int code, double secs) const;
     void saveCrashReport();
+    void dismissFirstStartNote() { if (state_.firstStartNote) { state_.firstStartNote = false; saveState(); } }
     // In-launcher file browser (pad, keyboard and mouse); the Windows dialog stays available behind a button.
     enum class BrowseFor { Game, GameFolder, UnpackParent, ModZip, ModFolder };
     void openBrowser(BrowseFor what);

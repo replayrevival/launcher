@@ -187,7 +187,7 @@ std::string unpackPreflight(const fs::path& image, const fs::path& finalDirIn, u
     else { auto sp = fs::space(probe, ec); if (!ec) avail = sp.available; }
     if (avail < bytes + kUnpackSlackBytes) {
         char b[256];
-        std::snprintf(b, sizeof b, "There is not enough free space on that drive: the game needs about %.1f GB and %.1f GB is free.",
+        std::snprintf(b, sizeof b, "There is not enough free space on that drive: the game needs about %.1f GB and %.1f GB is free. Free some space, or choose another drive for the unpacked game.",
                       double(bytes) / 1073741824.0, double(avail) / 1073741824.0);
         return b;
     }

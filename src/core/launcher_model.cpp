@@ -55,6 +55,8 @@ bool LauncherModel::load(std::string& err) {
         applyPresetNoted("max");
         std::string e2;
         settings.save(settingsDir(), e2);
+        state.firstStartNote = true;
+        state.save(statePath(), e2);
     }
     if (!fs::exists(marker, ec)) {
         fs::create_directories(paths.dataDir, ec);
