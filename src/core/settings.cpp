@@ -74,8 +74,10 @@ bool Settings::loadSchema(const fs::path& path, std::string& err) {
                 SettingRow row;
                 if (r.contains("group")) {
                     row.group = r["group"].get<std::string>();
+                    row.needs = r.value("needs", "");
                 } else {
                     row.id = r.at("id").get<std::string>();
+                    row.needs = r.value("needs", "");
                     row.label = r.at("label").get<std::string>();
                     row.hint = r.value("hint", "");
                     row.apply = r.value("apply", "restart");
@@ -102,9 +104,10 @@ bool Settings::loadSchema(const fs::path& path, std::string& err) {
                         for (auto& [k, v] : c.set)
                             if (!keys_.count(k)) { err = "settings.json: unknown key " + k; return false; }
                 }
-                pages_[pageName].push_back(row);
+                allPages_[pageName].push_back(row);
             }
         }
+        rebuildPages();
         return true;
     } catch (const std::exception& e) {
         err = std::string("The settings schema is not valid: ") + e.what();
@@ -116,6 +119,20 @@ const std::vector<SettingRow>& Settings::page(const std::string& name) const {
     static const std::vector<SettingRow> none;
     auto it = pages_.find(name);
     return it == pages_.end() ? none : it->second;
+}
+
+void Settings::rebuildPages() {
+    pages_.clear();
+    for (auto& [name, rows] : allPages_) {
+        auto& out = pages_[name];
+        for (auto& r : rows)
+            if (r.needs.empty() || caps_.count(r.needs)) out.push_back(r);
+    }
+}
+
+void Settings::setCapabilities(std::set<std::string> caps) {
+    caps_ = std::move(caps);
+    rebuildPages();
 }
 
 std::vector<std::string> Settings::fileIds() const {

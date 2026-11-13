@@ -23,6 +23,11 @@
     "video.render_threads": {"s": "video", "k": "render_threads", "d": "0"},
     "video.anisotropy": {"s": "video", "k": "anisotropy", "d": "0"},
     "video.mip_bias": {"s": "video", "k": "mip_bias", "d": "0"},
+    "video.hd_art": {"s": "video", "k": "hd_art", "d": "0"},
+    "video.hd_art_sky": {"s": "video", "k": "hd_art_sky", "d": "1"},
+    "video.hd_art_ground": {"s": "video", "k": "hd_art_ground", "d": "1"},
+    "video.hd_art_roofs": {"s": "video", "k": "hd_art_roofs", "d": "1"},
+    "video.hd_art_billboards": {"s": "video", "k": "hd_art_billboards", "d": "1"},
     "enhance.unlock_all_monsters": {"s": "enhance", "k": "unlock_all_monsters", "d": "0"},
     "enhance.unlock_all_cities": {"s": "enhance", "k": "unlock_all_cities", "d": "0"},
     "enhance.unlock_all_challenges": {"s": "enhance", "k": "unlock_all_challenges", "d": "0"},
@@ -48,7 +53,8 @@
     "enhance.seed_from_game_dir": {"s": "saves", "k": "seed_from_game_dir", "d": "0"}
   },
 
-  "ignore_for_preset": ["video.width", "video.height", "video.mode", "video.display", "enhance.button_prompts"],
+  "ignore_for_preset": ["video.width", "video.height", "video.mode", "video.display", "enhance.button_prompts",
+                        "video.hd_art", "video.hd_art_sky", "video.hd_art_ground", "video.hd_art_roofs", "video.hd_art_billboards"],
   "forced": {"video.menu_aspect": "pillar"},
   "migrate": {"video.aspect": {"stretch": "wide"}},
 
@@ -133,7 +139,25 @@
          {"label": "2x", "set": {"video.anisotropy": "2"}},
          {"label": "4x", "set": {"video.anisotropy": "4"}},
          {"label": "8x", "set": {"video.anisotropy": "8"}},
-         {"label": "16x", "set": {"video.anisotropy": "16"}}]}
+         {"label": "16x", "set": {"video.anisotropy": "16"}}]},
+      {"group": "HD ART", "needs": "hd_art"},
+      {"id": "hd", "needs": "hd_art", "type": "toggle", "label": "HD art", "hint": "Sharper replacement pictures, made for this game. Needs the HD art files.", "on": {"video.hd_art": "1"}},
+      {"id": "hd_sky", "needs": "hd_art", "label": "Sky", "hint": "Replacement sky pictures. Only used while HD art is on.",
+       "choices": [
+         {"label": "On", "set": {"video.hd_art_sky": "1"}},
+         {"label": "Off", "set": {"video.hd_art_sky": "0"}}]},
+      {"id": "hd_ground", "needs": "hd_art", "label": "Ground", "hint": "Replacement ground pictures. Only used while HD art is on.",
+       "choices": [
+         {"label": "On", "set": {"video.hd_art_ground": "1"}},
+         {"label": "Off", "set": {"video.hd_art_ground": "0"}}]},
+      {"id": "hd_roofs", "needs": "hd_art", "label": "Roofs", "hint": "Replacement roof pictures. Only used while HD art is on.",
+       "choices": [
+         {"label": "On", "set": {"video.hd_art_roofs": "1"}},
+         {"label": "Off", "set": {"video.hd_art_roofs": "0"}}]},
+      {"id": "hd_bill", "needs": "hd_art", "label": "Billboards", "hint": "Replacement billboard pictures. Only used while HD art is on.",
+       "choices": [
+         {"label": "On", "set": {"video.hd_art_billboards": "1"}},
+         {"label": "Off", "set": {"video.hd_art_billboards": "0"}}]}
     ],
     "enhance": [
       {"group": "UNLOCKS"},

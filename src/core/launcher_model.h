@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <functional>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,7 @@ public:
     DisplayList disp;
     int selDisplay = 0;
     bool customForced = false;        // the Custom... resolution entry is chosen
+    std::set<std::string> gameCaps;   // features the game reports (capabilities.json next to its exe, or LAUNCHER_GAME_CAPS); empty = none
     std::string gameVersion;          // version text of the game program ("0.1.0+c304"), "" = unknown
     std::string pendingNotice;        // plain-language message the view shows once it can
     std::string fakeDisplays;         // testing: a JSON monitor list instead of the real one
@@ -50,6 +52,7 @@ public:
     // Reads the schemas and all saved files, applies the first-run preset and the V-Sync default, loads the mods.
     // (Monitors are looked at separately with refreshDisplays(), once a window exists.)
     bool load(std::string& err);
+    void loadCapabilities();
     bool saveState(std::string& err);
     bool saveSettings(std::string& err);
 

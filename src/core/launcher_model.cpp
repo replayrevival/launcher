@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <fstream>
 
+#include <nlohmann/json.hpp>
+
 #include "core/identify.h"
 #include "platform/ExeVersion.h"
 
@@ -24,6 +26,29 @@ fs::path LauncherModel::exePath() const {
     return paths.exeDir / pathFromUtf8(profile.exe);
 }
 
+// What the game says it can do. Hidden settings rows ("needs" in settings.json) appear only for features listed here.
+// Source, in order: env LAUNCHER_GAME_CAPS="a,b" (tests), else <game exe folder>\capabilities.json {"features": ["hd_art"]}.
+void LauncherModel::loadCapabilities() {
+    gameCaps.clear();
+    if (const char* e = std::getenv("LAUNCHER_GAME_CAPS")) {
+        std::string cur;
+        for (const char* c = e;; ++c) {
+            if (*c == ',' || *c == 0) { if (!cur.empty()) gameCaps.insert(cur); cur.clear(); if (!*c) break; }
+            else if (*c != ' ') cur += *c;
+        }
+    } else {
+        std::ifstream f(exePath().parent_path() / "capabilities.json", std::ios::binary);
+        if (f) {
+            try {
+                const auto j = nlohmann::json::parse(f);
+                for (auto& v : j.value("features", nlohmann::json::array()))
+                    if (v.is_string()) gameCaps.insert(v.get<std::string>());
+            } catch (...) {}  // unreadable file = no extra features
+        }
+    }
+    settings.setCapabilities(gameCaps);
+}
+
 // ---------------------------------------------------------------- load / save
 
 bool LauncherModel::load(std::string& err) {
@@ -33,6 +58,7 @@ bool LauncherModel::load(std::string& err) {
     state.load(statePath());  // also holds the monitor choice, UI size, vrr note
     if (ignoreSaved) state.clearGame();
     gameVersion = readExeVersion(exePath());
+    loadCapabilities();
     // While no game build with the V-Sync / variable-refresh fix is known, presets start with variable
     // refresh Off (V-Sync stays On), so the out-of-the-box settings avoid the known start-up crash.
     if (!vsyncFixPresent()) settings.setPresetDefault("video.vrr", "off");

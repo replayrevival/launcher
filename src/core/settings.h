@@ -14,6 +14,7 @@ struct SettingChoice {
 struct SettingRow {
     std::string id, label, hint;
     std::string apply = "restart";  // when a change takes effect in a running game: "now" | "match" | "restart" (overlay badge)
+    std::string needs;  // capability the game must report (e.g. "hd_art"); the row is hidden otherwise
     std::string group;  // non-empty: this entry is a group header, nothing else is used
     bool toggle = false;
     std::string special;  // "display" / "resolution": drawn by the app from the detected monitors, no fixed choices
@@ -42,7 +43,11 @@ public:
     void clearAll() { values_.clear(); enforce(); }  // every key back to the game's default (for a one-off clean start)
     bool save(const std::filesystem::path& dir, std::string& err) const;
 
-    const std::vector<SettingRow>& page(const std::string& name) const;
+    const std::vector<SettingRow>& page(const std::string& name) const;  // only rows whose "needs" capability is present
+    // Features the game reports (capabilities.json next to its exe, or LAUNCHER_GAME_CAPS). Rows that need one
+    // the game does not have stay hidden, and their keys are never written by a preset.
+    void setCapabilities(std::set<std::string> caps);
+    bool hasCapability(const std::string& c) const { return caps_.count(c) > 0; }
     const std::vector<SettingPreset>& presets() const { return presets_; }
 
     // Index of the choice the current values correspond to, or -1 ("Custom").
@@ -74,7 +79,9 @@ private:
     static bool sameValue(const std::optional<std::string>& a, const std::optional<std::string>& b);
 
     std::map<std::string, SettingKey> keys_;
-    std::map<std::string, std::vector<SettingRow>> pages_;
+    std::map<std::string, std::vector<SettingRow>> allPages_, pages_;  // pages_ = visible rows
+    std::set<std::string> caps_;
+    void rebuildPages();
     std::vector<SettingPreset> presets_;
     std::map<std::string, std::map<std::string, std::string>> presetEnv_;
     void enforce();  // forced values, applied after every load / preset

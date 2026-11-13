@@ -74,3 +74,10 @@ Per `mod_manifest.md`: `mods\` next to the exe (or `STE_MODS_DIR`), one folder p
 - Written by the launcher to `ste_enhance.ini` as `[input] button_prompts=<value>`; also passed at every launch as env `STE_BUTTON_PROMPTS=<value>` (profile.json `launch.button_prompts_env`; the env wins over the ini, as for the other overrides). The one-off "original settings" retry also passes the player's choice.
 - The launcher's own hint bar and remap labels follow the same setting (keyboard use always shows key names).
 - TO ADD to the game project's `docs/LAUNCHER_INTERFACE.md` (that file belongs to the game session; the launcher does not edit it): the key, its values and the env var above.
+
+## Capabilities (proposal, 2026-11-12) - what the launcher expects for HD art
+The launcher hides settings rows that need a game feature (`"needs": "<feature>"` in `config/settings.json`) until the game reports the feature.
+- **How the game reports it:** a file `capabilities.json` in the same folder as the game program: `{"features": ["hd_art"]}`. A missing or unreadable file means no extra features. (Tests: env `LAUNCHER_GAME_CAPS=hd_art`.) If the game session prefers another channel (for example `ste-recomp.exe --capabilities` printing the same JSON), tell us and only `LauncherModel::loadCapabilities()` changes.
+- **HD art rows** (Video tab, group "HD ART", feature `hd_art`) and the ini keys they write to `ste_video.ini` `[video]`. Names of the four category keys are our guess, please confirm or correct:
+  `hd_art` (0/1, default 0), `hd_art_sky`, `hd_art_ground`, `hd_art_roofs`, `hd_art_billboards` (0/1, default 1 each, only used while `hd_art=1`).
+- Presets do not touch these keys (`ignore_for_preset`), so choosing MAX or ORIGINAL never switches HD art on or off.
