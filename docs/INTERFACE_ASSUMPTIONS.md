@@ -81,3 +81,6 @@ The launcher hides settings rows that need a game feature (`"needs": "<feature>"
 - **HD art rows** (Video tab, group "HD ART", feature `hd_art`) and the ini keys they write to `ste_video.ini` `[video]`. Names of the four category keys are our guess, please confirm or correct:
   `hd_art` (0/1, default 0), `hd_art_sky`, `hd_art_ground`, `hd_art_roofs`, `hd_art_billboards` (0/1, default 1 each, only used while `hd_art=1`).
 - Presets do not touch these keys (`ignore_for_preset`), so choosing MAX or ORIGINAL never switches HD art on or off.
+
+## Launcher settings win over environment overrides (2026-11-13)
+The launcher writes its saved choices into `ste_enhance.ini` / `ste_video.ini` and passes them to the game on start, including `button_prompts` (also as `STE_BUTTON_PROMPTS`). A `STE_BUTTON_PROMPTS` set in the shell before starting the launcher is therefore replaced by the launcher's saved value. This is intended: the launcher is the source of truth for players. For testing, set the value in the launcher (or its ini), not in the environment.

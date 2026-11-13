@@ -36,7 +36,7 @@ UPDATES
   a button that opens the download page. Nothing is downloaded. It stays quiet offline, and there is an ON/OFF row
   on the Overview tab. See docs\NETWORK.md in the source release.
 
-GAME (build c367)
+GAME (build c369)
 - No console window opens when the game or the launcher starts.
 - Button prompts now change the A/B/X/Y pictures inside the game too (Auto, Xbox, Original Xbox, PlayStation).
   The two picture packs ship in texturepacks\ (Kenney Input Prompts, CC0).
