@@ -56,7 +56,9 @@ void App::browserBack() {
 // Remembers the folder (newest first, at most 8) and hands the choice over exactly like the Windows dialogs do.
 void App::browserPicked(const fs::path& p) {
     std::error_code ec;
-    const fs::path folder = fs::is_directory(p, ec) ? p : p.parent_path();
+    // A chosen mod folder is remembered by its parent (the folder holding the mods), so the next browse lists the mods.
+    // A chosen game folder stays as it is.
+    const fs::path folder = (fs::is_directory(p, ec) && browseFor_ != BrowseFor::ModFolder) ? p : p.parent_path();
     const std::string f = pathToUtf8(folder);
     state_.recentDirs.erase(std::remove(state_.recentDirs.begin(), state_.recentDirs.end(), f), state_.recentDirs.end());
     state_.recentDirs.insert(state_.recentDirs.begin(), f);

@@ -12,13 +12,12 @@ MODS (new tab)
 - Patch mods: a mod can ship small patches instead of game files. The launcher checks your own game file against the
   patch, builds the changed file into the mod's own folder (your game files stay untouched) and tells you in plain
   words if a mod was made for a different version. PLAY prepares them first; there is also a PREPARE PATCHES button.
-  (The game build must support loading the built files; see the game's own release notes.)
+  (The game build does not load the built files yet; that comes in a later version.)
 
 CONTROLLERS
 - New "Button prompts" setting: Auto (match my controller), Xbox, Original Xbox (Black and White buttons) or
   PlayStation. The launcher's own button hints and the button names on the remap screen follow it. The choice is
-  saved in the game's settings and passed to the game when it starts; it takes effect in the game as soon as the
-  game build supports it.
+  saved in the game's settings and passed to the game when it starts.
 
 BUTTON PICTURES
 - The hint bar and the remap screen show real button pictures that follow "Button prompts": Xbox, Original Xbox
@@ -36,6 +35,16 @@ UPDATES
 - Once a day the launcher can look up the newest release number on GitHub and say "A new version is available" with
   a button that opens the download page. Nothing is downloaded. It stays quiet offline, and there is an ON/OFF row
   on the Overview tab. See docs\NETWORK.md in the source release.
+
+GAME (build c367)
+- No console window opens when the game or the launcher starts.
+- Button prompts now change the A/B/X/Y pictures inside the game too (Auto, Xbox, Original Xbox, PlayStation).
+  The two picture packs ship in texturepacks\ (Kenney Input Prompts, CC0).
+- capabilities.json tells the launcher which features this game build has.
+
+KNOWN ISSUES
+- Mechagodzilla 3's back missiles are invisible while they fly; the launch flash and the hits show.
+- Patch mods are prepared but not yet loaded by the game. Work continues.
 
 PACKAGE
 - The download no longer contains the unused variable Pixelify Sans font file; every shipped font is credited

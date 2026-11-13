@@ -59,7 +59,11 @@ CONTROLS
 
 KNOWN ISSUES (alpha)
   - Some distant buildings still pop in and out in a few places.
-  - The in-game overlay (opened with the Guide button / F1) is not finished.
+  - Mechagodzilla 3's back missiles are invisible while they fly (the launch flash and the hits show).
+  - Button prompts: only the four face buttons (A/B/X/Y) change style so far; START, BACK, Black and White
+    words still show the Xbox names.
+  - Mods that ship patches are checked and prepared by the launcher, but the game does not load the prepared
+    files yet (planned for the next version).
   - Windows only; Linux and Mac are untested.
   - Only Xbox controllers have been tested so far.
 

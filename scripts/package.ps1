@@ -25,6 +25,7 @@ param(
     [string]$Previous,                                # earlier release folder, for the [OK]/[CHANGED]/[NEW] column
     [string]$CrtDir,                                  # folder with msvcp140.dll, vcruntime140.dll, vcruntime140_1.dll (default: newest in Visual Studio's Redist)
     [string]$BuildDir,                                # default: <repo>\build
+    [string]$PackBuilder,                             # build_button_pack.py of the game project (default: the game repo's mission-l6	ools\mods copy)
     [switch]$NoBuild
 )
 $ErrorActionPreference = 'Stop'
@@ -70,7 +71,9 @@ if (-not $Previous) {
 # ---- build
 if (-not $NoBuild) {
     $env:BUILD_DIR = $BuildDir
+    $ErrorActionPreference = 'Continue'   # VsDevCmd may print harmless messages on stderr; the exit code decides
     & (Join-Path $PSScriptRoot 'build.cmd') "-DLAUNCHER_VERSION_STRING=$Version" "-DLAUNCHER_CONSOLE=OFF"  # Windows-subsystem launcher: no console window
+    $ErrorActionPreference = 'Stop'
     if ($LASTEXITCODE -ne 0) { Fail 'The build failed.' }
 }
 $launcherExe = Join-Path $BuildDir 'bin\launcher.exe'
@@ -81,6 +84,17 @@ New-Item -ItemType Directory -Force $stage | Out-Null
 Copy-Item $launcherExe $stage
 Copy-Item $GameExe (Join-Path $stage 'ste-recomp.exe')
 foreach ($c in $crtFiles) { Copy-Item (Join-Path $CrtDir $c) $stage }
+# features the game reports (the launcher reads it to show or hide settings rows)
+$capFile = Join-Path (Split-Path $GameExe -Parent) 'capabilities.json'
+if (Test-Path $capFile) { Copy-Item $capFile (Join-Path $stage 'capabilities.json') } else { Write-Warning "No capabilities.json next to $GameExe" }
+# Button-prompt texture packs: built from our Kenney zip (CC0, pinned hash). The zip itself is not shipped.
+if (-not $PackBuilder) { $PackBuilder = Join-Path $repo '..\ste-recomp\mission-l6\tools\mods\build_button_pack.py' }
+$kenneyZip = Get-ChildItem (Join-Path $repo 'assets\glyphs') -Filter 'kenney_input-prompts*.zip' | Select-Object -First 1
+if ((Test-Path $PackBuilder) -and $kenneyZip) {
+    & python -I $PackBuilder --zip $kenneyZip.FullName --out (Join-Path $stage 'texturepacks')
+    if ($LASTEXITCODE -ne 0) { Fail 'Building the button prompt packs failed.' }
+} else { Write-Warning 'Button prompt packs NOT built (builder or Kenney zip missing): the game will not show other button styles.' }
+
 foreach ($d in 'ui', 'assets', 'config') { robocopy (Join-Path $repo $d) (Join-Path $stage $d) /E /XF *.bak *.zip /NFL /NDL /NJH /NJS /NP | Out-Null }
 robocopy $FsrDir (Join-Path $stage 'fsr1') /E /NFL /NDL /NJH /NJS /NP | Out-Null
 foreach ($f in 'LICENSE', 'CREDITS.md') { Copy-Item (Join-Path $repo $f) $stage }
@@ -136,7 +150,7 @@ $L.Add("Total: $($files.Count) files, $([math]::Round($total / 1MB, 1)) MB uncom
 $L.Add("Zip: $folderName-win64.zip | $zipSize bytes | SHA-256 $zipHash")
 $L.Add('')
 $L.Add('=== EXPLICIT EXCLUDES (never in the zip) ===')
-$L.Add('data\, mods\, texturepacks\, shadercache\, saves\, logs, *.log, *.err, *.out, *.dmp, screenshots, *.pdb, *.bak, other candidate exes, any default.xbe / game files / disc images, tools\, docs\, tests\, .agent-state, .claude, play*.bat, xiso_unpack_tool.exe.')
+$L.Add('data\, mods\, texturepacks\ except the two button_prompts_* packs, shadercache\, saves\, logs, *.log, *.err, *.out, *.dmp, screenshots, *.pdb, *.bak, other candidate exes, any default.xbe / game files / disc images, tools\, docs\, tests\, .agent-state, .claude, play*.bat, xiso_unpack_tool.exe.')
 $L.Add('')
 $L.Add('=== NOTES ===')
 $L.Add("profile.json: compat.vsync_vrr_fix_build = $fixBuild (game build c$gameBuild is at or above it); input_map.supported = $($profile.launch.input_map.supported).")
