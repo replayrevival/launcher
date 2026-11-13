@@ -75,6 +75,16 @@ Steps:
 
 ## 4b. Install and verify
 - **Install:** Mods tab, **INSTALL FROM ZIP** or **FROM FOLDER** (or drag it onto the window). The launcher checks the zip first and refuses anything with paths that climb out of the mod folder, encrypted entries or oversized contents. A mod with the same id asks before replacing it; the old copy is moved aside.
+
+![Choosing a mod zip in the launcher's browser](screenshots/mod_browser_zip.png)
+
+A good mod is installed and switched on; one that is not safe or not valid is refused with a plain message and nothing is installed:
+
+![Mod installed](screenshots/mod_install_zip_ok.png)
+![Mod refused](screenshots/mod_install_zip_refused.png)
+
+Examples of refusals: a zip with a file path that climbs out of the mod folder, a folder without `manifest.json`, an id with characters other than letters, digits, `.`, `-`, `_`.
+
 - **Verify:** the badge says "Works with your game" or why not. For patch mods the launcher reads the player's own file (read only), checks its hash, builds the result into `mods\<id>\_built\` and checks that hash too. PLAY does this for you; PREPARE PATCHES does it by hand. Failures are per patch: "made for a different version of the game" (shows both hashes), "result did not match", "damaged patch".
 - **Test it yourself:** install on a clean copy, press PLAY, then read `data\mods\last_report.txt` for `ACTIVE` lines. Also test removing the mod and starting again.
 
