@@ -15,6 +15,11 @@ Pushing and publishing happen only with Miko's explicit go-ahead for that releas
 4. **Release page:** put 3 to 5 of the best current shots (game and launcher) into the release notes, taken from both repos' `docs\screenshots\`. Game screenshots must not contain game imagery that cannot be shown; use only ones the game session has cleared.
 5. Screenshots show no personal text (user name, folders outside the package).
 
+## 2b. READMEs (standing rule, every release)
+- Both READMEs (`publish\ste-recomp\README.md`, `publish\launcher\README.md`) advertise the project first and are written for someone who has never heard of a recompilation: logo, one-line pitch, badges, hero image, what you get, play in 3 steps, what you need, what's new, FAQ, disclaimer. Technical detail stays, in the "For developers" part at the bottom.
+- Every release: update **What's new in vX** and "Coming next", and refresh the screenshots they show (section 2). Check the links to the new release and the badges.
+- Show Miko the README text before pushing; push only after her approval.
+
 ## 3. Checks before publishing
 - Personal-text and no-game-data scan on both publish repos (`scripts\sync_publish.ps1` scans; also check tracked file types and sizes).
 - Release notes have no leftover DRAFT marks; the zip's SHA-256 in the notes matches the file.
