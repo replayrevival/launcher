@@ -154,3 +154,7 @@ endif()
 
 # Stand-in game for testing the launcher's crash handling (tests/fake_game). Not shipped, not in the default build.
 add_executable(fake_game EXCLUDE_FROM_ALL tests/fake_game/fake_game.cpp)
+# Version comparison of the update check (a hotfix letter such as 0.1.3a counts as newer). Exit code 0 = pass.
+add_executable(update_check_test EXCLUDE_FROM_ALL tests/update_check/update_check_test.cpp src/core/update_check.cpp)
+target_include_directories(update_check_test PRIVATE src)
+target_link_libraries(update_check_test PRIVATE nlohmann_json::nlohmann_json)

@@ -23,6 +23,19 @@ std::vector<long> numbersOf(const std::string& v) {
     return out;
 }
 
+// A hotfix letter right after the last number ("0.1.3a-alpha" -> 1, "b" -> 2). Not a word like "beta": the next character must not be a letter.
+int letterOf(const std::string& v) {
+    size_t i = 0;
+    while (i < v.size() && !std::isdigit(static_cast<unsigned char>(v[i]))) ++i;
+    size_t lastDigit = std::string::npos;
+    while (i < v.size() && (std::isdigit(static_cast<unsigned char>(v[i])) || v[i] == '.')) { if (v[i] != '.') lastDigit = i; ++i; }
+    if (lastDigit == std::string::npos || i >= v.size() || lastDigit + 1 != i) return 0;
+    const char c = static_cast<char>(std::tolower(static_cast<unsigned char>(v[i])));
+    if (c < 'a' || c > 'z') return 0;
+    if (i + 1 < v.size() && std::isalpha(static_cast<unsigned char>(v[i + 1]))) return 0;
+    return c - 'a' + 1;
+}
+
 bool releaseFrom(const nlohmann::json& r, UpdateInfo& out) {
     if (!r.is_object() || r.value("draft", false)) return false;
     const std::string tag = r.value("tag_name", std::string());
@@ -57,6 +70,8 @@ int compareVersions(const std::string& a, const std::string& b) {
         const long p = i < x.size() ? x[i] : 0, q = i < y.size() ? y[i] : 0;
         if (p != q) return p < q ? -1 : 1;
     }
+    const int l = letterOf(a), m = letterOf(b);
+    if (l != m) return l < m ? -1 : 1;   // 0.1.3 < 0.1.3a < 0.1.3b < 0.1.4
     return 0;
 }
 

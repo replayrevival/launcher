@@ -12,7 +12,7 @@ struct UpdateInfo {
 // Returns false for anything unexpected (rate limit message, not found, garbage).
 bool parseLatestRelease(const std::string& json, UpdateInfo& out);
 
-// Compares dotted version numbers ("0.1.3", "v0.1.4-alpha", "1.0"): the leading numbers decide, extra text is ignored.
+// Compares dotted version numbers ("0.1.3", "v0.1.4-alpha", "1.0"): the leading numbers decide, then a hotfix letter right after them (0.1.3 < 0.1.3a < 0.1.4); other text is ignored.
 // Returns <0, 0, >0.
 int compareVersions(const std::string& a, const std::string& b);
 
