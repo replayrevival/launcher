@@ -45,7 +45,7 @@ bool Settings::loadSchema(const fs::path& path, std::string& err) {
         const json j = json::parse(text);
         for (auto& [id, v] : j.at("keys").items()) {
             SettingKey k;
-            k.file = id.substr(0, id.find('.'));
+            k.file = v.value("f", id.substr(0, id.find('.')));   // "f" = the ini file when the id prefix is a section name (audio.*, window.*)
             k.section = v.at("s").get<std::string>();
             k.key = v.at("k").get<std::string>();
             k.def = optStr(v.at("d"));
