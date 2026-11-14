@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.1.3_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.1.3a_launcher_video.png)
 
 ## What it does
 
@@ -28,11 +28,11 @@ The game itself is in its own repository: **[replayrevival/ste-recomp](https://g
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.1.3_launcher_overview.png) | ![Video](docs/screenshots/0.1.3_launcher_video.png) |
+| ![Overview](docs/screenshots/0.1.3a_launcher_overview.png) | ![Video](docs/screenshots/0.1.3a_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.1.3_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.3_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.1.3a_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.3a_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.1.3_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.1.3a_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
 
 ## Not included
