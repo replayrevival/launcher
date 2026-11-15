@@ -87,7 +87,7 @@
 
   "pages": {
     "controls": [
-      {"id": "prompts", "apply": "now", "label": "Button prompts", "hint": "Which button names the game and this launcher show.",
+      {"id": "prompts", "apply": "match", "label": "Button prompts", "hint": "Which button names the game and this launcher show.",
        "choices": [
          {"label": "Auto (match my controller)", "set": {"enhance.button_prompts": "auto"}},
          {"label": "Xbox", "set": {"enhance.button_prompts": "xbox"}},
@@ -113,24 +113,24 @@
          {"label": "75%", "set": {"video.render_scale": "0.75", "video.upscale": "fsr1"}},
          {"label": "67%", "set": {"video.render_scale": "0.667", "video.upscale": "fsr1"}},
          {"label": "50%", "set": {"video.render_scale": "0.5", "video.upscale": "fsr1"}}]},
-      {"id": "fps", "apply": "now", "label": "Frame rate", "hint": "The game keeps its original speed at any setting",
+      {"id": "fps", "apply": "restart", "label": "Frame rate", "hint": "The game keeps its original speed at any setting",
        "choices": [
          {"label": "60", "set": {"video.fps_cap": "60"}},
          {"label": "30", "set": {"video.fps_cap": "30"}},
          {"label": "Uncapped", "set": {"video.fps_cap": "0"}}]},
-      {"id": "vsync", "apply": "now", "type": "toggle", "label": "V-Sync", "hint": "On = no tearing (recommended). Off = lowest latency, may tear.",
+      {"id": "vsync", "apply": "restart", "type": "toggle", "label": "V-Sync", "hint": "On = no tearing (recommended). Off = lowest latency, may tear.",
        "on": {"video.vsync": "on"}},
-      {"id": "vrr", "apply": "now", "label": "Variable refresh rate", "hint": "Needs FreeSync/G-Sync enabled on your monitor and graphics driver.",
+      {"id": "vrr", "apply": "restart", "label": "Variable refresh rate", "hint": "Needs FreeSync/G-Sync enabled on your monitor and graphics driver.",
        "choices": [
          {"label": "Auto", "set": {"video.vrr": "auto"}},
          {"label": "Off", "set": {"video.vrr": "off"}}]},
-      {"id": "draw", "apply": "now", "label": "Draw distance", "hint": "Stops distant objects from vanishing",
+      {"id": "draw", "apply": "restart", "label": "Draw distance", "hint": "Stops distant objects from vanishing",
        "choices": [
          {"label": "Original", "set": {"video.draw_distance": "1"}},
          {"label": "2x", "set": {"video.draw_distance": "2"}},
          {"label": "4x", "set": {"video.draw_distance": "4"}},
          {"label": "Unlimited", "set": {"video.draw_distance": "unlimited"}}]},
-      {"id": "fov", "apply": "now", "label": "Field of view", "hint": "Wider shows more of the arena",
+      {"id": "fov", "apply": "restart", "label": "Field of view", "hint": "Wider shows more of the arena",
        "choices": [
          {"label": "Original", "set": {"video.fov_scale": "1"}},
          {"label": "Wider", "set": {"video.fov_scale": "1.1"}},
