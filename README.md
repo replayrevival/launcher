@@ -35,6 +35,8 @@ The game itself is in its own repository: **[replayrevival/ste-recomp](https://g
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
 | ![Mods](docs/screenshots/0.1.5_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
+| ![The in-game menu](docs/screenshots/0.1.5_overlay_paused.png) | ![The in-game menu's Video page](docs/screenshots/0.1.5_overlay_video.png) |
+| *The same screens inside the game (Back+Start, F1 or Guide).* | *Volume and mouse pointer change at once.* |
 
 ## Not included
 **No game files, game data or game executables are in this repository, and none will be accepted.** You must own the game. This is an unofficial fan project, not affiliated with or endorsed by the game's publishers or rights holders (Toho, Atari or Pipeworks). Game names are used only to say which games the launcher works with.
