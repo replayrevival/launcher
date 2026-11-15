@@ -119,3 +119,6 @@ row change -> Overlay writes the key to the ini (same writer as the launcher, at
 - Which exit code means "return to launcher", and whether the game wants to keep running its own pause menu underneath.
 - Whether the game polls SDL events (then `feedEvent(const SDL_Event&)` works as is) or needs a neutral input struct.
 - Where the overlay may draw in the frame (after the game's final composition, before present) and how it protects the game's D3D11 state.
+
+## Hosting from a plain C game: ste_overlay.dll (2026-11-14)
+A game that must not link the C++ runtime loads `ste_overlay.dll` at run time through the C interface in `include/ste_overlay_c.h` (a function-pointer table filled by `ste_overlay_load`, ABI number `STE_OVERLAY_ABI`). The DLL wraps the same `ste_overlay::Host`; the game program needs no C++ glue. Built by the normal build (`build/bin/ste_overlay.dll`), tested by `tests/overlay/overlay_dll_test.c` (`scripts/build_overlay.cmd`). Notes for the game side: `docs/NOTE_FOR_GAME_SESSION_overlay_dll.md`.

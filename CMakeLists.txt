@@ -140,6 +140,23 @@ if(WIN32)
         target_compile_options(ste_overlay PRIVATE /utf-8 /W3)
     endif()
 
+    # ste_overlay.dll: the same host behind a plain C interface (include/ste_overlay_c.h) for a game written in C that must not link the
+    # C++ runtime itself. Loaded at run time with LoadLibrary; msvcp140.dll / vcruntime140_1.dll ship next to it. Part of the default build.
+    add_library(ste_overlay_dll SHARED src/overlay_host/ste_overlay_dll.cpp)
+    target_link_libraries(ste_overlay_dll PRIVATE ste_overlay)
+    target_include_directories(ste_overlay_dll PRIVATE include)
+    set_target_properties(ste_overlay_dll PROPERTIES OUTPUT_NAME ste_overlay PREFIX ""
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/dll_import" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+    if(MSVC)
+        target_compile_options(ste_overlay_dll PRIVATE /utf-8 /W3)
+    endif()
+
+    # Plain C program that loads ste_overlay.dll like a C game (no C++ runtime in the exe). Not shipped.
+    add_executable(overlay_dll_test EXCLUDE_FROM_ALL tests/overlay/overlay_dll_test.c)
+    target_include_directories(overlay_dll_test PRIVATE include)
+    target_link_libraries(overlay_dll_test PRIVATE d3d11 dxgi)
+    add_dependencies(overlay_dll_test ste_overlay_dll)
+
     add_executable(overlay_test_host EXCLUDE_FROM_ALL tools/overlay_test_host.cpp)
     target_link_libraries(overlay_test_host PRIVATE ste_overlay)
     target_compile_definitions(overlay_test_host PRIVATE OVERLAY_TEST_SCENE="${CMAKE_SOURCE_DIR}/tests/overlay/test_scene.png")
