@@ -58,10 +58,11 @@ CONTROLS
   Black = left shoulder, White = right shoulder.
 
 IN-GAME MENU
-  Hold Back and Start together for a second on any controller (or press F1, or the Guide button) to pause the game and
+  Hold Back and Start together for a second on any controller (or press F1) to pause the game and
   open the menu: volume, mouse pointer and the other settings, controller setup, Return to launcher and Quit. Volume and
   the mouse pointer change at once; Button prompts and the enhancements apply from the next match; the rest from the
-  next start. The menu needs ste_overlay.dll next to the game program.
+  next start. The menu needs ste_overlay.dll next to the game program. The Guide / Home button can open it too if you
+  switch on "Guide button opens the menu" on the Controllers tab (off by default).
 
 KNOWN ISSUES (alpha)
   - Some distant buildings still pop in and out in a few places.

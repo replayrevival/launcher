@@ -103,7 +103,7 @@ Bug reports: <https://github.com/replayrevival/ste-recomp/issues>. Please includ
 Known issues of the current alpha are listed in the release notes.
 
 ## The in-game menu
-While the game runs, hold **Back and Start** together for a second on any controller (or press **F1**, or the **Guide** button). The game pauses and the launcher's own screens open over it: Video, Enhancements and Controllers (with button pictures and remapping), plus **Return to launcher** and **Quit game**.
+While the game runs, hold **Back and Start** together for a second on any controller (or press **F1**). The Guide / Home button opens it too if you switch on **Guide button opens the menu** on the Controllers tab (off by default). The game pauses and the launcher's own screens open over it: Video, Enhancements and Controllers (with button pictures and remapping), plus **Return to launcher** and **Quit game**.
 - **Volume** and **Mouse pointer** change at once. **Button prompts** and the enhancements apply from the next match. Everything else is saved and used the next time you start the game; each row says which.
 - **Return to launcher** asks once more, then closes the game and brings you back to the launcher. Unsaved progress is lost.
 - The menu needs `ste_overlay.dll` next to the game program (it is in the download). Without it the game runs as before.

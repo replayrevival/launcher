@@ -1,0 +1,25 @@
+Everything in v0.1.5 is in it, plus:
+
+FIXES
+- Fixes the game freezing when you open the in-game menu, seen on a real PC in true fullscreen: the window stopped
+  answering Windows, the close button and Alt+F4 did nothing. The window now keeps answering while the menu is open, and
+  closing the window (close button, Alt+F4) ends the game even with the menu open.
+- The mouse pointer is always visible while the menu is open.
+- If the game ever stops drawing for 3 seconds while the menu is NOT open, the log gets a [HANG] line, the pointer is
+  restored and a crash report is written (to help us find the cause).
+
+CHANGES
+- The Guide / Home / PlayStation button no longer opens the in-game menu by default. Hold Back and Start together for a
+  second, or press F1, as before. New setting on the Controllers tab: "Guide button opens the menu" (off by default).
+
+GAME (build c381)
+- See above. Nothing else changes in how the game plays.
+
+KNOWN ISSUES
+- Mechagodzilla 3's back missiles are invisible while they fly; the launch flash and the hits show.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- Typing a profile name with the keyboard is not possible yet (planned for 0.1.6).
+
+PACKAGE
+- Same files as v0.1.5, including ste_overlay.dll (the in-game menu).

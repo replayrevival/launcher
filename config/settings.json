@@ -52,10 +52,11 @@
     "enhance.stem_rule_rage_meter": {"s": "enhance", "k": "stem_rule_rage_meter", "d": "0"},
     "enhance.stem_rule_empty_arena": {"s": "enhance", "k": "stem_rule_empty_arena", "d": "0"},
     "enhance.button_prompts": {"s": "input", "k": "button_prompts", "d": "auto"},
+    "enhance.overlay_guide": {"s": "input", "k": "overlay_guide", "d": "0"},
     "enhance.seed_from_game_dir": {"s": "saves", "k": "seed_from_game_dir", "d": "0"}
   },
 
-  "ignore_for_preset": ["audio.master_volume", "window.hide_cursor", "video.width", "video.height", "video.mode", "video.display", "enhance.button_prompts",
+  "ignore_for_preset": ["enhance.overlay_guide", "audio.master_volume", "window.hide_cursor", "video.width", "video.height", "video.mode", "video.display", "enhance.button_prompts",
                         "video.hd_art", "video.hd_art_sky", "video.hd_art_ground", "video.hd_art_roofs", "video.hd_art_billboards"],
   "forced": {"video.menu_aspect": "pillar"},
   "migrate": {"video.aspect": {"stretch": "wide"}},
@@ -92,7 +93,8 @@
          {"label": "Auto (match my controller)", "set": {"enhance.button_prompts": "auto"}},
          {"label": "Xbox", "set": {"enhance.button_prompts": "xbox"}},
          {"label": "Original Xbox (Black and White)", "set": {"enhance.button_prompts": "xbox_original"}},
-         {"label": "PlayStation", "set": {"enhance.button_prompts": "playstation"}}]}
+         {"label": "PlayStation", "set": {"enhance.button_prompts": "playstation"}}]},
+      {"id": "guide", "apply": "restart", "type": "toggle", "label": "Guide button opens the menu", "hint": "The Guide / Home / PlayStation button also opens the in-game menu. Off by default; holding Back and Start, or F1, always work.", "on": {"enhance.overlay_guide": "1"}}
     ],
     "video": [
       {"id": "display", "type": "display", "label": "Display", "hint": "Which monitor the game opens on"},
