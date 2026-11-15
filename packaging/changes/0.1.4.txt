@@ -1,0 +1,23 @@
+Everything in v0.1.3a is in it, plus:
+
+GAME (build c376)
+- The game starts about 20 seconds sooner. It used to wait on every start for a network cable that does not exist.
+- Patch mods now work: a mod made of small patches changes the game for real. The launcher builds the changed
+  files from your own copy (your game files are never touched) and the game uses them.
+- The game can set its own volume and hide the mouse pointer (see the two new settings below).
+- If the game stops, the crash report now says a little more about what it was doing.
+
+LAUNCHER
+- New settings on the Video tab, under SOUND AND POINTER: Volume (0 to 100%) and Mouse pointer (Auto hides it
+  after 3 seconds, Always hidden, Always shown). The presets do not change them.
+- The update check now knows hotfix versions: 0.1.3a counts as newer than 0.1.3.
+
+KNOWN ISSUES
+- Mechagodzilla 3's back missiles are invisible while they fly; the launch flash and the hits show.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- The in-game menu (pause, live settings, return to launcher) is not in this version yet.
+- Button words such as START and BACK still use the Xbox names; only the A/B/X/Y pictures follow Button prompts.
+
+PACKAGE
+- Same files as v0.1.3a: the launcher, the game program, the button-picture packs and capabilities.json. No game data.

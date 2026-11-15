@@ -88,7 +88,7 @@ Examples of refusals: a zip with a file path that climbs out of the mod folder, 
 - **Verify:** the badge says "Works with your game" or why not. For patch mods the launcher reads the player's own file (read only), checks its hash, builds the result into `mods\<id>\_built\` and checks that hash too. PLAY does this for you; PREPARE PATCHES does it by hand. Failures are per patch: "made for a different version of the game" (shows both hashes), "result did not match", "damaged patch".
 - **Test it yourself:** install on a clean copy, press PLAY, then read `data\mods\last_report.txt` for `ACTIVE` lines. Also test removing the mod and starting again.
 
-Current limit: as of build c304 the game does not yet use `_built\` files, so patch mods verify and build but do not change the game until the game side lands.
+Game side: since game build c376 (v0.1.4) the game uses `_built\<target>` of an enabled api-2 mod when its SHA-256 equals `result_sha256` of the manifest; a missing or wrong file falls back to your original and is logged (`[MODS]   patch <target>: not built ...` / `RESULT MISMATCH ...`). The game does not build `_built\` itself: the launcher does it (PLAY prepares patches first, or the PREPARE PATCHES button). Checked end to end with the self-test mod: the game log says `built file verified ..., used`.
 
 ## 5. Credits and licence
 - Give your mod a licence in the manifest and say who made what.

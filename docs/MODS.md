@@ -30,7 +30,7 @@ A patch mod never contains game data: it ships binary patches that turn the play
 - **Chaining.** Two mods may patch the same file only when the later one's `base_sha256` is the earlier one's result; otherwise the later one is reported as a conflict.
 - **Safety.** The decoder checks every size before it reads or writes, bounds the decompressed op stream, verifies the patch's CRC-32 and both hashes, and cannot touch memory outside its buffers. Tested with 60,000 randomly damaged patches (CRC fixed up): each was rejected or reproduced the exact expected hash; no crash. One file is held in memory at a time (limit 1.9 GB).
 - **Tool.** `step_patch_tool` (`cmake --build build --target step_patch_tool`): `make <original> <modified> <out.step> [--raw]`, `check`, `hash`, `fuzz`. A simple starter encoder (shared start and end as COPY, the middle as INSERT), not the planned size-optimised one.
-- **Game side, as of c304: not done.** The game's `last_report.txt` lists `_built\...` as new files of the mod instead of mapping them onto the target path, so a built file does not override the original yet. The launcher passes nothing extra; the game has to treat `_built\` as the mod's file tree (mod_patch.md, section 1, rule 2).
+- **Game side (c376, v0.1.4): done.** The game uses `mods\<id>\_built\<target>` when its SHA-256 equals the manifest's `result_sha256`; otherwise it logs `not built` / `RESULT MISMATCH` and uses the original. It never builds `_built\` itself, the launcher does. Checked end to end with the game session's self-test mod (`ste.test-patch`): the game log shows `built file verified ..., used`.
 
 ## Not done yet
 - `bsdiff40` patches (they need bzip2).
