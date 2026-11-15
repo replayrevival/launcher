@@ -1,11 +1,12 @@
 Everything in v0.1.3a is in it, plus:
 
-GAME (build c376)
+GAME (build c377)
 - The game starts about 20 seconds sooner. It used to wait on every start for a network cable that does not exist.
 - Patch mods now work: a mod made of small patches changes the game for real. The launcher builds the changed
   files from your own copy (your game files are never touched) and the game uses them.
 - The game can set its own volume and hide the mouse pointer (see the two new settings below).
 - If the game stops, the crash report now says a little more about what it was doing.
+- The log says which controller button each game button is bound to (one line), to find out quickly if a controller is set up with swapped buttons.
 
 LAUNCHER
 - New settings on the Video tab, under SOUND AND POINTER: Volume (0 to 100%) and Mouse pointer (Auto hides it

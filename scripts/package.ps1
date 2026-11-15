@@ -26,6 +26,7 @@ param(
     [string]$CrtDir,                                  # folder with msvcp140.dll, vcruntime140.dll, vcruntime140_1.dll (default: newest in Visual Studio's Redist)
     [string]$BuildDir,                                # default: <repo>\build
     [string]$PackBuilder,                             # build_button_pack.py of the game project (default: the game repo's mission-l6	ools\mods copy)
+    [switch]$Overlay,                                 # also ship ste_overlay.dll (the in-game overlay); done automatically when the game's capabilities.json lists "overlay"
     [switch]$NoBuild
 )
 $ErrorActionPreference = 'Stop'
@@ -87,6 +88,16 @@ foreach ($c in $crtFiles) { Copy-Item (Join-Path $CrtDir $c) $stage }
 # features the game reports (the launcher reads it to show or hide settings rows)
 $capFile = Join-Path (Split-Path $GameExe -Parent) 'capabilities.json'
 if (Test-Path $capFile) { Copy-Item $capFile (Join-Path $stage 'capabilities.json') } else { Write-Warning "No capabilities.json next to $GameExe" }
+# The in-game overlay: ste_overlay.dll (plain C interface, include\ste_overlay_c.h). It needs msvcp140.dll / vcruntime140.dll / vcruntime140_1.dll next to it,
+# which are already shipped for the launcher (the game program itself stays plain C and loads the DLL at run time).
+$wantOverlay = $Overlay.IsPresent
+if (Test-Path $capFile) { try { if ((Get-Content $capFile -Raw | ConvertFrom-Json).features -contains 'overlay') { $wantOverlay = $true } } catch { Write-Warning "capabilities.json is not valid JSON" } }
+if ($wantOverlay) {
+    $ovDll = Join-Path $BuildDir 'bin\ste_overlay.dll'
+    if (-not (Test-Path $ovDll)) { Fail "ste_overlay.dll not found: $ovDll (the build makes it)" }
+    Copy-Item $ovDll $stage
+    Write-Host 'overlay  : ste_overlay.dll included'
+} else { Write-Host 'overlay  : not included (the game does not list "overlay" in capabilities.json; use -Overlay to force)' }
 # Button-prompt texture packs: built from our Kenney zip (CC0, pinned hash). The zip itself is not shipped.
 if (-not $PackBuilder) { $PackBuilder = Join-Path $repo '..\ste-recomp\mission-l6\tools\mods\build_button_pack.py' }
 $kenneyZip = Get-ChildItem (Join-Path $repo 'assets\glyphs') -Filter 'kenney_input-prompts*.zip' | Select-Object -First 1
