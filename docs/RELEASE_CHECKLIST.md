@@ -6,6 +6,7 @@ Pushing and publishing happen only with Miko's explicit go-ahead for that releas
 1. Wait for the game session's `PROMOTED:` note (game repo `docs\NOTE_FOR_LAUNCHER_*.md`); take the exe from `ste-recomp\mission-l6\artifacts\` and check its version and SHA-256 against the note.
 2. `scripts\package.ps1 -Version X -GameExe <exe> -Out E:\GodzillaSTE\release -BuildDir <dir>`. Move old outputs of the same version to `release\_to_delete\` first (the script refuses to overwrite).
 3. Smoke-test an unzipped copy in a new scratch folder: each Button prompts value starts the game, no console window, `--game-console` works, no `[CRASH]`, nothing written outside the package and its data folder.
+3b. Overlay (when the package has `ste_overlay.dll`): `scripts\smoke_overlay.ps1 -Pkg <unzipped package> -Game <extracted game folder>` (Back+Start chord opens it, a setting applies live, Return to launcher exits with code 20; the pad script must press at 60 s or later). Guide and F1 are keys the game reads: check by hand once.
 4. Write the release notes (`RELEASE_NOTES-vX.md`): what's new, known issues, source links, SHA-256 of the zip and of the game exe. Keep DRAFT until the tests Miko names are done.
 
 ## 2. Screenshots (standing rule, every release)

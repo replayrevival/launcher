@@ -1,0 +1,26 @@
+Everything in v0.1.4 is in it, plus:
+
+IN-GAME MENU (new)
+- Press Back and Start together (hold for a second) on any controller, or F1, or the Guide button. The game
+  pauses and the launcher's own screens open over it: change settings, set up controllers, then go on playing.
+- Volume and Mouse pointer change at once. Button prompts and the enhancements take effect at the next match,
+  everything else the next time the game starts. "Return to launcher" closes the game and brings you back here;
+  "Quit" closes it.
+- The menu needs ste_overlay.dll next to the game program (it is in the download). Without it the game runs as before.
+
+GAME (build c379)
+- With Button prompts set to Xbox or PlayStation, the words in the game follow too: for example "PRESS START"
+  becomes "PRESS MENU" or "PRESS OPTIONS", and "Xbox console" becomes "this computer". Original Xbox keeps the
+  original words. (On PlayStation a few short lines say PRESS MENU where "PRESS OPTIONS" does not fit.)
+- Back and Start held together no longer reach the game (they open the menu above).
+
+NOT IN THIS VERSION
+- Typing a profile name with the keyboard.
+
+KNOWN ISSUES
+- Mechagodzilla 3's back missiles are invisible while they fly; the launch flash and the hits show.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+
+PACKAGE
+- New file: ste_overlay.dll (the in-game menu). The Visual C++ runtime DLLs it needs were already in the download.

@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.1.4_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.1.5_launcher_video.png)
 
 ## What it does
 
@@ -19,6 +19,7 @@
 - **Presets and settings.** Choose ORIGINAL, MAX or LOW-END, or change single options: resolution, widescreen, draw distance and more.
 - **Controllers.** Set up each controller port, remap any button, and pick Xbox, PlayStation or original Xbox button pictures.
 - **Mods.** Install mods from a zip or a folder, switch them on and off and set their order. Unsafe or damaged zips are refused.
+- **In the game too.** The same screens open over the game (hold Back and Start, or press F1 or the Guide button) so you can change settings or go back to the launcher without quitting first.
 - **Plain messages.** If something is missing or the game stops, it says what happened and what to do. **Save crash report** makes a zip you can send yourself.
 - **Works with a controller, keyboard or mouse.**
 
@@ -28,11 +29,11 @@ The game itself is in its own repository: **[replayrevival/ste-recomp](https://g
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.1.4_launcher_overview.png) | ![Video](docs/screenshots/0.1.4_launcher_video.png) |
+| ![Overview](docs/screenshots/0.1.5_launcher_overview.png) | ![Video](docs/screenshots/0.1.5_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.1.4_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.4_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.1.5_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.5_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.1.4_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.1.5_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
 
 ## Not included
