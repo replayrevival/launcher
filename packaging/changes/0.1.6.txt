@@ -1,0 +1,22 @@
+Everything in v0.1.5a is in it, plus:
+
+GAME (build c408)
+- Mechagodzilla 3's back missiles now show their heads and their smoke trails. The same fix repairs other
+  particle effects that were drawn wrongly (small sprites that used the wrong picture).
+- You can type your profile name with the PC keyboard on the on-screen keyboard (Tab does END).
+- For people who make videos: an optional recorder (set STE_RECORD) and a log line for frames that took
+  more than a quarter of a second.
+
+LAUNCHER
+- Unchanged from v0.1.5a.
+
+KNOWN ISSUES
+- Mechagodzilla 2's finger rockets were not checked specifically.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- One longer stall in a water stage was seen once in a 4K test run and did not repeat (the game now logs such
+  frames, so a report with the log helps).
+- On PlayStation style a few short lines say "PRESS MENU" where "PRESS OPTIONS" does not fit.
+
+PACKAGE
+- Same files as v0.1.5a, including ste_overlay.dll (the in-game menu).

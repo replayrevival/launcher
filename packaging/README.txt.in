@@ -49,6 +49,7 @@ WHERE THINGS GO (this download runs portable)
   Delete these folders to reset (deleting data\ means an .iso is unpacked again and mods are gone).
 
 CONTROLS
+  Typing your name: on the on-screen keyboard of the profile screen you can type with the PC keyboard (Tab = END).
   Keyboard: arrows = d-pad, Enter = Start, Backspace = Back, Z X C V = A B X Y,
   Q / E = White / Black, 1 / 3 = triggers, W A S D / I J K L = sticks.
   Gamepads work (Xbox tested; PlayStation, Switch and generic pads untested). The
@@ -66,8 +67,8 @@ IN-GAME MENU
 
 KNOWN ISSUES (alpha)
   - Some distant buildings still pop in and out in a few places.
-  - Mechagodzilla 3's back missiles are invisible while they fly (the launch flash and the hits show).
-  - Typing a profile name with the keyboard is not possible yet.
+  - Mechagodzilla 2's finger rockets were not checked specifically.
+  - A rare crash while loading, seen on slow systems.
   - Windows only; Linux and Mac are untested.
   - Only Xbox controllers have been tested so far.
 

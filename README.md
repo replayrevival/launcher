@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.1.5a_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.1.6_launcher_video.png)
 
 ## What it does
 
@@ -29,14 +29,14 @@ The game itself is in its own repository: **[replayrevival/ste-recomp](https://g
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.1.5a_launcher_overview.png) | ![Video](docs/screenshots/0.1.5a_launcher_video.png) |
+| ![Overview](docs/screenshots/0.1.6_launcher_overview.png) | ![Video](docs/screenshots/0.1.6_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.1.5a_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.5a_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.1.6_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.6_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.1.5a_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.1.6_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
-| ![The in-game menu](docs/screenshots/0.1.5a_overlay_paused.png) | ![The in-game menu's Video page](docs/screenshots/0.1.5a_overlay_video.png) |
-| *The same screens inside the game (Back+Start or F1).* | *Volume and mouse pointer change at once.* |
+| ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page](docs/screenshots/0.1.6_ingame_menu_enhancements.png) |
+| *The same screens inside the game (Back+Start or F1).* | *The same style as the launcher's own pages.* |
 
 ## Not included
 **No game files, game data or game executables are in this repository, and none will be accepted.** You must own the game. This is an unofficial fan project, not affiliated with or endorsed by the game's publishers or rights holders (Toho, Atari or Pipeworks). Game names are used only to say which games the launcher works with.
