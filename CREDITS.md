@@ -21,6 +21,12 @@ Written in-house, no dependency: SHA-256 (src/core/sha256.cpp, checked against t
 | Chakra Petch Regular, Medium, SemiBold, Bold | SIL OFL 1.1 (`assets/fonts/OFL-ChakraPetch.txt`) | github.com/google/fonts `ofl/chakrapetch` (main branch, fetched 2026-10-31) | Regular 98fcd638baa5c81ff0316b7538ce330ee3b23b1302726de3526d5933a8ecf986, Medium d480f4f97405fac3600652e2e14fd0b14339031c0af4da11582994878f04d919, SemiBold 45264de3204ddbd5fb3e14a2402acd5c630d16650ae5fc221d2c52da46a6734b, Bold 65fbf76d95651697275e19db4d717c0e95a789ddd3476478b05292104db278a0 |
 | Kenney Input Prompts 1.5 (controller glyphs) | CC0 1.0 (public domain; credit given as a courtesy). `assets/glyphs/License.txt` says "Creative Commons Zero, CC0" | Created by Kenney, https://kenney.nl/assets/input-prompts; the zip was downloaded by Miko (browser only) and is kept as `assets/glyphs/kenney_input-prompts_1.5.zip` (not shipped in release zips). Used: 36 PNGs from the Xbox Series and PlayStation Series "Default" folders (list in `assets/glyphs/README.md`), copied unchanged. Original Xbox Black/White are not in the set: `assets/glyphs/ours_xbox_black.png` / `ours_xbox_white.png` are our own art (GPL-2.0-or-later, made by `scripts/make_glyphs.py`). Switch and generic pads stay text | zip: ac2fcf599080b0f3ba2d174c9474db6df1a0e96ff0662580e2da79a122ab78a1 |
 
+### Release media tooling (not shipped, not part of the launcher or the game)
+| Name | Licence | Source |
+|---|---|---|
+| FFmpeg 8.1.1 "full" Windows build | GPL-3.0 build (includes x264, x265 and others); a build tool only, nothing from it is distributed with the project | already installed on this PC by winget (`Gyan.FFmpeg`), from gyan.dev; used by `scripts/media/make_media.py` for the trailer, Short and thumbnail. No installation was needed (Miko had approved one). |
+| IBM Plex Mono Medium and Bold | SIL OFL 1.1 (copyright IBM Corp., reserved name "Plex") | github.com/google/fonts `ofl/ibmplexmono`, downloaded 2026-11-17 into `E:\GodzillaSTE\release\media\_fonts\` (Medium SHA-256 `ac27abd6450a64dd9446...`, Bold `a9b4c49bb299e05b5f6c...`); used only in the release videos and thumbnails |
+
 Shipped font files (`scripts/package.ps1` refuses to package any other .ttf): ChakraPetch-Regular.ttf, ChakraPetch-Medium.ttf, ChakraPetch-SemiBold.ttf, ChakraPetch-Bold.ttf, PixelifySans-Bold.ttf. The earlier variable Pixelify Sans file was replaced by the static Bold and is not shipped.
 
 ## Design reference

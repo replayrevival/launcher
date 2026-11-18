@@ -25,6 +25,13 @@ Pushing and publishing happen only with Miko's explicit go-ahead for that releas
 - Personal-text and no-game-data scan on both publish repos (`scripts\sync_publish.ps1` scans; also check tracked file types and sizes).
 - Release notes have no leftover DRAFT marks; the zip's SHA-256 in the notes matches the file.
 
+## 3c. Release media (standing rule, every release; Miko 2026-11-17)
+For every release make a **trailer** (16:9, 60 to 90 s, 1080p60 and 4K60), a **Short** (9:16, 1080x1920, 60 fps, 30 to 45 s, under 60 s) and a **thumbnail** (1280x720) for the Replay Revival channel (https://www.youtube.com/@ReplayRevivalGames), each with a `.txt` (title, description, tags, pinned comment; the description has the download link and the disclaimer: unofficial fan project, no game files, you need your own copy). Output: `E:\GodzillaSTE\release\media\<version>\`. Miko reviews and uploads; we never upload.
+1. Ask the game session for clips (`docs\MEDIA_CLIPS_REQUEST.md`; for the first one after a PROMOTED note) and put them in `media\<version>\clips\` with a `CLIPS.txt`.
+2. Copy `scripts\media\manifest.example.json` to `media\<version>\manifest.json`, set clip names and start times, write the release-specific beats and the "what's new" text. Every caption must be true for that release (it says what the release notes say).
+3. `python scripts\media\make_media.py media\<version>\manifest.json --draft` (fast 540p check), look at frames of every scene, then without `--draft` (1080p60 and 4K60 trailer, Short, thumbnail, chapters, audio stem, `.txt`). Check: no personal text on screen, no game logos or game files (rendered footage only), loudness about -18 LUFS (trailer) so a music track can be added, Short under 60 s and the first 2 s are the hook.
+4. Report the folder and what to review. Tooling and what we do better than the first videos: `docs\MEDIA_PLAN.md`.
+
 ## 4. Publish (only after the explicit go-ahead)
 - Back up the existing remote first if anything will be replaced.
 - Push the repos, then create the release (pre-release while the project is alpha) with the zip and its `.sha256` on both repos so the update check sees it.
