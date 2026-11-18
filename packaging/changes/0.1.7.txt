@@ -1,0 +1,22 @@
+Everything in v0.1.6 is in it, plus:
+
+GAME (build c415)
+- For developers: the game program can mount a disc image (.iso) read-only with --game <file.iso>
+  (or STE_GAME_PATH). The launcher does not use this yet; it still unpacks images itself.
+- Cheats you switch on in the Enhancements settings (invulnerable, super damage, red health) now apply
+  at once, even in the middle of a fight.
+- With PlayStation button pictures, lines that have no room for "OPTIONS" now say START (they said MENU before).
+- For people who make videos: the optional recorder was reworked (smoother, opt-in).
+
+LAUNCHER
+- Unchanged from v0.1.6.
+
+KNOWN ISSUES
+- Mechagodzilla 2's "finger rockets" (mentioned before) could not be triggered from the pad in two test takes;
+  every other Mechagodzilla 2 effect drew correctly.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- With the in-game menu open the picture is redrawn only when something changes, so it can look choppy in video.
+
+PACKAGE
+- Same files as v0.1.6, including ste_overlay.dll (the in-game menu).
