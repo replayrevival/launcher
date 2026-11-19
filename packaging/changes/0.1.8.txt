@@ -7,6 +7,8 @@ GAME (build c422)
 - "Fullscreen" is now borderless fullscreen: a borderless window that covers the whole screen, without the
   old switch of display mode. The old true full screen is still there as "Exclusive fullscreen (advanced)".
   Existing settings that said Fullscreen now give borderless fullscreen.
+- Fixed: with true full screen ("Exclusive fullscreen") or with variable refresh rate switched off, the in-game
+  menu did not redraw or react and looked frozen. It now works in every window mode.
 - Typing a name with the on-screen keyboard is about twice as fast (it is still one letter per press).
 - At the highest draw-distance quality step (x4) the game's load governor no longer shrinks the far
   skyline below x3 when the game is busy.
@@ -22,7 +24,7 @@ KNOWN ISSUES
 - A rare crash while loading, seen on slow systems. Still being investigated.
 - A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
 - With the in-game menu open the picture is redrawn only when something changes, so it can look choppy in video.
-- Exclusive fullscreen is new and little tested; if the game freezes with it, switch back to Fullscreen (borderless).
+- Exclusive fullscreen is new and less tested than the other modes; if you have trouble, switch to Fullscreen (borderless).
 - Only Xbox controllers have been tested. Windows only.
 
 PACKAGE

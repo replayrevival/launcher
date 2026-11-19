@@ -28,7 +28,7 @@ The game itself is in its own repository: **[replayrevival/ste-recomp](https://g
 ## What's new in v0.1.8
 
 - **The in-game menu works with a controller alone.** Hold Back and Start (or press F1), move with the D-pad or left stick, A chooses, B goes back, **LB and RB switch between the Video, Enhancements and Controllers pages**, Start closes it. The pages show as a strip at the top.
-- **Fullscreen is now borderless fullscreen** (it covers the screen without switching the display mode). In the Video tab the window mode now has four choices: Window, Borderless window, Fullscreen (borderless) and Exclusive fullscreen (advanced, little tested).
+- **Fullscreen is now borderless fullscreen** (it covers the screen without switching the display mode). In the Video tab the window mode now has four choices: Window, Borderless window, Fullscreen (borderless) and Exclusive fullscreen (advanced, less tested than the other modes).
 - Fresh screenshots below.
 
 [Full release notes](https://github.com/replayrevival/launcher/releases/tag/v0.1.8-alpha).
