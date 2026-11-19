@@ -79,7 +79,8 @@ bool App::init(Rml::ElementDocument* doc, std::string& err) {
         uint64_t size = 0;
         int64_t mtime = 0;
         statPath(p, size, mtime);
-        if (fs::exists(p, ec) && !state_.sha256.empty() && size == state_.pathSize && mtime == state_.pathMtime && !fs::is_regular_file(p, ec)) {
+        if (fs::exists(p, ec) && !state_.sha256.empty() && size == state_.pathSize && mtime == state_.pathMtime &&
+            (!fs::is_regular_file(p, ec) || (state_.gameKind == "disc image" && discImageOk()))) {
             screen_ = Screen::Main;
         } else {
             startupCheck_ = true;
@@ -128,8 +129,26 @@ void App::beginCheck(const fs::path& p) {
 }
 
 void App::acceptGame() {
-    if (result_.kind == "disc image") { enterUnpack(); return; }   // the game itself only ever runs from a folder
+    if (result_.kind == "disc image") {
+        if (discImageOk()) { acceptImage(resultPath_, result_); return; }   // the game mounts the image itself, read-only
+        enterUnpack();   // an older game program only runs from a folder
+        return;
+    }
     acceptFolder(resultPath_, result_, fs::path());
+}
+
+void App::acceptImage(const fs::path& image, const IdResult& r) {
+    state_.gamePath = pathToUtf8(image);
+    state_.gameKind = "disc image";
+    state_.gameTitle = r.title;
+    state_.gameRegion = r.region;
+    state_.sha256 = r.sha256;
+    statPath(image, state_.pathSize, state_.pathMtime);
+    state_.sourceImage.clear(); state_.sourceSize = 0; state_.sourceMtime = 0;
+    if (!saveState()) return;
+    screen_ = Screen::Main;
+    tab_ = Tab::Overview;
+    render();
 }
 
 void App::acceptFolder(const fs::path& folder, const IdResult& r, const fs::path& sourceImage) {
@@ -511,7 +530,9 @@ void App::play(bool original, bool borderless) {
     dismissFirstStartNote();
     refreshDisplays();  // monitors may have changed since the launcher started
     if (!pendingNotice_.empty()) { render(); return; }  // shows the notice; press PLAY again to start
-    if (!fs::is_directory(state_.gamePath.empty() ? fs::path() : pathFromUtf8(state_.gamePath))) {
+    std::error_code ec0;
+    const bool imageOk = playingFromImage() && discImageOk() && fs::is_regular_file(pathFromUtf8(state_.gamePath), ec0);
+    if (!imageOk && !fs::is_directory(state_.gamePath.empty() ? fs::path() : pathFromUtf8(state_.gamePath))) {
         showModal("Your game needs to be a folder",
                   "The game runs from an unpacked folder. Choose your disc image or extracted game folder again; a disc image is unpacked once for you.",
                   state_.gamePath);
@@ -854,7 +875,7 @@ std::string App::renderSetup() {
     if (step_ == SetupStep::Choose) {
         h += "<div class=\"title big-title\">Add your game</div>";
         h += "<p class=\"secondary lead\">Choose your disc image (.iso) or extracted game folder. The launcher works out which game it is and checks it. "
-             "Your files are only read; a disc image is unpacked once into a folder next to the launcher.</p>";
+             "Your files are only read" + std::string(discImageOk() ? "; a disc image is played straight from the image.</p>" : "; a disc image is unpacked once into a folder next to the launcher.</p>");
         if (!setupNote_.empty()) h += "<div class=\"note\">" + esc(setupNote_) + "</div>";
         h += "<button class=\"nav bigbtn default\" data-action=\"choose-file\" data-key=\"choose-file\"><span class=\"marker\"/>"
              "<div class=\"title bigbtn-title\">CHOOSE DISC IMAGE (.ISO)...</div>"

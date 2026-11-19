@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.1.8_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.2.0_launcher_video.png)
 
 ## What it does
 
@@ -25,26 +25,28 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
-## What's new in v0.1.8
+## What's new in v0.2.0
 
-- **The in-game menu works with a controller alone.** Hold Back and Start (or press F1), move with the D-pad or left stick, A chooses, B goes back, **LB and RB switch between the Video, Enhancements and Controllers pages**, Start closes it. The pages show as a strip at the top.
-- **Fullscreen is now borderless fullscreen** (it covers the screen without switching the display mode). In the Video tab the window mode now has four choices: Window, Borderless window, Fullscreen (borderless) and Exclusive fullscreen (advanced, less tested than the other modes).
-- Fresh screenshots below.
-
-[Full release notes](https://github.com/replayrevival/launcher/releases/tag/v0.1.8-alpha).
+- **Play straight from your disc image.** Choose your .iso and press Play: the launcher no longer unpacks it into a folder first, and your image is only ever read. (An extracted game folder still works, and is needed for mods that change the game's own files.)
+- **The in-game menu works with a controller alone.** Hold Back and Start (or press F1), move with the D-pad or left stick, A chooses, B goes back, **LB and RB switch between the Video, Enhancements and Controllers pages**, Start closes it. The pages show as a strip at the top. The menu no longer looks frozen in true full screen.
+- **Fullscreen is now borderless fullscreen**, and the window mode has four choices: Window, Borderless window, Fullscreen (borderless) and Exclusive fullscreen (advanced, less tested).
+- **Credit:** the Enhancements options that are based on G:STEM's gameplay options are grouped under "G:STEM-inspired options" (launcher tab and in-game menu). Based on G:STEM's gameplay options — credit to Gojirex, Shame Devs, GR8GODZILLAGOD and the STEM community.
+- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.2.0-alpha).
 
 ## Screenshots
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.1.8_launcher_overview.png) | ![Video](docs/screenshots/0.1.8_launcher_video.png) |
+| ![Overview](docs/screenshots/0.2.0_launcher_overview.png) | ![Video](docs/screenshots/0.2.0_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.1.8_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.8_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.2.0_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.2.0_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.1.8_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.2.0_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
-| ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page](docs/screenshots/0.1.6_ingame_menu_enhancements.png) |
-| *The same screens inside the game (Back+Start or F1).* | *The same style as the launcher's own pages.* |
+| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.2.0_launcher_enhancements_credit.png) | |
+| *Enhancements: the G:STEM-inspired options and their credit.* | |
+| ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page with the G:STEM-inspired options](docs/screenshots/0.2.0_ingame_menu_enhancements_credit.jpg) |
+| *The same screens inside the game (Back+Start or F1).* | *The Enhancements page in the game, with the G:STEM credit.* |
 
 ## Not included
 **No game files, game data or game executables are in this repository, and none will be accepted.** You must own the game. This is an unofficial fan project, not affiliated with or endorsed by the game's publishers or rights holders (Toho, Atari or Pipeworks). Game names are used only to say which games the launcher works with.
@@ -58,7 +60,7 @@ See the [player guide](docs/PLAYER_GUIDE.md). Making mods: [modding guide](docs/
 
 One launcher for every recomp: everything game-specific lives in `config/profile.json` (identity, game program, environment), `config/settings.json` (the options and presets) and `config/controls.json` (the controller actions).
 
-- A disc image (.iso) is unpacked once into the launcher's own `data\game\` folder; an extracted folder is used in place.
+- A disc image (.iso) is played straight from the image, read-only (when the game program reports `disc_image` in its `capabilities.json`; an older game program makes the launcher unpack it once into `data\game\`). An extracted folder is used in place.
 - C++20, SDL3 + [RmlUi](https://github.com/mikke89/RmlUi) (OpenGL 3.3 behind `src/platform/UiBackend.h`, so another renderer can be added). The UI code takes a Context/Document and has no global window state, so it can be hosted in-game as an overlay.
 - Optional, quiet update check once a day (can be switched off on the Overview tab). Details: [docs/NETWORK.md](docs/NETWORK.md).
 

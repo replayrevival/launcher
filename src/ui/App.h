@@ -80,6 +80,10 @@ private:
     void beginCheck(const std::filesystem::path& p);
     void acceptGame();
     void acceptFolder(const std::filesystem::path& folder, const IdResult& r, const std::filesystem::path& sourceImage);
+    // The game reads a disc image directly (capability "disc_image", 0.2): the image path is the game path, nothing is unpacked.
+    bool discImageOk() const { return model_.gameCaps.count("disc_image") > 0; }
+    bool playingFromImage() const { return state_.gameKind == "disc image"; }
+    void acceptImage(const std::filesystem::path& image, const IdResult& r);
 
     // disc image -> game folder (the launcher unpacks it once; the game only ever sees a folder)
     void enterUnpack();

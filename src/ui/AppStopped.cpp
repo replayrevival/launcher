@@ -110,8 +110,10 @@ void App::onGameExit(int code, double secs) {
                "The launcher normally passes your game folder itself, so please press Copy details and send it with your bug report. "
                "Choosing your game again from the Overview tab may help.";
     } else if (code == 3) {
-        title = "The game could not use your game folder";
-        body = "The game's own check of your game folder failed (exit code 3). Choose your game again from the Overview tab.";
+        const bool img = playingFromImage();
+        title = img ? "The game could not use your disc image" : "The game could not use your game folder";
+        body = img ? "The game's own check of your disc image failed (exit code 3). It says what it did not like in the details below (for example that the file is not an Xbox disc image, or has no game program in it). Choose your game again from the Overview tab, or unpack the image into a folder yourself and choose that folder."
+                   : "The game's own check of your game folder failed (exit code 3). Choose your game again from the Overview tab.";
     } else if (code == 6) {
         title = "The game hit an internal error";
         body = "The game stopped because of an internal error in its own code (exit code 6)" + after +

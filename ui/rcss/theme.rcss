@@ -142,7 +142,9 @@ button.found { display: block; width: 590dp; margin-bottom: 12dp; text-align: le
 .gap14 { display: flex; flex-direction: column; gap: 14dp; padding-top: 18dp; }
 .warnline { color: #FFD43B; }
 .lbl { font-weight: 600; color: #EAF5FF; }
-.grouphead { margin-top: 18dp; padding-left: 26dp; }
+.grouphead { margin-top: 18dp; padding-left: 26dp; width: 100%; box-sizing: border-box; }
+.groupnote { padding-left: 26dp; margin: 0 0 8dp 0; font-size: 13dp; color: #7C9CC4; padding-right: 16dp; }
+.groupblock { display: flex; flex-direction: column; width: 100%; }
 button.val { min-width: 230dp; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 8dp 14dp; }
 button.val .marker { top: 12dp; left: -26dp; }
 button.val .valtext { flex: 1 1 auto; text-align: center; color: #EAF5FF; }

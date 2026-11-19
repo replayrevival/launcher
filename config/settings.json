@@ -191,7 +191,7 @@
       {"id": "u_gal", "apply": "match", "type": "toggle", "label": "Unlock the gallery", "hint": "All Gallery items.", "on": {"enhance.unlock_gallery": "1"}},
       {"id": "u_fw", "apply": "match", "type": "toggle", "label": "Unlock Final Wars items", "hint": "All Final Wars gallery items.", "on": {"enhance.unlock_final_wars": "1"}},
       {"id": "u_bio", "apply": "match", "type": "toggle", "label": "Unlock Biollante", "hint": "Needs the Biollante slot mod.", "on": {"enhance.unlock_biollante": "1"}},
-      {"group": "GAMEPLAY RULES"},
+      {"group": "G:STEM-INSPIRED OPTIONS", "note": "Based on G:STEM's gameplay options — credit to Gojirex, Shame Devs, GR8GODZILLAGOD and the STEM community."},
       {"id": "size", "apply": "match", "label": "Monster size", "hint": "Camera and hit boxes follow the size.",
        "choices": [
          {"label": "Original", "set": {"enhance.stem_rule_player_size": "0"}},

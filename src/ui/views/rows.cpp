@@ -76,7 +76,12 @@ std::string rowHtml(const std::string& id, const std::string& label, const std::
 std::string settingsRows(const LauncherModel& m, const std::string& page, bool badges, const std::map<std::string, std::string>* applied) {
     std::string h;
     for (auto& row : m.settings.page(page)) {
-        if (!row.group.empty()) { h += "<div class=\"section-label grouphead\">" + esc(row.group) + "</div>"; continue; }
+        if (!row.group.empty()) {
+            if (row.hint.empty()) { h += "<div class=\"section-label grouphead\">" + esc(row.group) + "</div>"; continue; }
+            // heading + one-line note in one column block (nested divs in a flex item need their own flex column)
+            h += "<div class=\"groupblock\"><div class=\"section-label grouphead\">" + esc(row.group) + "</div><div class=\"groupnote\">" + esc(row.hint) + "</div></div>";
+            continue;
+        }
         if (!row.special.empty()) { h += specialRow(m, row); continue; }
         const int ci = m.settings.currentChoice(row);
         const std::string val = ci >= 0 ? row.choices[ci].label : "Custom";

@@ -7,7 +7,7 @@ Not affiliated with or endorsed by Toho, Atari or Pipeworks. **You must own the 
 ## What you need
 - Windows 10 or 11, 64-bit, a graphics card with Direct3D 11.
 - Your own copy of the Xbox game: a disc image (`.iso`) or an extracted folder that contains `default.xbe`.
-- About 0.8 GB of free space if you use an `.iso` (it is unpacked once).
+- Nothing extra for an `.iso`: it is played straight from the image. (With an older game program the image is unpacked once and needs about 0.8 GB.)
 - Windows "N" editions need Microsoft's Media Feature Pack.
 
 ## Install
@@ -21,7 +21,7 @@ The first time, the launcher asks for your game.
 
 ![Choose your game](screenshots/10_setup_choose.png)
 
-- **Choose disc image** takes your `.iso`. It is checked, then unpacked once into `data\game\`.
+- **Choose disc image** takes your `.iso`. It is checked, then played straight from the image (read-only). Mods that change the game's own files need an unpacked folder instead.
 - **Choose a folder** takes an already extracted game folder.
 - You can also drag an `.iso` or a folder onto the window.
 

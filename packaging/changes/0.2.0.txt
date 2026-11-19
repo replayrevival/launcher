@@ -1,0 +1,47 @@
+Everything in v0.1.7 is in it, plus (v0.1.8 was never released, so its changes are in here too):
+
+GAME (build c426)
+- The game reads your disc image (.iso) directly and read-only: nothing is unpacked and your image is never
+  changed. Your saves and settings are kept next to the launcher, as before.
+- The in-game menu works with a controller alone: D-pad or left stick to move, A to choose, B to go back,
+  LB and RB to switch between the Video, Enhancements and Controllers pages, Start to close it. Holding a
+  direction repeats. The keyboard still works (arrows, Enter, Esc, Page Up and Page Down for the pages).
+- Fixed: with true full screen ("Exclusive fullscreen") or with variable refresh rate switched off, the in-game
+  menu did not redraw or react and looked frozen. It now works in every window mode.
+- "Fullscreen" is now borderless fullscreen: a borderless window that covers the whole screen, without the
+  old switch of display mode. The old true full screen is still there as "Exclusive fullscreen (advanced)".
+  Existing settings that said Fullscreen now give borderless fullscreen.
+- Typing a name with the on-screen keyboard is about three times as fast as in 0.1.7 (still one letter per press).
+- At the highest draw-distance quality step (x4) the game's load governor no longer shrinks the far
+  skyline below x3 when the game is busy.
+
+LAUNCHER
+- Choose your disc image and press Play: the launcher no longer unpacks it into a folder first. The image is
+  checked the same way as before (the game program inside it must match a known-good copy).
+  Images with a video partition in front (some dumps) are recognised too. An extracted folder still works,
+  and is needed for mods that patch the game's files (they are not applied while you play from an image).
+- Fixed: disc images with the game partition at one particular offset (a third-generation Xbox layout) were not
+  recognised.
+- The Video tab's window mode has four choices: Window, Borderless window, Fullscreen (borderless) and
+  Exclusive fullscreen (advanced). The resolution list for both fullscreen modes shows the sizes your
+  monitor reports.
+- The in-game menu shows its three pages as a tab strip and understands the controller's LB and RB.
+- Credit: the Enhancements settings that are based on G:STEM's gameplay options are grouped under
+  "G:STEM-inspired options", with the note "Based on G:STEM's gameplay options - credit to Gojirex, Shame Devs,
+  GR8GODZILLAGOD and the STEM community." (launcher tab and in-game menu).
+
+KNOWN ISSUES
+- Unlimited draw distance can still show buildings popping in and out at the far skyline (not fixed yet).
+- In Tokyo a UFO can leave the playing area (out of bounds). Not fixed yet.
+- The announcer's "RAGE" voice line is missing. Not fixed yet.
+- Playing from a disc image was tested with images made from an extracted game folder, plain and with a video
+  partition in front. Images dumped from a real disc have not been tested yet.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- With the in-game menu open the picture is redrawn only when something changes, so it can look choppy in video.
+- Exclusive fullscreen is less tested than the other modes.
+- A real physical controller has not been tried with the in-game menu (the tests used a virtual one).
+  Only Xbox controllers have been tested. Windows only.
+
+PACKAGE
+- Same files as v0.1.7, including ste_overlay.dll (the in-game menu).

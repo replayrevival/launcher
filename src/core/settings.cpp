@@ -74,6 +74,7 @@ bool Settings::loadSchema(const fs::path& path, std::string& err) {
                 SettingRow row;
                 if (r.contains("group")) {
                     row.group = r["group"].get<std::string>();
+                    row.hint = r.value("note", "");  // a one-line note under the group heading
                     row.needs = r.value("needs", "");
                 } else {
                     row.id = r.at("id").get<std::string>();

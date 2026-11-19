@@ -6,7 +6,9 @@
 
 namespace {
 constexpr uint32_t kSector = 2048;
-const uint64_t kBases[] = {0, 0xFD90000ull, 0x2080000ull, 0x18300000ull};  // raw, XGD1, XGD3, XGD2
+// raw (extract-xiso style) and the game-partition starts of redump-style images with a video partition in front (the same list the game uses):
+// 0x18300000 (XGD1), 0xFD90000 (XGD2), 0x2090000 (XGD3, as in extract-xiso). 0x2080000 was this list's old XGD3 value and stays as a last guess.
+const uint64_t kBases[] = {0, 0x18300000ull, 0xFD90000ull, 0x2090000ull, 0x2080000ull};
 
 bool iequals(const std::string& a, const std::string& b) {
     if (a.size() != b.size()) return false;
