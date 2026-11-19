@@ -74,7 +74,11 @@ int api_feed(ste_overlay_handle* o, const ste_overlay_input* in) {
     switch (in->type) {
         case STE_INPUT_NAV:
             i.type = ste_overlay::Input::Type::Nav;
-            i.nav = static_cast<ste_overlay::Nav>(in->nav < 0 || in->nav > STE_NAV_BACK ? 0 : in->nav);
+            i.nav = static_cast<ste_overlay::Nav>(in->nav < 0 || in->nav > STE_NAV_NEXT_TAB ? 0 : in->nav);
+            break;
+        case STE_INPUT_NAV_RELEASE:
+            i.type = ste_overlay::Input::Type::NavRelease;
+            i.nav = static_cast<ste_overlay::Nav>(in->nav < 0 || in->nav > STE_NAV_NEXT_TAB ? 0 : in->nav);
             break;
         case STE_INPUT_MOUSE_MOVE: i.type = ste_overlay::Input::Type::MouseMove; i.x = in->x; i.y = in->y; break;
         case STE_INPUT_MOUSE_BUTTON: i.type = ste_overlay::Input::Type::MouseButton; i.x = in->x; i.y = in->y; i.button = in->button; i.down = in->down != 0; break;

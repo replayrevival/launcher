@@ -131,7 +131,7 @@ void App::onGameExit(int code, double secs) {
     const bool settingsCouldMatter = code != 2 && code != 3 && code != 6;
     std::vector<ModalButton> buttons;
     if (settingsCouldMatter && !lastOriginal_) buttons.push_back({"TRY AGAIN WITH ORIGINAL SETTINGS", "modal-retry-original", ""});
-    if (settingsCouldMatter && videoMode() == "fullscreen" && !lastBorderless_ && !lastOriginal_)
+    if (settingsCouldMatter && videoMode() == "exclusive" && !lastBorderless_ && !lastOriginal_)
         buttons.push_back({"TRY BORDERLESS INSTEAD", "modal-retry-borderless", ""});
     // A crash that left a dump or a [CRASH] line: offer a report the player can send (nothing is sent by the launcher).
     if (code != 0 && findCrashEvidence(dumpDir(), game_.outLog(), game_.errLog(), secs + 120.0).any())

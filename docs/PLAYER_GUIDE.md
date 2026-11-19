@@ -47,7 +47,7 @@ The first time, settings start on **MAX**. Choose:
 Picking a preset sets many rows at once; you can still change single rows afterwards. Then press **PLAY**.
 
 ## Settings
-- **VIDEO**: resolution (starts at your screen's own, ultrawide included), display (which monitor), window / borderless / fullscreen, gameplay view ("Original (4:3)" or "Fit my screen"; menus always stay 4:3), frame limit, V-Sync (on by default), variable refresh rate (needs FreeSync/G-Sync switched on in your driver), render scale and upscaling, draw distance, fog, field of view, texture filtering, and under SOUND AND POINTER the game's volume and whether the mouse pointer hides itself (Auto, always hidden or always shown). Volume and pointer are your own choices: the presets do not change them.
+- **VIDEO**: resolution (starts at your screen's own, ultrawide included), display (which monitor), window / borderless window / fullscreen (borderless, covers the whole screen) / exclusive fullscreen (advanced), gameplay view ("Original (4:3)" or "Fit my screen"; menus always stay 4:3), frame limit, V-Sync (on by default), variable refresh rate (needs FreeSync/G-Sync switched on in your driver), render scale and upscaling, draw distance, fog, field of view, texture filtering, and under SOUND AND POINTER the game's volume and whether the mouse pointer hides itself (Auto, always hidden or always shown). Volume and pointer are your own choices: the presets do not change them.
 - **ENHANCEMENTS**: unlock options (all monsters, cities, challenges, gallery), cheats, and gameplay tweaks. These are off in ORIGINAL.
 
 ![Video tab](screenshots/21_video_tab.png)

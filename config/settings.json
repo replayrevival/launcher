@@ -99,11 +99,12 @@
     "video": [
       {"id": "display", "type": "display", "label": "Display", "hint": "Which monitor the game opens on"},
       {"id": "res", "type": "resolution", "label": "Resolution", "hint": "Native is your screen's own resolution"},
-      {"id": "mode", "label": "Window", "hint": "Borderless works best with variable refresh rate",
+      {"id": "mode", "label": "Window", "hint": "Fullscreen (borderless) works best with variable refresh rate",
        "choices": [
          {"label": "Window", "set": {"video.mode": "window"}},
-         {"label": "Borderless", "set": {"video.mode": "borderless"}},
-         {"label": "Fullscreen", "set": {"video.mode": "fullscreen"}}]},
+         {"label": "Borderless window", "set": {"video.mode": "borderless"}},
+         {"label": "Fullscreen (borderless)", "set": {"video.mode": "fullscreen"}},
+         {"label": "Exclusive fullscreen (advanced)", "set": {"video.mode": "exclusive"}}]},
       {"id": "aspect", "apply": "restart", "label": "Gameplay view", "hint": "Fit my screen shows more of the world. Menus always keep their original 4:3 shape",
        "choices": [
          {"label": "Original (4:3)", "set": {"video.aspect": "4:3-pillar"}},

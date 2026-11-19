@@ -40,7 +40,7 @@ bool inOptions(const std::vector<ResOption>& opts, int w, int h) {
 }
 
 std::vector<ResOption> buildResolutionOptions(const DisplayInfo& d, const std::string& mode) {
-    const bool fullscreen = mode == "fullscreen", windowed = mode == "window";
+    const bool fullscreen = mode == "fullscreen" || mode == "exclusive", windowed = mode == "window";
     const bool showHz = fullscreen;
     std::vector<ResOption> rest;
     auto add = [&](int w, int h, float hz) {

@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.1.6_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.1.8_launcher_video.png)
 
 ## What it does
 
@@ -25,15 +25,23 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
+## What's new in v0.1.8
+
+- **The in-game menu works with a controller alone.** Hold Back and Start (or press F1), move with the D-pad or left stick, A chooses, B goes back, **LB and RB switch between the Video, Enhancements and Controllers pages**, Start closes it. The pages show as a strip at the top.
+- **Fullscreen is now borderless fullscreen** (it covers the screen without switching the display mode). In the Video tab the window mode now has four choices: Window, Borderless window, Fullscreen (borderless) and Exclusive fullscreen (advanced, little tested).
+- Fresh screenshots below.
+
+[Full release notes](https://github.com/replayrevival/launcher/releases/tag/v0.1.8-alpha).
+
 ## Screenshots
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.1.6_launcher_overview.png) | ![Video](docs/screenshots/0.1.6_launcher_video.png) |
+| ![Overview](docs/screenshots/0.1.8_launcher_overview.png) | ![Video](docs/screenshots/0.1.8_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.1.6_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.6_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.1.8_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.1.8_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.1.6_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.1.8_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
 | ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page](docs/screenshots/0.1.6_ingame_menu_enhancements.png) |
 | *The same screens inside the game (Back+Start or F1).* | *The same style as the launcher's own pages.* |

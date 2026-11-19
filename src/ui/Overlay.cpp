@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "ui/Overlay.h"
 
 #include <algorithm>
@@ -45,6 +46,7 @@ void Overlay::shutdown() {
     ctx_ = nullptr;
     doc_ = nullptr;
     visible_ = false;
+    held_ = NavAction::None;
 }
 
 void Overlay::resize(int w, int h, float contentScale) {
@@ -67,6 +69,7 @@ void Overlay::hide() {
     if (!visible_) return;
     ctl_.endListen();
     visible_ = false;
+    held_ = NavAction::None;
     if (cb_.onHide) cb_.onHide();
 }
 
@@ -74,7 +77,15 @@ bool Overlay::feedNav(NavAction a) {
     if (!visible_ || !ctx_) return false;
     if (listening()) return true;  // the next press is a binding, not navigation (the host sends it with feedSource)
     nav_.push(a);
+    held_ = a;
+    nextRepeatMs_ = nowMs_ + 400.0;
     return true;
+}
+
+bool Overlay::feedNavRelease(NavAction a) {
+    repeatOn_ = true;
+    if (held_ == a) held_ = NavAction::None;
+    return visible_;
 }
 
 bool Overlay::feedSource(const std::string& source) {
@@ -125,6 +136,9 @@ bool Overlay::feedMouseWheel(float up) {
 void Overlay::update(double dt) {
     if (!visible_ || !ctx_) return;
     nowMs_ += dt * 1000.0;
+    if (repeatOn_ && (held_ == NavAction::Up || held_ == NavAction::Down || held_ == NavAction::Left || held_ == NavAction::Right)) {
+        while (nowMs_ >= nextRepeatMs_) { nav_.push(held_); nextRepeatMs_ += 90.0; }
+    }
     if (listening() && uint64_t(nowMs_) - ctl_.listenSince > ControllersUi::kListenTimeoutMs) {
         ctl_.endListen();
         renderScreen();
@@ -154,6 +168,16 @@ void Overlay::handleNav(NavAction a) {
         } else {
             step(id, dir);
         }
+        return;
+    }
+    if ((a == NavAction::PrevTab || a == NavAction::NextTab) && !listening()) {  // LB / RB: Video <-> Enhancements <-> Controllers
+        static const Screen tabs[] = {Screen::Video, Screen::Enhance, Screen::Controls};
+        int i = -1;
+        for (int k = 0; k < 3; ++k) if (tabs[k] == screen_) i = k;
+        const int dir = a == NavAction::NextTab ? +1 : -1;
+        if (i < 0) i = dir > 0 ? -1 : 3;  // from the main menu or a confirm page: first / last tab
+        const int n = i + dir;
+        if (n >= 0 && n < 3) go(tabs[n]);  // no wrap: the ends stay put
         return;
     }
     if (a == NavAction::Back) {
@@ -278,6 +302,11 @@ void Overlay::restoreFocus(const std::string& key) {
 
 void Overlay::go(Screen s) {
     screen_ = s;
+    {   // one log line per page change: the smoke tests (a pad-only run) read it
+        static const char* names[] = {"main", "video", "enhance", "controls", "confirm-launcher", "confirm-quit"};
+        std::fprintf(stderr, "[OVERLAY] page %s\n", names[int(s)]);
+        std::fflush(stderr);
+    }
     note_.clear();
     renderScreen();
     restoreFocus("");
@@ -309,7 +338,17 @@ void Overlay::renderScreen() {
                 navButton("NO, KEEP PLAYING", "ov-go", "main", "ov-no", true) + navButton("YES, LEAVE", "ov-yes", "", "ov-yes") + "</div>";
             break;
     }
-    if (auto* t = doc_->GetElementById("ov-title")) t->SetInnerRML(views::esc(title));
+    if (auto* t = doc_->GetElementById("ov-title")) {
+        const bool tabbed = screen_ == Screen::Video || screen_ == Screen::Enhance || screen_ == Screen::Controls;
+        std::string html = views::esc(title);
+        if (tabbed) {  // the three pages as a visible strip; LB / RB moves along it
+            const struct { Screen s; const char* name; } t3[] = {{Screen::Video, "VIDEO"}, {Screen::Enhance, "ENHANCEMENTS"}, {Screen::Controls, "CONTROLLERS"}};
+            html = "";
+            for (auto& x : t3) html += std::string("<span class=\"ov-tab") + (x.s == screen_ ? " on" : "") + "\">" + x.name + "</span>";
+        }
+        t->SetClass("tabs", tabbed);
+        t->SetInnerRML(html);
+    }
     if (auto* n = doc_->GetElementById("ov-note")) n->SetInnerRML(views::esc(note_));
     if (auto* p = doc_->GetElementById("ov-page")) {
         p->SetInnerRML(h);
@@ -332,11 +371,18 @@ void Overlay::renderHints() {
         if (auto* g = doc_->GetElementById("hint-group")) g->SetInnerRML("<div class=\"hint\"><span class=\"key\">Press the new button</span><span>Esc or wait to cancel</span></div>");
         return;
     }
+    const bool tabbed = screen_ == Screen::Video || screen_ == Screen::Enhance || screen_ == Screen::Controls;
+    std::string tabsHtml;
+    if (tabbed) {
+        if (h.tabsG.empty()) tabsHtml = "<span class=\"key\">" + views::esc(h.tabs) + "</span>";
+        else for (auto& g : h.tabsG) tabsHtml += views::glyphHtml(g);
+        tabsHtml = "<div class=\"hint\">" + tabsHtml + "<span>tabs</span></div>";
+    }
     for (auto& x : items) {
         std::string cap;
         if (x.pics.empty()) cap = "<span class=\"key\">" + views::esc(x.key) + "</span>";
         else for (auto& g : x.pics) cap += views::glyphHtml(g);
         html += "<div class=\"hint\">" + cap + "<span>" + x.text + "</span></div>";
     }
-    if (auto* g = doc_->GetElementById("hint-group")) g->SetInnerRML(html);
+    if (auto* g = doc_->GetElementById("hint-group")) g->SetInnerRML(tabsHtml + html);
 }

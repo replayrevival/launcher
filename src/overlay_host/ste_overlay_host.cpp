@@ -130,8 +130,12 @@ bool Host::feed(const Input& in) {
     Overlay& o = impl_->overlay;
     switch (in.type) {
         case Input::Type::Nav: {
-            static const NavAction map[] = {NavAction::Up, NavAction::Down, NavAction::Left, NavAction::Right, NavAction::Confirm, NavAction::Back};
+            static const NavAction map[] = {NavAction::Up, NavAction::Down, NavAction::Left, NavAction::Right, NavAction::Confirm, NavAction::Back, NavAction::PrevTab, NavAction::NextTab};
             return o.feedNav(map[int(in.nav)]);
+        }
+        case Input::Type::NavRelease: {
+            static const NavAction rmap[] = {NavAction::Up, NavAction::Down, NavAction::Left, NavAction::Right, NavAction::Confirm, NavAction::Back, NavAction::PrevTab, NavAction::NextTab};
+            return o.feedNavRelease(rmap[int(in.nav)]);
         }
         case Input::Type::MouseMove: return o.feedMouseMove(int(in.x), int(in.y));
         case Input::Type::MouseButton: return o.feedMouseButton(in.button, in.down);

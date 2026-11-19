@@ -23,7 +23,7 @@ std::string specialRow(const LauncherModel& m, const SettingRow& row) {
     } else if (row.special == "resolution") {
         const auto opts = m.resOptions();
         const int w = toInt(m.settings.value("video.width")), h2 = toInt(m.settings.value("video.height"));
-        const bool fullscreen = m.videoMode() == "fullscreen";
+        const bool fullscreen = isFullscreenMode(m.videoMode());
         const bool custom = !fullscreen && (m.customForced || !inOptions(opts, w, h2));
         std::string val = "Custom\xE2\x80\xA6";
         for (auto& o : opts)

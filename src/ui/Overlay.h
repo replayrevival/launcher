@@ -47,6 +47,8 @@ public:
     // overlay used it, i.e. always while visible and never while hidden: the game must not see input while the overlay is open.
     // Mouse positions are back buffer pixels.
     bool feedNav(NavAction a);
+    // The held button was let go (0.1.8). The first release switches on the overlay's own hold repeat (400 ms, then every 90 ms, directions only).
+    bool feedNavRelease(NavAction a);
     bool feedMouseMove(int x, int y);
     bool feedMouseButton(int button, bool down);  // 0 left, 1 right, 2 middle
     bool feedMouseWheel(float notchesUp);
@@ -83,6 +85,9 @@ private:
     OverlayCallbacks cb_;
     NavCore nav_;
     ControllersUi ctl_;
+    NavAction held_ = NavAction::None;
+    bool repeatOn_ = false;
+    double nextRepeatMs_ = 0;
     double nowMs_ = 0;  // advanced by update(); the remap timeout runs on it
     void saveInputNote(const std::string& err);
     Rml::Context* ctx_ = nullptr;

@@ -15,6 +15,9 @@ body#overlay {
 }
 #ov-page .filerow { width: 100%; box-sizing: border-box; }
 #ov-title { font-size: 30dp; margin-bottom: 8dp; }
+#ov-title.tabs { display: flex; flex-direction: row; align-items: flex-end; }
+#ov-title .ov-tab { display: block; margin-right: 28dp; color: #7C9CC4; font-size: 18dp; white-space: nowrap; }
+#ov-title .ov-tab.on { color: #FFD43B; font-size: 30dp; }
 #ov-note { font-size: 13dp; color: #FFD43B; min-height: 18dp; margin-bottom: 6dp; }
 #ov-page { flex: 1 1 0; min-height: 0; overflow-y: auto; padding-right: 12dp; }
 .ov-menu { display: flex; flex-direction: column; gap: 12dp; align-items: flex-start; padding-left: 26dp; }

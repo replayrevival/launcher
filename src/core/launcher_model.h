@@ -22,6 +22,9 @@ struct LauncherPaths {
     std::filesystem::path dataDir;  // launcher state, game ini files, logs
 };
 
+// "fullscreen" (borderless, since 0.1.8) and "exclusive" both cover the monitor and list the monitor's reported sizes.
+inline bool isFullscreenMode(const std::string& m) { return m == "fullscreen" || m == "exclusive"; }
+
 class LauncherModel {
 public:
     LauncherModel(Profile p, LauncherPaths pa) : profile(std::move(p)), paths(std::move(pa)) {}

@@ -1,4 +1,4 @@
-﻿#include "core/launcher_model.h"
+#include "core/launcher_model.h"
 
 #include <cstdio>
 
@@ -146,7 +146,7 @@ std::vector<ResOption> LauncherModel::resOptions() const { return buildResolutio
 bool LauncherModel::resValid(int w, int h) const {
     const DisplayInfo& d = curDisplay();
     if (inOptions(resOptions(), w, h)) return true;
-    return videoMode() != "fullscreen" && w >= 320 && h >= 240 && w <= d.desktop.w && h <= d.desktop.h;
+    return !isFullscreenMode(videoMode()) && w >= 320 && h >= 240 && w <= d.desktop.w && h <= d.desktop.h;
 }
 
 void LauncherModel::setNative() {
@@ -252,7 +252,7 @@ LauncherModel::StepOutcome LauncherModel::stepSetting(const std::string& id, int
     } else if (id == "res") {
         const auto opts = resOptions();
         const int w = toInt(settings.value("video.width")), h = toInt(settings.value("video.height"));
-        const bool custom = videoMode() != "fullscreen";  // fullscreen has no Custom... entry
+        const bool custom = !isFullscreenMode(videoMode());  // fullscreen has no Custom... entry
         const int n = int(opts.size()) + (custom ? 1 : 0);  // the last entry is Custom...
         int idx = custom ? n - 1 : 0;
         if (!customForced || !custom)
@@ -285,7 +285,7 @@ done:
     if (id == "mode") {  // the list of sizes depends on the window mode (fullscreen: only reported modes)
         const int w = toInt(settings.value("video.width")), h = toInt(settings.value("video.height"));
         if (!resValid(w, h)) setNative();
-        else if (videoMode() == "fullscreen") customForced = false;
+        else if (isFullscreenMode(videoMode())) customForced = false;
     }
     std::string e;
     if (!saveSettings(e)) out.saveError = e;

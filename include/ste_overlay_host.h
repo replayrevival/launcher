@@ -58,9 +58,9 @@ struct InitInfo {
 };
 
 // Input in neutral form so the game does not have to use SDL. Coordinates are back buffer pixels.
-enum class Nav { Up, Down, Left, Right, Confirm, Back };
+enum class Nav { Up, Down, Left, Right, Confirm, Back, PrevTab, NextTab };  // PrevTab/NextTab = LB/RB (0.1.8; appended, older games never send them)
 struct Input {
-    enum class Type { Nav, MouseMove, MouseButton, MouseWheel, Source } type = Type::Nav;
+    enum class Type { Nav, MouseMove, MouseButton, MouseWheel, Source, NavRelease } type = Type::Nav;  // NavRelease (0.1.8): the Nav button was released; after the first one the overlay repeats a held Nav itself, so send only the first press
     Nav nav = Nav::Up;     // Type::Nav: a key / D-pad / stick step / A / B press; send key repeats too (not releases)
     float x = 0, y = 0;    // MouseMove, MouseButton: pointer position
     int button = 0;        // MouseButton: 0 left, 1 right, 2 middle
