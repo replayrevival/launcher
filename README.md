@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.2.0_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.2.1_launcher_video.png)
 
 ## What it does
 
@@ -25,25 +25,22 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
-## What's new in v0.2.0
+## What's new in v0.2.1
 
-- **Play straight from your disc image.** Choose your .iso and press Play: the launcher no longer unpacks it into a folder first, and your image is only ever read. (An extracted game folder still works, and is needed for mods that change the game's own files.)
-- **The in-game menu works with a controller alone.** Hold Back and Start (or press F1), move with the D-pad or left stick, A chooses, B goes back, **LB and RB switch between the Video, Enhancements and Controllers pages**, Start closes it. The pages show as a strip at the top. The menu no longer looks frozen in true full screen.
-- **Fullscreen is now borderless fullscreen**, and the window mode has four choices: Window, Borderless window, Fullscreen (borderless) and Exclusive fullscreen (advanced, less tested).
-- **Credit:** the Enhancements options that are based on G:STEM's gameplay options are grouped under "G:STEM-inspired options" (launcher tab and in-game menu). Based on G:STEM's gameplay options — credit to Gojirex, Shame Devs, GR8GODZILLAGOD and the STEM community.
-- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.2.0-alpha).
+- The launcher itself is unchanged from 0.2.0 (play straight from your disc image, borderless Fullscreen, and the credit for G:STEM's gameplay options in the Enhancements tab and in-game menu). The game program now makes typing a name on the profile screen instant.
+- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.2.1-alpha).
 
 ## Screenshots
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.2.0_launcher_overview.png) | ![Video](docs/screenshots/0.2.0_launcher_video.png) |
+| ![Overview](docs/screenshots/0.2.1_launcher_overview.png) | ![Video](docs/screenshots/0.2.1_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.2.0_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.2.0_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.2.1_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.2.1_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.2.0_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.2.1_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
-| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.2.0_launcher_enhancements_credit.png) | |
+| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.2.1_launcher_enhancements_credit.png) | |
 | *Enhancements: the G:STEM-inspired options and their credit.* | |
 | ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page with the G:STEM-inspired options](docs/screenshots/0.2.0_ingame_menu_enhancements_credit.jpg) |
 | *The same screens inside the game (Back+Start or F1).* | *The Enhancements page in the game, with the G:STEM credit.* |

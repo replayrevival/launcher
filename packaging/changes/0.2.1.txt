@@ -1,0 +1,26 @@
+Everything in v0.2.0 is in it, plus:
+
+GAME (build c430)
+- Typing a name on the profile name screen is instant: the name you type appears at once (about a third of a second
+  after the first key), up to the game's own limit of 10 characters. Backspace removes the last letter.
+
+LAUNCHER
+- Unchanged from v0.2.0.
+
+KNOWN ISSUES
+- Unlimited draw distance can still show buildings popping in and out at the far skyline (not fixed, not verified either way).
+- In Tokyo a UFO can leave the playing area (out of bounds). Not fixed yet.
+- The announcer's "RAGE" voice line: in our test fights an announcer voice plays about a second after a monster enters
+  rage, but we have not been able to confirm that it says "RAGE". Not fixed yet.
+- Typing a name was tested with a virtual keyboard path only, not with a physical keyboard.
+- Playing from a disc image was tested with images made from an extracted game folder, plain and with a video
+  partition in front. Images dumped from a real disc have not been tested yet.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- With the in-game menu open the picture is redrawn only when something changes, so it can look choppy in video.
+- Exclusive fullscreen is less tested than the other modes.
+- A real physical controller has not been tried with the in-game menu (the tests used a virtual one).
+  Only Xbox controllers have been tested. Windows only.
+
+PACKAGE
+- Same files as v0.2.0, including ste_overlay.dll (the in-game menu).
