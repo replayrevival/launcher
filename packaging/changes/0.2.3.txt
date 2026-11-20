@@ -1,0 +1,36 @@
+Everything in v0.2.2 is in it, plus:
+
+GAME (build c432)
+- Sound packs: replace the game's sound effects, the announcer's lines and the music with your own WAV files.
+  Build a pack with one command and install it from the launcher's Mods tab. A sound pack follows the Mods tab's
+  on/off switch and order. With no sound pack switched on, nothing changes.
+- Tools (Python only): "sound_pack.py export" saves the game's own sounds as named WAV files from your game folder or
+  disc image; "sound_pack.py import" checks your edited WAVs and builds the pack.
+
+LAUNCHER
+- The Mods tab shows "Sound pack" for sound packs (next to "Texture pack").
+- The modding guide (docs/MODDING.md) has a new walkthrough, "Replace sounds and music", with what can be replaced,
+  the file rules and a clear note: share only audio you made or have the rights to; packs with copyrighted music or the
+  game's own voice clips are for personal use only.
+
+KNOWN ISSUES
+- Sound packs: making a replaced sound loop (a file name ending in _loop) is untested in the game.
+- Sound packs: the first start with a pack takes a few seconds longer while the game prepares the changed sounds.
+- Unlimited draw distance can still show buildings popping in and out at the far skyline (not fixed, not verified either way).
+- In Tokyo a UFO can leave the playing area (out of bounds). Not fixed yet.
+- The announcer's "RAGE" voice line: in our test fights an announcer voice plays about a second after a monster enters
+  rage, and the game does play its RAGE line on a real rage pickup, but we have not confirmed by ear what it sounds like.
+- Retexturing: every monster has one skin set (colour and bump map). Menu name plates are not power-of-two pictures and
+  may look stretched if you change their shape.
+- Typing a name was tested with a virtual keyboard path only, not with a physical keyboard.
+- Playing from a disc image was tested with images made from an extracted game folder, plain and with a video
+  partition in front. Images dumped from a real disc have not been tested yet.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- With the in-game menu open the picture is redrawn only when something changes, so it can look choppy in video.
+- Exclusive fullscreen is less tested than the other modes.
+- A real physical controller has not been tried with the in-game menu (the tests used a virtual one).
+  Only Xbox controllers have been tested. Windows only.
+
+PACKAGE
+- Same files as v0.2.2, including ste_overlay.dll (the in-game menu).

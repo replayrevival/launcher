@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.2.2_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.2.3_launcher_video.png)
 
 ## What it does
 
@@ -25,23 +25,23 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
-## What's new in v0.2.2
+## What's new in v0.2.3
 
-- **Retexture any monster.** Packs of your own monster skins now work from the **Mods** tab: install, switch on, press Play. The launcher labels each mod as a "Texture pack" (or, later, a "Sound pack"). Walkthrough in plain words, from exporting the game's pictures to sharing your pack: **[Retexture a monster](docs/MODDING.md#retexture-a-monster)**.
-- The [modding guide](docs/MODDING.md) is rewritten: start here, one walkthrough per kind of mod, every setting you can change (generated from the launcher's own settings), troubleshooting, and what changed for modders in each version.
-- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.2.2-alpha).
+- **Replace sounds and music.** Packs of your own sounds now work from the **Mods** tab: install, switch on, press Play. The launcher labels them "Sound pack". Walkthrough in plain words, from exporting the game's sounds to sharing your pack: **[Replace sounds and music](docs/MODDING.md#replace-sounds-and-music)**. Share only audio you made or have the rights to.
+- Retexturing monsters (0.2.2) and the rewritten [modding guide](docs/MODDING.md) are part of this release too.
+- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.2.3-alpha).
 
 ## Screenshots
 
 | | |
 |---|---|
-| ![Overview](docs/screenshots/0.2.2_launcher_overview.png) | ![Video](docs/screenshots/0.2.2_launcher_video.png) |
+| ![Overview](docs/screenshots/0.2.3_launcher_overview.png) | ![Video](docs/screenshots/0.2.3_launcher_video.png) |
 | *Overview: presets and your game.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers with Xbox pictures](docs/screenshots/0.2.2_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.2.2_launcher_controllers_playstation.png) |
+| ![Controllers with Xbox pictures](docs/screenshots/0.2.3_launcher_controllers_xbox.png) | ![Controllers with PlayStation pictures](docs/screenshots/0.2.3_launcher_controllers_playstation.png) |
 | *Controllers with Xbox button pictures.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.2.2_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.2.3_launcher_mods.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Mods tab.* | *The built-in file browser.* |
-| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.2.2_launcher_enhancements_credit.png) | |
+| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.2.3_launcher_enhancements_credit.png) | |
 | *Enhancements: the G:STEM-inspired options and their credit.* | |
 | ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page with the G:STEM-inspired options](docs/screenshots/0.2.0_ingame_menu_enhancements_credit.jpg) |
 | *The same screens inside the game (Back+Start or F1).* | *The Enhancements page in the game, with the G:STEM credit.* |
