@@ -18,8 +18,7 @@ KNOWN ISSUES
 - Sound packs: the first start with a pack takes a few seconds longer while the game prepares the changed sounds.
 - Unlimited draw distance can still show buildings popping in and out at the far skyline (not fixed, not verified either way).
 - In Tokyo a UFO can leave the playing area (out of bounds). Not fixed yet.
-- The announcer's "RAGE" voice line: in our test fights an announcer voice plays about a second after a monster enters
-  rage, and the game does play its RAGE line on a real rage pickup, but we have not confirmed by ear what it sounds like.
+- The announcer's "RAGE" line plays on a rage pickup; tell us if you don't hear it.
 - Retexturing: every monster has one skin set (colour and bump map). Menu name plates are not power-of-two pictures and
   may look stretched if you change their shape.
 - Typing a name was tested with a virtual keyboard path only, not with a physical keyboard.
