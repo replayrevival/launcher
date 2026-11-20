@@ -49,11 +49,10 @@ python import_texture_set.py export "D:\Games\Godzilla Save the Earth" gigan_ori
 - Only put the pictures you changed in `my_edits`. The ones you leave out stay original.
 - Only use pictures you made yourself or may share. The exported originals belong to the game's owners: never share them.
 
-**3. Import into a texture pack.** One time per game copy, build the index (about 7 seconds), then import:
+**3. Import into a texture pack.** One command (it reads your game once to find each texture, about 10 seconds):
 
 ```
-python import_texture_set.py index "D:\Games\Godzilla Save the Earth" xbox_texture_index.csv
-python import_texture_set.py import my_edits xbox_texture_index.csv my_gigan_pack --id my-gigan --name "My Gigan retexture" --credits "your name, own work, CC0"
+python import_texture_set.py import my_edits "D:\Games\Godzilla Save the Earth" my_gigan_pack --id my-gigan --name "My Gigan retexture" --credits "your name, own work, CC0"
 ```
 You get a folder `my_gigan_pack` with your pictures renamed to what the game expects, a `manifest.json` and `report.csv`. Open `report.csv`: every line should say `matched`. `unmatched` means the name is wrong (the tool suggests the closest names); `size-mismatch` means the shape differs from the original (it is still written, but check it looks right in the game).
 
@@ -61,7 +60,7 @@ You get a folder `my_gigan_pack` with your pictures renamed to what the game exp
 
 ![A texture pack installed in the Mods tab](screenshots/texmod_installed.png)
 
-> Needs a game build that loads texture packs from the Mods tab (the release notes say from which version). On older builds copy the pack folder into `texturepacks\` next to `ste-recomp.exe` and set `"enabled": true` in its `manifest.json`.
+> Packs installed in the Mods tab are loaded by game version **0.2.2 or newer**. On older versions copy the pack folder into `texturepacks\` next to `ste-recomp.exe` and set `"enabled": true` in its `manifest.json`. To check that it worked, open `data\mods\last_report.txt`: it should say `texture pack <id>: ACTIVE, 1 file(s)`.
 
 **5. Share.** Zip the `my_gigan_pack` folder (the zip holds your PNGs and `manifest.json`, never the game's originals) and put it on your own page. Say who made it, add a licence and credit anything you reused in `--credits`. The launcher users install it with **INSTALL FROM ZIP...**.
 
@@ -242,7 +241,7 @@ Every key can also be set for one run with the environment variable `STE_<SECTIO
 
 ## What's changed for modders
 
-- **0.2.2 (next)**: texture export (`import_texture_set.py export`) to get a monster's original textures as named PNGs; texture packs installed in the Mods tab are loaded by the game from the Mods folder, with the Mods tab's ON/OFF and order; this guide restructured with a generated settings reference.
+- **0.2.2 (next)**: texture export (`import_texture_set.py export`) to get a monster's original textures as named PNGs, and `import` reads your game folder or `.iso` directly (no separate index step); texture packs installed in the Mods tab are loaded by the game from the Mods folder, with the Mods tab's ON/OFF and order (checked end to end: install in the launcher, PLAY, `last_report.txt` says ACTIVE); this guide restructured with a generated settings reference.
 - **0.2.1**: no change for modders.
 - **0.2.0**: play straight from a disc image (file mods and texture packs work; patch mods need an unpacked folder). The Enhancements settings that come from G:STEM are grouped as "G:STEM-inspired options" (credit in the launcher and the in-game menu).
 - **0.1.7**: the texture pack import tool and texture pack loader are described in the game project's `docs\formats\texturepack*.md`.
