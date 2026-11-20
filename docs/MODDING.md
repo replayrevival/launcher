@@ -4,7 +4,7 @@ For people who want to change or add to *Godzilla: Save the Earth* on PC (the re
 
 **One rule above all: a mod never contains game data.** This project ships no mods and hosts none; you host yours. Your mod holds only your own work, or it is a set of *patches* (only the difference from the player's own file).
 
-Contents: [Start here](#start-here) · [Retexture a monster](#retexture-a-monster) · [Install and share a mod](#install-and-share-a-mod) · [Patch mods](#patch-mods) · [Settings and tweaks you can change](#settings-and-tweaks-you-can-change) · [Troubleshooting and FAQ](#troubleshooting-and-faq) · [What's changed for modders](#whats-changed-for-modders)
+Contents: [Start here](#start-here) · [Retexture a monster](#retexture-a-monster) · [Replace sounds and music](#replace-sounds-and-music) · [Install and share a mod](#install-and-share-a-mod) · [Patch mods](#patch-mods) · [Settings and tweaks you can change](#settings-and-tweaks-you-can-change) · [Troubleshooting and FAQ](#troubleshooting-and-faq) · [What's changed for modders](#whats-changed-for-modders)
 
 ## Start here
 
@@ -13,6 +13,7 @@ Contents: [Start here](#start-here) · [Retexture a monster](#retexture-a-monste
 | I want to... | Use | Walkthrough |
 |---|---|---|
 | Repaint a monster or other textures (HD or just different) | a *texture pack* | [Retexture a monster](#retexture-a-monster) |
+| Replace sounds, voices or music with my own | a *sound pack* | [Replace sounds and music](#replace-sounds-and-music) |
 | Replace or add game files (data, scripts, sounds) with my own work | a *file mod* | [Install and share a mod](#install-and-share-a-mod) |
 | Change a game file I must not share (a model, a bundle) | a *patch mod* | [Patch mods](#patch-mods) |
 | Change how the game plays (rage meter, cheats, size, ...) | settings, no mod needed | [Settings and tweaks](#settings-and-tweaks-you-can-change) |
@@ -20,7 +21,7 @@ Contents: [Start here](#start-here) · [Retexture a monster](#retexture-a-monste
 **What you need**
 - Your own copy of the game (the Xbox disc image or an extracted folder). Your files are only ever read.
 - The launcher and game from the [latest release](https://github.com/replayrevival/ste-recomp/releases/latest).
-- For the texture tools: **Python 3.9 or newer** (python.org, tick "Add python.exe to PATH") and the Pillow library: open a Command Prompt and type `pip install Pillow`.
+- For the texture and sound tools: **Python 3.9 or newer** (python.org, tick "Add python.exe to PATH") and the Pillow library: open a Command Prompt and type `pip install Pillow`.
 - An image editor for textures (anything that saves PNG: GIMP, Krita, Photoshop, Paint.NET).
 
 **Where mods go**
@@ -65,6 +66,51 @@ You get a folder `my_gigan_pack` with your pictures renamed to what the game exp
 **5. Share.** Zip the `my_gigan_pack` folder (the zip holds your PNGs and `manifest.json`, never the game's originals) and put it on your own page. Say who made it, add a licence and credit anything you reused in `--credits`. The launcher users install it with **INSTALL FROM ZIP...**.
 
 Details of the file name key, the pack format and the loader: game project `docs\formats\texturepack.md` and `texturepack_import.md`.
+
+## Replace sounds and music
+
+Replace the game's sound effects, the announcer and voices, or the music with your own. Five steps, like textures: **export** the originals as WAV files, **edit** them, **build** a pack, **install** it, **share** it.
+
+> **Please read first: share only audio you made or have the rights to.** Packs that contain copyrighted music, or the game's own voice clips, are for your personal use only. Never put the game's original sounds into something you publish.
+
+**What you can replace**
+- **Effects**: hits, roars, explosions, menu clicks, ambient sounds.
+- **The announcer and voices**: the lines like "VERSUS", "RAGE", the monsters' intro and win lines (English and Japanese voice banks).
+- **Music**: the menu and fight tracks.
+
+**1. Export the originals from your own game.** You need Python 3.9 or newer (no extra packages for sounds). Open a Command Prompt in the folder with `sound_pack.py` (it is in the game project's `tools\mods\`) and type, with your own paths:
+
+```
+python sound_pack.py export "D:\Games\Godzilla Save the Earth" my_sounds --match RAGE
+```
+- The game can be the folder or the `.iso`.
+- `--match WORDS` exports every sound whose name contains one of the words (comma-separated). `--category effects`, `voices`, `music` or `monsters` exports a whole group. `--list` only prints the names.
+- You get WAV files named like the game's sounds, for example `godzilla_voice_e_028_RAGE.wav` (the announcer's RAGE line) or one file per music track, plus `export_report.csv`.
+
+**2. Edit in Audacity** (free, audacityteam.org) or any sound editor:
+1. **File > Open** the WAV, make your changes (or record or import your own sound).
+2. **File > Export > Export as WAV**. Choose **Signed 16-bit PCM** as the encoding.
+3. **Keep the file name exactly as exported.** The name is how the tool knows which game sound you are replacing.
+
+Rules for the files you put in your edits folder:
+- WAV, **16-bit PCM**, **any sample rate**, **mono or stereo**, up to 60 seconds. Anything else (24-bit, floating point, compressed, longer) is refused with a plain message and the original sound stays.
+- The length may differ from the original. Effects are mono in the game (a stereo file is mixed down to mono); music is stereo (a mono file is played on both sides).
+- Put only the files you changed in the folder. The others stay original.
+- **Loops:** a sound loops when its WAV file has a loop point inside it (Audacity cannot write loop points; use an editor that can, for example Wavosaur). The whole sound then loops, not only the marked part. A file without a loop point plays once. Music tracks have no loop setting: the game restarts them when they end.
+
+**3. Build the pack.**
+```
+python sound_pack.py import my_edits "D:\Games\Godzilla Save the Earth" my_sounds_pack --id my-sounds --name "My sounds" --credits "your name, own work, CC0"
+```
+You get a folder `my_sounds_pack` with your sounds, a `manifest.json` and `report.csv`. Open `report.csv`: each line says `matched`, or why not (`unmatched` = the name does not exist, `format-refused` = not 16-bit PCM WAV, a note says when the length or channels differ). The tool ends with the reminder about sharing only audio you have the rights to.
+
+**4. Install.** In the launcher open **Mods**, then **INSTALL FROM FOLDER...** and choose `my_sounds_pack` (or drag the folder onto the launcher window). It shows up as a **Sound pack**. Switch it ON, press **PLAY**. The first start with a sound pack takes a few seconds longer while the game prepares the changed sounds; later starts are quick.
+
+![A sound pack installed in the Mods tab](screenshots/sound_pack_installed.png)
+
+> Needs game version **0.2.3 or newer**. Check `data\mods\last_report.txt`: it should say `sound pack <id>: ACTIVE, K file(s)`.
+
+**5. Share.** Zip the `my_sounds_pack` folder and host it yourself. Say who made it, add a licence, credit what you reused. Remember the rule at the top: only audio you made or have the rights to. Details of the format: the game project's `docsormats\soundpack.md`.
 
 ## Install and share a mod
 
@@ -237,11 +283,16 @@ Every key can also be set for one run with the environment variable `STE_<SECTIO
 
 **Does my mod work if the player runs the game from a disc image?** File mods and texture packs do. Patch mods need an unpacked game folder.
 
+**My sound pack does not play.** Is it switched ON, and is the game 0.2.3 or newer? Read `last_report.txt`: refused files are listed there with the reason (usually not 16-bit PCM WAV). The first start rebuilds the changed sounds, so give it a few seconds.
+
+**A replaced sound is too quiet or too loud.** Change the volume in your editor before exporting; the game plays the file as it is.
+
 **Where do I report problems?** https://github.com/replayrevival/ste-recomp/issues
 
 ## What's changed for modders
 
-- **0.2.2 (next)**: texture export (`import_texture_set.py export`) to get a monster's original textures as named PNGs, and `import` reads your game folder or `.iso` directly (no separate index step); texture packs installed in the Mods tab are loaded by the game from the Mods folder, with the Mods tab's ON/OFF and order (checked end to end: install in the launcher, PLAY, `last_report.txt` says ACTIVE); this guide restructured with a generated settings reference.
+- **0.2.3 (next)**: sound packs (`sound_pack.py export` and `import`, mod type "Sound pack" in the Mods tab, loaded from the Mods folder with the on/off switch and order); a "Replace sounds and music" walkthrough.
+- **0.2.2**: texture export (`import_texture_set.py export`) to get a monster's original textures as named PNGs, and `import` reads your game folder or `.iso` directly (no separate index step); texture packs installed in the Mods tab are loaded by the game from the Mods folder, with the Mods tab's ON/OFF and order (checked end to end: install in the launcher, PLAY, `last_report.txt` says ACTIVE); this guide restructured with a generated settings reference.
 - **0.2.1**: no change for modders.
 - **0.2.0**: play straight from a disc image (file mods and texture packs work; patch mods need an unpacked folder). The Enhancements settings that come from G:STEM are grouped as "G:STEM-inspired options" (credit in the launcher and the in-game menu).
 - **0.1.7**: the texture pack import tool and texture pack loader are described in the game project's `docs\formats\texturepack*.md`.
