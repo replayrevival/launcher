@@ -96,7 +96,7 @@ Rules for the files you put in your edits folder:
 - WAV, **16-bit PCM**, **any sample rate**, **mono or stereo**, up to 60 seconds. Anything else (24-bit, floating point, compressed, longer) is refused with a plain message and the original sound stays.
 - The length may differ from the original. Effects are mono in the game (a stereo file is mixed down to mono); music is stereo (a mono file is played on both sides).
 - Put only the files you changed in the folder. The others stay original.
-- **Loops:** a sound loops when its WAV file has a loop point inside it (Audacity cannot write loop points; use an editor that can, for example Wavosaur). The whole sound then loops, not only the marked part. A file without a loop point plays once. Music tracks have no loop setting: the game restarts them when they end.
+- **Loops:** to make a sound loop, **end its file name with `_loop`** (for example `shell_sound_001_ROLLOVER_loop.wav`). The whole sound then loops. A file without `_loop` plays once. (A loop point inside the WAV, written by editors such as Wavosaur, also works; Audacity does not write loop points, so use the file name.) Music tracks have no loop setting: the game restarts them when they end.
 
 **3. Build the pack.**
 ```
