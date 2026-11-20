@@ -37,7 +37,12 @@ std::string modsPage(const LauncherModel& m_, const ModsViewState& v) {
         for (auto& a : m.authors) by += (by.empty() ? "" : ", ") + a;
         std::string line2 = m.problem.empty() ? "#" + std::to_string(i + 1) : "";
         if (!by.empty()) line2 += (line2.empty() ? "" : " · ") + std::string("by ") + by;
-        if (!m.profile.empty()) line2 += (line2.empty() ? "" : " · ") + m.profile;
+        if (!m.profile.empty()) {  // the mod type, in plain words
+            std::string kind = m.profile;
+            if (kind == "textures" || kind == "texture") kind = "Texture pack";
+            else if (kind == "sounds" || kind == "sound" || kind == "audio") kind = "Sound pack";
+            line2 += (line2.empty() ? "" : " · ") + kind;
+        }
 
         h += "<div class=\"setrow\"><div class=\"setlabel\"><div class=\"lbl\">" + title + "</div>";
         if (!m.description.empty()) h += "<div class=\"muted small\">" + esc(m.description) + "</div>";
