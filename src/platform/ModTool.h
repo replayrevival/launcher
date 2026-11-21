@@ -10,3 +10,6 @@
 
 ExternalResult runModTool(const std::filesystem::path& exeDir, const std::filesystem::path& modDir, const std::filesystem::path& gameDir,
                           const std::atomic<bool>* cancel);
+// `prepare-stack <mods root> <game> --enable ids`: builds all enabled recipe mods, each on top of the earlier ones.
+ExternalResult runModToolStack(const std::filesystem::path& exeDir, const std::filesystem::path& modsRoot, const std::filesystem::path& gameDir,
+                               const std::vector<std::string>& ids, const std::atomic<bool>* cancel);

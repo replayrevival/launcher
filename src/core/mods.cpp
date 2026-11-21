@@ -117,7 +117,7 @@ bool parseManifest(const std::string& text, ModInfo& m, std::string& err) {
                     err = "A patch entry in manifest.json needs \"target\", \"patch\", \"base_sha256\" and \"result_sha256\".";
                     return false;
                 }
-                if (!safeRel(e.target) || (e.format != "zip-of" && !safeRel(e.patchRel))) { err = "A patch entry in manifest.json has an unsafe file path."; return false; }
+                if (!safeRel(e.target) || ((e.format != "zip-of" && e.format != "builtin") && !safeRel(e.patchRel))) { err = "A patch entry in manifest.json has an unsafe file path."; return false; }
                 m.patches.push_back(std::move(e));
             }
         }

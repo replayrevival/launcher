@@ -305,21 +305,65 @@ std::string lowerKey(std::string s) {
     return s;
 }
 
-bool isExternalFormat(const std::string& f) { return f == "bsf-edit" || f == "zip-of"; }
+bool isExternalFormat(const std::string& f) { return f == "bsf-edit" || f == "zip-of" || f == "text-edit" || f == "builtin"; }
 
 std::string normTarget(std::string t) {
     for (auto& c : t) { if (c == '\\') c = '/'; c = char(std::tolower((unsigned char)c)); }
     return t;
 }
 
-// Is the built file there and the one the manifest announces? (size first, then the hash)
-bool builtMatches(const ModInfo& m, const ModPatchEntry& p) {
+bool usesStack(const ModInfo& m) {
+    bool ext = false;
+    for (auto& p : m.patches) {
+        if (!isExternalFormat(p.format)) return false;
+        if (p.format == "zip-of") return false;  // zip rebuilds go through `prepare` on their own
+        ext = true;
+    }
+    return ext;
+}
+
+// The mods that build one file on top of each other, in load order, up to and including `m`.
+std::vector<std::string> expectedStack(const ModStore* store, const ModInfo& m, const std::string& target,
+                                       const std::function<bool(const ModInfo&)>* fits) {
+    std::vector<std::string> ids;
+    if (!store) { ids.push_back(m.id); return ids; }
+    const std::string key = normTarget(target);
+    for (const ModInfo& o : store->mods()) {
+        if (!usesStack(o) || !o.enabled || !o.problem.empty()) continue;
+        if (fits && !(*fits)(o)) continue;
+        bool has = false;
+        for (auto& q : o.patches) if (normTarget(q.target) == key) has = true;
+        if (!has) continue;
+        ids.push_back(o.id);
+        if (o.id == m.id) break;
+    }
+    return ids;
+}
+
+// Is the built file there and the one the manifest announces (alone), or the one Prepare recorded for exactly this stack of mods?
+bool builtMatches(const ModInfo& m, const ModPatchEntry& p, const std::vector<std::string>& expected) {
     std::error_code ec;
     const fs::path b = builtPath(m, p.target);
     if (!fs::is_regular_file(b, ec)) return false;
-    if (p.size && fs::file_size(b, ec) != p.size) return false;
+    if (expected.size() <= 1) {
+        if (p.size && fs::file_size(b, ec) != p.size) return false;
+        std::string e;
+        return !p.resultSha256.empty() && sha256OfFile(b, e) == p.resultSha256;
+    }
     std::string e;
-    return !p.resultSha256.empty() && sha256OfFile(b, e) == p.resultSha256;
+    const std::string sha = sha256OfFile(b, e);
+    try {
+        std::ifstream f(builtDir(m) / "_stack.json", std::ios::binary);
+        if (!f) return false;
+        const json j = json::parse(f);
+        const std::string want = normTarget(p.target);
+        for (auto it = j.at("targets").begin(); it != j.at("targets").end(); ++it) {
+            if (normTarget(it.key()) != want) continue;
+            if (it.value().at("sha256").get<std::string>() != sha) return false;
+            return it.value().at("stack").get<std::vector<std::string>>() == expected;
+        }
+        return false;
+    } catch (...) { return false; }
 }
 
 }  // namespace
@@ -334,7 +378,7 @@ namespace {
 
 }  // namespace
 
-std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const fs::path& gameDir) {
+std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const fs::path& gameDir, const ModStore* store) {
     std::vector<ModPatchReport> out;
     if (mod.patches.empty()) return out;
     const auto st = loadState(mod);
@@ -344,7 +388,7 @@ std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const fs::path&
         r.modId = mod.id;
         r.target = p.target;
         if (ext) {  // built by the helper tool: current when the built file is there and has the announced hash
-            r.state = builtMatches(mod, p) ? PatchState::Ready : PatchState::NotBuilt;
+            r.state = builtMatches(mod, p, usesStack(mod) ? expectedStack(store, mod, p.target, nullptr) : std::vector<std::string>{mod.id}) ? PatchState::Ready : PatchState::NotBuilt;
             out.push_back(std::move(r));
             continue;
         }
@@ -363,9 +407,59 @@ std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const fs::path&
     return out;
 }
 
+namespace {
+
+using ToolLines = std::map<std::string, std::pair<PatchState, std::string>>;
+
+// Reads the tool's output: `<target>: <result>` per file (prepare) or `<mod id>: <target>: <result>` / `CONFLICT <mod id>: <target>: <why>` (prepare-stack).
+ToolLines parseToolLines(const std::string& output, bool stacked) {
+    ToolLines lines;
+    size_t pos = 0;
+    while (pos <= output.size()) {
+        const size_t nl = output.find('\n', pos);
+        std::string line = output.substr(pos, nl == std::string::npos ? std::string::npos : nl - pos);
+        pos = nl == std::string::npos ? output.size() + 1 : nl + 1;
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) line.pop_back();
+        bool conflict = false;
+        if (line.rfind("CONFLICT ", 0) == 0) { conflict = true; line = line.substr(9); }
+        std::string id;
+        if (stacked) {
+            const size_t c0 = line.find(": ");
+            if (c0 == std::string::npos) continue;
+            id = line.substr(0, c0) + "|";
+            line = line.substr(c0 + 2);
+        }
+        const size_t c = line.find(": ");
+        if (c == std::string::npos) continue;
+        const std::string key = id + normTarget(line.substr(0, c)), msg = line.substr(c + 2);
+        PatchState st;
+        if (conflict) st = PatchState::BadPatch;
+        else if (msg.rfind("built", 0) == 0) st = PatchState::Built;
+        else if (msg.rfind("BASE MISMATCH", 0) == 0) st = PatchState::BaseMismatch;
+        else if (msg.rfind("RESULT MISMATCH", 0) == 0) st = PatchState::ResultMismatch;
+        else if (msg.find("not in your game") != std::string::npos) st = PatchState::MissingTarget;
+        else st = PatchState::BadPatch;
+        lines[key] = {st, conflict ? "CONFLICT: " + msg : msg};
+    }
+    return lines;
+}
+
+std::string lastLine(std::string o) {
+    while (!o.empty() && (o.back() == '\n' || o.back() == '\r' || o.back() == ' ')) o.pop_back();
+    const size_t nl = o.find_last_of('\n');
+    std::string tail = o.substr(nl == std::string::npos ? 0 : nl + 1);
+    if (tail.size() > 160) tail = tail.substr(0, 160) + "...";
+    return tail;
+}
+
+}  // namespace
+
 PatchRunResult preparePatches(const ModStore& store, const fs::path& gameDir, const std::function<bool(const ModInfo&)>& fits,
-                              const std::atomic<bool>* cancel, const ExternalRunner& external) {
+                              const std::atomic<bool>* cancel, const ExternalRunner& external, const StackRunner& stackRunner) {
     PatchRunResult run;
+    bool stackRan = false;
+    ExternalResult stackResult;
+    ToolLines stackLines;
     struct Cur { fs::path path; std::string sha, owner; };
     std::map<std::string, Cur> cur;  // target -> where the current version of that file is
 
@@ -385,63 +479,56 @@ PatchRunResult preparePatches(const ModStore& store, const fs::path& gameDir, co
         }
         if (modNeedsExternalTool(m)) {
             const bool cancelled = cancel && cancel->load();
+            const bool stacked = usesStack(m);
+            std::map<std::string, std::vector<std::string>> exp;  // target -> mods stacked on it up to this one
             bool allReady = true;
-            for (auto& p : m.patches) if (!builtMatches(m, p)) allReady = false;
+            for (auto& p : m.patches) {
+                exp[p.target] = stacked ? expectedStack(&store, m, p.target, &fits) : std::vector<std::string>{m.id};
+                if (!builtMatches(m, p, exp[p.target])) allReady = false;
+            }
             if (cancelled) { for (auto& p : m.patches) add(p, PatchState::Skipped, "Cancelled."); continue; }
             if (allReady) {
                 for (auto& p : m.patches) { add(p, PatchState::Ready, ""); cur[lowerKey(p.target)] = {builtPath(m, p.target), p.resultSha256, m.id}; }
                 continue;
             }
             auto failAll = [&](PatchState st, const std::string& why) { for (auto& p : m.patches) add(p, st, why); };
-            if (!external) { failAll(PatchState::BadPatch, "This mod is built on your PC and needs a helper that this launcher does not have."); continue; }
-            const ExternalResult er = external(m.dir, gameDir);
-            if (!er.started) { failAll(PatchState::BadPatch, er.startError.empty() ? "The helper that builds this mod could not be started." : er.startError); continue; }
-            std::map<std::string, std::pair<PatchState, std::string>> lines;  // normalised target -> state, text
-            size_t pos = 0;
-            while (pos <= er.output.size()) {
-                size_t nl = er.output.find('\n', pos);
-                std::string line = er.output.substr(pos, nl == std::string::npos ? std::string::npos : nl - pos);
-                pos = nl == std::string::npos ? er.output.size() + 1 : nl + 1;
-                while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) line.pop_back();
-                const size_t c = line.find(": ");
-                if (c == std::string::npos) continue;
-                const std::string tgt = normTarget(line.substr(0, c)), msg = line.substr(c + 2);
-                PatchState st;
-                if (msg == "built") st = PatchState::Built;
-                else if (msg.rfind("BASE MISMATCH", 0) == 0) st = PatchState::BaseMismatch;
-                else if (msg.rfind("RESULT MISMATCH", 0) == 0) st = PatchState::ResultMismatch;
-                else if (msg.find("not in your game") != std::string::npos) st = PatchState::MissingTarget;
-                else st = PatchState::BadPatch;  // "script does not match what this tool expects ..." and anything unknown
-                lines[tgt] = {st, msg};
+            ExternalResult er;
+            ToolLines lines;
+            if (stacked) {
+                if (!stackRunner) { failAll(PatchState::BadPatch, "This mod is built on your PC and needs a helper that this launcher does not have."); continue; }
+                if (!stackRan) {  // one run builds every enabled recipe mod, each on top of the earlier ones
+                    stackRan = true;
+                    std::vector<std::string> ids;
+                    for (const ModInfo& o : store.mods()) if (usesStack(o) && o.enabled && o.problem.empty() && fits(o)) ids.push_back(o.id);
+                    stackResult = stackRunner(store.root(), gameDir, ids);
+                    if (stackResult.started) stackLines = parseToolLines(stackResult.output, true);
+                }
+                er = stackResult;
+                lines = stackLines;
+            } else {
+                if (!external) { failAll(PatchState::BadPatch, "This mod is built on your PC and needs a helper that this launcher does not have."); continue; }
+                er = external(m.dir, gameDir);
+                if (er.started) lines = parseToolLines(er.output, false);
             }
-            bool bad = false;
+            if (!er.started) { failAll(PatchState::BadPatch, er.startError.empty() ? "The helper that builds this mod could not be started." : er.startError); continue; }
             for (auto& p : m.patches) {
-                const auto it = lines.find(normTarget(p.target));
+                const auto it = lines.find((stacked ? m.id + "|" : std::string()) + normTarget(p.target));
                 if (it == lines.end()) {
-                    bad = true;
-                    std::string tail;  // the helper's last line, which usually says why it stopped
-                    {
-                        std::string o = er.output;
-                        while (!o.empty() && (o.back() == '\n' || o.back() == '\r' || o.back() == ' ')) o.pop_back();
-                        const size_t nl = o.find_last_of('\n');
-                        tail = o.substr(nl == std::string::npos ? 0 : nl + 1);
-                        if (tail.size() > 160) tail = tail.substr(0, 160) + "...";
-                    }
+                    const std::string tail = lastLine(er.output);
                     add(p, PatchState::BadPatch, er.exitCode == 0 ? "The helper did not report this file." :
                         "The helper stopped before it reached this file (exit code " + std::to_string(er.exitCode) + ")." + (tail.empty() ? "" : " It said: " + tail));
                 } else if (it->second.first == PatchState::Built) {
-                    if (builtMatches(m, p)) { add(p, PatchState::Built, ""); cur[lowerKey(p.target)] = {builtPath(m, p.target), p.resultSha256, m.id}; }
-                    else { bad = true; add(p, PatchState::ResultMismatch, "The built file is not the one this mod expects, so the game will use your original file."); }
+                    if (builtMatches(m, p, exp[p.target])) { add(p, PatchState::Built, ""); cur[lowerKey(p.target)] = {builtPath(m, p.target), p.resultSha256, m.id}; }
+                    else add(p, PatchState::ResultMismatch, "The built file is not the one this mod expects, so the game will use your original file.");
                 } else {
-                    bad = true;
                     std::string txt = it->second.second;
                     if (it->second.first == PatchState::BaseMismatch) txt = "Your game file is not the one this mod was made for (a different version of the game?).";
                     else if (it->second.first == PatchState::MissingTarget) txt = "Your game has no file \"" + p.target + "\".";
                     else if (it->second.first == PatchState::ResultMismatch) txt = "The rebuilt file does not match what the mod expects, so the game will use your original file.";
+                    else if (txt.rfind("CONFLICT: ", 0) == 0) txt = "This mod changes the same thing as another mod you switched on (" + txt.substr(10) + "). It was left out, so the game uses your original file. Switch one of them off.";
                     add(p, it->second.first, txt);
                 }
             }
-            (void)bad;
             continue;
         }
         auto state = loadState(m);

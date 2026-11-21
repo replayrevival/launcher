@@ -205,7 +205,7 @@
       {"id": "u_gal", "apply": "match", "type": "toggle", "label": "Unlock the gallery", "hint": "All Gallery items.", "on": {"enhance.unlock_gallery": "1"}},
       {"id": "u_fw", "apply": "match", "type": "toggle", "label": "Unlock Final Wars items", "hint": "All Final Wars gallery items.", "on": {"enhance.unlock_final_wars": "1"}},
       {"id": "u_bio", "apply": "match", "type": "toggle", "label": "Unlock Biollante", "hint": "Needs the Biollante slot mod.", "on": {"enhance.unlock_biollante": "1"}},
-      {"group": "G:STEM-INSPIRED OPTIONS", "note": "Based on G:STEM's gameplay options — credit to Gojirex, Shame Devs, GR8GODZILLAGOD and the STEM community."},
+      {"group": "G:STEM-INSPIRED OPTIONS", "note": "Inspired by G:STEM (our own code) - see Credits"},
       {"id": "size", "apply": "match", "label": "Monster size", "hint": "Camera and hit boxes follow the size.",
        "choices": [
          {"label": "Original", "set": {"enhance.stem_rule_player_size": "0"}},
@@ -228,7 +228,7 @@
       {"id": "wvk", "apply": "match", "type": "toggle", "label": "Weapon-independent vertical knockback", "hint": "", "on": {"enhance.stem_weapon_vertical_knockback": "1"}},
       {"id": "dim", "apply": "match", "type": "toggle", "label": "No results-screen dimming", "hint": "", "on": {"enhance.stem_no_results_dim": "1"}},
       {"id": "empty", "apply": "match", "type": "toggle", "label": "Empty arena", "hint": "Flat ground, no buildings.", "on": {"enhance.stem_rule_empty_arena": "1"}},
-      {"group": "GODZILLA ULTRA FEATURES", "needs": "ultra_features", "note": "Based on ANILORAK's Godzilla Ultra research."},
+      {"group": "GODZILLA ULTRA FEATURES", "needs": "ultra_features", "note": "Inspired by ANILORAK's Godzilla Ultra research (our own code) - see Credits"},
       {"group": "CHEATS"},
       {"id": "inv1", "apply": "match", "type": "toggle", "label": "Player 1 invulnerable", "hint": "Checked against the real game.", "on": {"enhance.cheat_invulnerable_p1": "1"}},
       {"id": "invc", "apply": "match", "type": "toggle", "label": "Computer player invulnerable", "hint": "", "on": {"enhance.cheat_invulnerable_com": "1"}},

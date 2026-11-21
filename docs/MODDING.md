@@ -200,7 +200,11 @@ Some mods change the game's scripts (Solo Destruction is one). The changed scrip
 
 It works with an unpacked game folder and with a disc image. If a build fails the launcher says why in plain words ("Your game file is not the one this mod was made for", "the script does not match what this tool expects, is this the original Xbox game?") and starts the game without that mod.
 
-**For modders: a recipe mod.** A recipe mod is a normal mod folder (`"api": 2`) whose `patches` entries have `"format": "bsf-edit"` and `"patch": "edits\<name>.json"` (a list of `old` / `new` script snippets) with `base_sha256` and `result_sha256`. The launcher runs the project's tool for you (`iso_to_mod.py prepare`, standard-library Python; the download carries its own small Python in `tools\python`, so nothing has to be installed). You can run it by hand too: `python -I iso_to_mod.py prepare <mod folder> <game folder or .iso>`; it prints one line per file (`built`, `BASE MISMATCH`, `RESULT MISMATCH`, ...). Details: the game project's `docsormats\mod_build_recipe.md`. Never publish the `_built` folder: it holds game data.
+**Biollante.** The same way: "Biollante" is in the Mods tab, switched **OFF**. Switch it **ON** and press **PLAY**. The select screen gets a third row below the two original rows with Biollante in it, and she is playable as player 1, as player 2 (a second human on a second pad), as COM, in Versus, Melee, Action mode and Solo Destruction. Her models, animations, HUD and sounds come from your own game disc; the mod holds only a recipe. The grid is a little smaller so three rows fit. Switch the mod off and the select screen is the original again.
+
+**Using several script mods at once.** Solo Destruction and Biollante can both be ON. The launcher builds all switched-on script mods in one go, in the order shown in the Mods tab, each on top of the earlier ones. If two mods change the same piece of a script, the launcher says so in plain words, leaves the later one out and starts the game without it; switch one of the two off. After you switch a mod on or off or change the order, the next PLAY rebuilds what is needed.
+
+**For modders: a recipe mod.** A recipe mod is a normal mod folder (`"api": 2`) whose `patches` entries are built on the player's PC from their own files: `"format": "bsf-edit"` (a list of `old` / `new` script snippets in `edits\<name>.json`), `"format": "text-edit"` (the same idea for text files) or `"format": "builtin"` (a named builder in the tools, for example `builtin:bio_ui`), each with `base_sha256` and `result_sha256`. The launcher runs the project's tool for you (`iso_to_mod.py prepare-stack`, standard-library Python; the download carries its own small Python in `tools\python`, so nothing has to be installed). You can run it by hand too: `python -I iso_to_mod.py prepare-stack <mods folder> <game folder or .iso>` builds every switched-on recipe mod in load order, and `python -I iso_to_mod.py prepare <one mod folder> <game folder or .iso>` builds one mod alone. Each prints one line per file (`built`, `BASE MISMATCH`, `RESULT MISMATCH`, `CONFLICT ...`). When a mod is built on top of another mod's result, its hash cannot be in the manifest; the tool records it in `_built\_stack.json` and the game accepts it. Details: the game project's `docs/formats/mod_build_recipe.md`. Never publish the `_built` folder: it holds game data. If you edit `order.json` by hand, save it without a byte-order mark (the launcher writes it correctly).
 
 ## Make a mod from a modified disc image or folder
 
@@ -209,7 +213,29 @@ If you have edited a copy of the game (a disc image or an unpacked folder) and w
 python -I iso_to_mod.py diff <your modified image or folder> <your retail folder or image>
 python -I iso_to_mod.py make <modified> <retail> <output mod folder> --id my.mod --name "My mod"
 ```
-`diff` lists what changed. `make` writes a mod folder with only patches (the differences), never game files. Files that exist only in your modified copy cannot be shared this way unless you point them at a similar retail file with `--new-base NEW=RETAIL`; otherwise they are listed as "not expressible" and left out. Players install the mod from the Mods tab like any other; PLAY builds the patched files from their own game, including the zip packages some files live in, and checks every result. Only share what you made or have the rights to share. Details: the game project's `docsormats\mod_patch.md`, section 8.
+`diff` lists what changed. `make` writes a mod folder with only patches (the differences), never game files. Files that exist only in your modified copy cannot be shared this way unless you point them at a similar retail file with `--new-base NEW=RETAIL`; otherwise they are listed as "not expressible" and left out. Players install the mod from the Mods tab like any other; PLAY builds the patched files from their own game, including the zip packages some files live in, and checks every result. Only share what you made or have the rights to share. Details: the game project's `docs/formats/mod_patch.md`, section 8.
+
+## Add a monster to the roster
+
+A roster recipe adds a character to the select screen without shipping any game file. The select grid keeps the two original rows and gets one extra row below them; every extra monster is one entry in the slot table `SLOTS` of `tools\mods\bio_ui.py`, for example `{'name': 'biollante', 'row': 2, 'art': 'biollante_en', 'crop': (28, 34, 92)}`:
+- `name`: the monster's script name,
+- `art`: the portrait picture inside `ControlRoom.bdl` that the four grid icons are made from,
+- `crop`: where the head is in that picture.
+
+Up to 12 monsters fit in the extra row. The row is centred automatically and the cursor handles a row that is not full. With the mod off nothing changes.
+
+You still need the monster's own data in the game files: model, animations, HUD bundle, sounds, its `attributes.xfg` entry and a `Setup<Name>AI` in `ConventionalGame.bsf`. Biollante's are on the retail disc; other monsters need their data added by another mod.
+
+Steps:
+1. Build the recipe: `python -I tools\mods\build_biollante.py <your game folder> <output mod folder>` (copy and edit this file for your monster).
+2. Install the output folder from the **Mods** tab (**INSTALL FROM FOLDER...**), switch it on and press **PLAY**. The launcher builds the changed files from your own game and checks them.
+3. If another script mod is on too and the two clash, the launcher names both; switch one off.
+
+Known limits: when the select screen reopens, a monster in the extra row is not preselected, and the grid is smaller than the original. Reference: the game project's `docs/formats/roster_slots.md` and `docs/formats/mod_build_recipe.md`. Credit: the idea of a third select page was explored by ANILORAK on PS2 (research only; this is our own implementation, no code from him used).
+
+## Photo mode
+
+Photo mode pauses a fight so you can fly a free camera, change the field of view, roll the camera, hide the HUD and save full-resolution PNG screenshots. Open it from the in-game menu (**PHOTO MODE**), with the photo key (default **F8**) or, if you switch it on in the Controllers tab, by holding **Back** and **Y**. Close it with B or Esc. It works during a fight only. The settings (on/off, keys, camera speed, range, controller shortcut) are in the Controllers tab and listed in `ste_enhance.ini` under `[camera]`; they are in the settings tables below.
 
 ## Settings and tweaks you can change
 
@@ -232,7 +258,7 @@ These are the options in the launcher (Video and Enhancements tabs) and in the i
 | Field of view | Wider shows more of the arena | Original, Wider, Widest | `ste_video.ini` `[video]` `fov_scale` | `1` |
 | Texture filtering | Sharper surfaces at an angle | Off, 2x, 4x, 8x, 16x | `ste_video.ini` `[video]` `anisotropy` | `0` |
 | **SOUND AND POINTER** |  | | | |
-| Volume | The game's overall volume. | 0% (mute), 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100% | `ste_video.ini` `[audio]` `master_volume` | `100` |
+| Volume | The game's overall volume. | 100%, 90%, 80%, 70%, 60%, 50%, 40%, 30%, 20%, 10%, 0% (mute) | `ste_video.ini` `[audio]` `master_volume` | `100` |
 | Mouse pointer | Auto hides it after 3 seconds without movement. | Auto, Always hidden, Always shown | `ste_video.ini` `[window]` `hide_cursor` | `auto` |
 | **HD ART** |  | | | |
 | HD art | Sharper replacement pictures, made for this game. Needs the HD art files. (shown only when the game reports `hd_art`) | ON / OFF | `ste_video.ini` `[video]` `hd_art` | `0` |
@@ -252,7 +278,7 @@ These are the options in the launcher (Video and Enhancements tabs) and in the i
 | Unlock the gallery | All Gallery items. | ON / OFF | `ste_enhance.ini` `[enhance]` `unlock_gallery` | `0` |
 | Unlock Final Wars items | All Final Wars gallery items. | ON / OFF | `ste_enhance.ini` `[enhance]` `unlock_final_wars` | `0` |
 | Unlock Biollante | Needs the Biollante slot mod. | ON / OFF | `ste_enhance.ini` `[enhance]` `unlock_biollante` | `0` |
-| **G:STEM-INSPIRED OPTIONS** | Based on G:STEM's gameplay options — credit to Gojirex, Shame Devs, GR8GODZILLAGOD and the STEM community. | | | |
+| **G:STEM-INSPIRED OPTIONS** | Inspired by G:STEM (our own code) - see Credits | | | |
 | Monster size | Camera and hit boxes follow the size. | Original, 150%, 200%, 300% | `ste_enhance.ini` `[enhance]` `stem_rule_player_size` | `0` |
 | Footstep camera shake | Big monsters shake the screen. | ON / OFF | `ste_enhance.ini` `[enhance]` `stem_footstep_camera_shake` | `0` |
 | Rage meter | How the rage meter fills. | Original, Damage taken, Damage dealt, Both, Over time, All | `ste_enhance.ini` `[enhance]` `stem_rule_rage_meter` | `0` |
@@ -263,7 +289,7 @@ These are the options in the launcher (Video and Enhancements tabs) and in the i
 | Weapon-independent vertical knockback |  | ON / OFF | `ste_enhance.ini` `[enhance]` `stem_weapon_vertical_knockback` | `0` |
 | No results-screen dimming |  | ON / OFF | `ste_enhance.ini` `[enhance]` `stem_no_results_dim` | `0` |
 | Empty arena | Flat ground, no buildings. | ON / OFF | `ste_enhance.ini` `[enhance]` `stem_rule_empty_arena` | `0` |
-| **GODZILLA ULTRA FEATURES** | Based on ANILORAK's Godzilla Ultra research. | | | |
+| **GODZILLA ULTRA FEATURES** | Inspired by ANILORAK's Godzilla Ultra research (our own code) - see Credits | | | |
 | **CHEATS** |  | | | |
 | Player 1 invulnerable | Checked against the real game. | ON / OFF | `ste_enhance.ini` `[enhance]` `cheat_invulnerable_p1` | `0` |
 | Computer player invulnerable |  | ON / OFF | `ste_enhance.ini` `[enhance]` `cheat_invulnerable_com` | `0` |
@@ -314,7 +340,7 @@ Every key can also be set for one run with the environment variable `STE_<SECTIO
 
 ## What's changed for modders
 
-- **0.3.1 (next)**: photo mode settings (`[camera]` in `ste_enhance.ini`; the in-game menu has a PHOTO MODE button). Mods that build on your PC (recipe mods, `"format": "bsf-edit"`) and `zip-of` patches are built by the launcher's Prepare step with `iso_to_mod.py prepare`, using the embedded Python in `tools\python`; Solo Destruction ships as one, switched off; new walkthroughs "Mods that are built on your PC" and "Make a mod from a modified disc image or folder". Recipe mods also work when you play from a disc image.
+- **0.4.0**: one release for everything since 0.2.3. New: Biollante as a roster recipe mod (`ste.biollante`, three build formats `bsf-edit`, `text-edit`, `builtin`); several recipe mods on at once (`iso_to_mod.py prepare-stack`, `_built\_stack.json`, `CONFLICT` lines); the guide section "Add a monster to the roster" (extra select row, `bio_ui.py`, `build_biollante.py`); edit `order.json` without a byte-order mark. Also in this release: Solo Destruction (a recipe mod that ships switched off), photo mode (`[camera]` settings, PHOTO MODE button in the in-game menu), the launcher builds script mods for you with an embedded Python in `tools\python`, "Mods that are built on your PC" and "Make a mod from a modified disc image or folder" walkthroughs. Recipe mods also work when you play from a disc image.
 - **0.2.3**: sound packs (`sound_pack.py export` and `import`, mod type "Sound pack" in the Mods tab, loaded from the Mods folder with the on/off switch and order); a "Replace sounds and music" walkthrough.
 - **0.2.2**: texture export (`import_texture_set.py export`) to get a monster's original textures as named PNGs, and `import` reads your game folder or `.iso` directly (no separate index step); texture packs installed in the Mods tab are loaded by the game from the Mods folder, with the Mods tab's ON/OFF and order (checked end to end: install in the launcher, PLAY, `last_report.txt` says ACTIVE); this guide restructured with a generated settings reference.
 - **0.2.1**: no change for modders.

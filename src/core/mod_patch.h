@@ -48,7 +48,7 @@ std::string sha256OfFile(const std::filesystem::path& p, std::string& err);   //
 std::string sha256OfBytes(const std::vector<uint8_t>& b);
 
 // What is built and current, from <mod>\_built\state.json (no hashing of game files). One entry per patch of the mod.
-std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const std::filesystem::path& gameDir);
+std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const std::filesystem::path& gameDir, const ModStore* store = nullptr);
 
 // Mods whose patches are "bsf-edit" (a recipe built from the player's own scripts) or "zip-of" (a zip rebuilt from a patched
 // member) are built by the game project's tool (iso_to_mod.py prepare), never by this launcher. The runner starts it:
@@ -60,6 +60,12 @@ struct ExternalResult {
     std::string output;
 };
 using ExternalRunner = std::function<ExternalResult(const std::filesystem::path& modDir, const std::filesystem::path& gameDir)>;
+// Recipe mods (bsf-edit, text-edit, builtin) are built together, on top of each other in load order:
+// `prepare-stack <mods root> <game folder> --enable id,id`; lines are `<mod id>: <target>: built...` or `CONFLICT <mod id>: <target>: ...`.
+using StackRunner = std::function<ExternalResult(const std::filesystem::path& modsRoot, const std::filesystem::path& gameDir, const std::vector<std::string>& ids)>;
+// Recipe mods (bsf-edit, text-edit, builtin) are built together, on top of each other in load order:
+// `prepare-stack <mods root> <game folder> --enable id,id`; lines are `<mod id>: <target>: built...` or `CONFLICT <mod id>: <target>: ...`.
+using StackRunner = std::function<ExternalResult(const std::filesystem::path& modsRoot, const std::filesystem::path& gameDir, const std::vector<std::string>& ids)>;
 bool isExternalPatch(const ModPatchEntry& p);
 bool modNeedsExternalTool(const ModInfo& m);
 
@@ -71,4 +77,4 @@ struct PatchRunResult {
 // load order; two mods may patch the same file only when the later one's base is the earlier one's result.
 // `cancel` may be null; it is checked between files.
 PatchRunResult preparePatches(const ModStore& store, const std::filesystem::path& gameDir, const std::function<bool(const ModInfo&)>& fits,
-                              const std::atomic<bool>* cancel, const ExternalRunner& external = {});
+                              const std::atomic<bool>* cancel, const ExternalRunner& external = {}, const StackRunner& stack = {});

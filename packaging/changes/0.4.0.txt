@@ -1,0 +1,38 @@
+Everything in v0.2.3 is in it, plus the changes of the unreleased 0.3.x work:
+
+GAME (build c437)
+- Biollante is playable: P1, COM, a second human player on a second pad, Versus, Melee, Action mode and Solo Destruction. Her models,
+  animations, HUD and sounds come from the retail disc; the mod holds only a recipe and is built on your PC (nothing is downloaded).
+  It is switched OFF until you turn it on in the Mods tab. The select screen gets a third row for her.
+- Solo Destruction: a SOLO DESTRUCTION row on the main menu. Any monster, any city, ROUND LENGTH 1 to 10 minutes or NO TIME LIMIT,
+  a results screen at 0:00. Also a mod built on your PC, OFF until you switch it on. Inspired by ANILORAK's Godzilla Ultra research
+  (our own code; none of his code or files are used).
+- Photo mode: pause a fight and fly a free camera. Field of view, camera roll, HUD on/off and full-resolution PNG screenshots. Open it
+  from the in-game menu (PHOTO MODE), with F8, or by holding Back and Y (switch that on in the Controllers tab).
+- Script mods can be combined: Solo Destruction and Biollante work together. If two mods change the same thing, the launcher names both.
+
+LAUNCHER
+- Mods that change game scripts are built from your own game files when you press PLAY, all switched-on ones together in one go.
+  The Mods tab shows "Needs build" until it is done. Works with an unpacked folder and with a disc image.
+- The download contains a small Python (python.org's embeddable Python 3.15.2, about 14 MB) and the game project's mod tools, so nothing
+  has to be installed. Solo Destruction and Biollante are already in your Mods tab, switched off.
+- Controllers tab: a "Photo mode" group (on/off, keys, camera speed, controller shortcut). The in-game menu has a PHOTO MODE button.
+- The Mods tab labels gameplay mods "Gameplay mod". The credit lines on the Enhancements pages now read "Inspired by ... (our own code) -
+  see Credits". CREDITS.md has two parts: code and assets used, and research and inspiration (no code used).
+
+KNOWN ISSUES
+- Biollante: when the select screen reopens, a monster in the third row is not preselected. Her AI is the stock Easy/Medium/Hard level.
+  Her effects were checked with a scripted sample of attacks, not every move.
+- Solo Destruction: the title is English only; Mothra in solo and a 5-digit score banner are untested.
+- Photo mode works during a fight only. The picture of the HUD clock keeps counting while the HUD is shown (the match clock itself is
+  frozen). Flying with keyboard and mouse and the in-game menu button were not tested by hand.
+- Unlimited draw distance can still show buildings popping in and out at the far skyline (not fixed, not verified either way).
+- In Tokyo a UFO can leave the playing area (out of bounds). Not fixed yet.
+- Sound packs: making a replaced sound loop (a file name ending in _loop) is untested in the game.
+- Playing from a disc image was tested with images made from an extracted game folder, not with a dump of a real disc.
+- A real physical controller has not been tried with the in-game menu (the tests used a virtual one). Only Xbox controllers have been
+  tested. Windows only. A rare crash while loading on slow systems is still being investigated.
+
+PACKAGE
+- Same files as v0.2.3 plus tools\python (embedded Python), tools\mods (the mod tools) and bundled_mods\ste.solo-destruction and
+  bundled_mods\ste.biollante.

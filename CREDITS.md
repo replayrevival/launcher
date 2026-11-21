@@ -1,9 +1,16 @@
 ﻿# Credits and dependencies
 
+This file has two separate parts:
+1. **Code and assets used in this project**: everything that is actually included (code, libraries, fonts, icons), with its source, version, licence and where it is used.
+2. **Research and inspiration (no code used)**: people and projects whose research, documentation, tools or ideas helped. None of their code or files are included.
+
+The recompilation itself (the game program and its tools) has its own list in the game repository: https://github.com/replayrevival/ste-recomp/blob/main/CREDITS.md
+
 Every dependency is recorded here with version, licence and the SHA-256 of the pinned archive (also in `cmake/Deps.cmake`). GPL-compatible only. Dev builds fetch the archives with FetchContent; **before release the exact sources must be vendored into `third_party\`** (`-DLAUNCHER_VENDORED=ON`) so release builds need no network. Not done yet.
 
-## Code dependencies (approved 2026-10-31)
-| Name | Version | Licence | Use | Archive SHA-256 |
+## Code and assets used in this project
+### Libraries (code compiled into the launcher; approved 2026-10-31)
+| Name | Version | Licence | Used by (files or parts) | Archive SHA-256 |
 |---|---|---|---|---|
 | SDL3 | 3.4.18 | zlib | window, input, gamepads, rumble, audio (static) | 9c75cf16330322c217dedd2e0609f1124f1b54b8633e763467b4684d0f4334a3 |
 | RmlUi | 6.3 | MIT | UI from RML/RCSS. We compile its `RmlUi_Platform_SDL.cpp` and `RmlUi_Renderer_GL3.cpp` | d977298bb6147610e5984d5db85ddf284020d655a8713913f6982074f1dbdede |
@@ -12,14 +19,31 @@ Every dependency is recorded here with version, licence and the SHA-256 of the p
 | nlohmann/json | 3.12.0 | MIT | profile.json, manifests (profile.json is read now) | 4b92eb0c06d10683f7447ce9406cb97cd4b453be18d7279320f7b2f025c10187 |
 | miniz | 3.1.2 | MIT | mod .zip reading. Built in (Mods tab, 0.1.3): its four .c files are compiled into the launcher; MIT notice in THIRD_PARTY_NOTICES.md | 98468f8924934b723276680f85238b6c78bf1f8b49b4459cc9b7214a20e2e9fb |
 
-Written in-house, no dependency: SHA-256 (src/core/sha256.cpp, checked against the known default.xbe hash), XISO reader, ini read/write, drive search.
+Written in-house, no dependency (our own code): SHA-256 (src/core/sha256.cpp, checked against the known default.xbe hash), XISO reader, ini read/write, drive search.
 
-## Assets
+### Assets (fonts and button pictures shipped with the launcher)
 | Name | Licence | Source | SHA-256 |
 |---|---|---|---|
 | Pixelify Sans Bold (static instance) | SIL OFL 1.1 (`assets/fonts/OFL-PixelifySans.txt`) | Google Fonts CSS API (fonts.googleapis.com, weight 700, TrueType), fetched 2026-10-31; the google/fonts repo only holds the variable font | c67401df48ce6be02ffdf8129cdf274c5d7b27a673e15ed0f018e465028a8363 |
 | Chakra Petch Regular, Medium, SemiBold, Bold | SIL OFL 1.1 (`assets/fonts/OFL-ChakraPetch.txt`) | github.com/google/fonts `ofl/chakrapetch` (main branch, fetched 2026-10-31) | Regular 98fcd638baa5c81ff0316b7538ce330ee3b23b1302726de3526d5933a8ecf986, Medium d480f4f97405fac3600652e2e14fd0b14339031c0af4da11582994878f04d919, SemiBold 45264de3204ddbd5fb3e14a2402acd5c630d16650ae5fc221d2c52da46a6734b, Bold 65fbf76d95651697275e19db4d717c0e95a789ddd3476478b05292104db278a0 |
 | Kenney Input Prompts 1.5 (controller glyphs) | CC0 1.0 (public domain; credit given as a courtesy). `assets/glyphs/License.txt` says "Creative Commons Zero, CC0" | Created by Kenney, https://kenney.nl/assets/input-prompts; the zip was downloaded by Miko (browser only) and is kept as `assets/glyphs/kenney_input-prompts_1.5.zip` (not shipped in release zips). Used: 36 PNGs from the Xbox Series and PlayStation Series "Default" folders (list in `assets/glyphs/README.md`), copied unchanged. Original Xbox Black/White are not in the set: `assets/glyphs/ours_xbox_black.png` / `ours_xbox_white.png` are our own art (GPL-2.0-or-later, made by `scripts/make_glyphs.py`). Switch and generic pads stay text | zip: ac2fcf599080b0f3ba2d174c9474db6df1a0e96ff0662580e2da79a122ab78a1 |
+
+Shipped font files (`scripts/package.ps1` refuses to package any other .ttf): ChakraPetch-Regular.ttf, ChakraPetch-Medium.ttf, ChakraPetch-SemiBold.ttf, ChakraPetch-Bold.ttf, PixelifySans-Bold.ttf. The earlier variable Pixelify Sans file was replaced by the static Bold and is not shipped.
+
+### Shipped helper: embedded Python and the game project's mod tools
+- **Python 3.15.2 embeddable package (64-bit)** (PSF licence, GPL-compatible), python.org release page `python-3152`, `python-3.15.2-embed-amd64.zip` (SHA-256 `D012F3AA29CF07436DAE8AEA1FEC0FD195C2612A0B059B1F915AE0AFB9AD1F62`, verified against the hash on python.org). Shipped unchanged as `tools\python\` (about 14 MB) so the launcher can run the game project's mod tools without Python installed on the player's PC (Miko approved bundling, 2026-11-21). The tools themselves (`tools\mods\iso_to_mod.py`, `bsf_edit.py`, `step_diff.py`) are the game project's own GPL-2.0-or-later code, standard library only.
+
+## Research and inspiration (no code used)
+Nothing from the people and projects below is included in the launcher or its download. Where a feature of ours was inspired by their work, it was written by us from scratch.
+
+| Who / what | What they contributed | What we did |
+|---|---|---|
+| **G:STEM** (credit to Gojirex, Shame Devs, GR8GODZILLAGOD and the STEM community) | Their gameplay options for the PC game were the inspiration for our "G:STEM-inspired options" (monster size, camera shake and similar). | Our own code in the game project; the launcher only shows the settings. No code or files from G:STEM are used. |
+| **ANILORAK, Godzilla Ultra** | Research and design of Solo Destruction (any monster in any city, round timer, results screen). | Our own implementation, built on your PC from your own game files. No code or files of his are included; his own mods stay hosted by him. |
+| Launcher mockup (our own design reference) | The approved navy blueprint look (kept in the game project's docs). | Our own art and layout. |
+
+### Tools used to make releases (not shipped)
+Nothing from these is distributed with the project.
 
 ### Release media tooling (not shipped, not part of the launcher or the game)
 | Name | Licence | Source |
@@ -27,13 +51,6 @@ Written in-house, no dependency: SHA-256 (src/core/sha256.cpp, checked against t
 | FFmpeg 8.1.1 "full" Windows build | GPL-3.0 build (includes x264, x265 and others); a build tool only, nothing from it is distributed with the project | already installed on this PC by winget (`Gyan.FFmpeg`), from gyan.dev; used by `scripts/media/make_media.py` for the trailer, Short and thumbnail. No installation was needed (Miko had approved one). |
 | IBM Plex Mono Medium and Bold | SIL OFL 1.1 (copyright IBM Corp., reserved name "Plex") | github.com/google/fonts `ofl/ibmplexmono`, downloaded 2026-11-17 into `E:\GodzillaSTE\release\media\_fonts\` (Medium SHA-256 `ac27abd6450a64dd9446...`, Bold `a9b4c49bb299e05b5f6c...`); used only in the release videos and thumbnails |
 
-Shipped font files (`scripts/package.ps1` refuses to package any other .ttf): ChakraPetch-Regular.ttf, ChakraPetch-Medium.ttf, ChakraPetch-SemiBold.ttf, ChakraPetch-Bold.ttf, PixelifySans-Bold.ttf. The earlier variable Pixelify Sans file was replaced by the static Bold and is not shipped.
-
-## Design reference
-The approved launcher mockup (kept in the game project's docs): navy blueprint grid, cyan chamfered buttons, yellow markers.
-
-## Test-only tooling (not shipped, not in any repo)
+### Test-only tooling (not shipped, not in any repo)
 - **Pillow 13.0.0** (Python imaging library, MIT-CMU / HPND licence), installed with pip into the throwaway venv `F:\modder_test\venv` on 2026-11-19 (Miko approved) to test the game project's `import_texture_set.py` texture export/import as a modder would. Not bundled in any package.
 
-## Shipped helper: embedded Python
-- **Python 3.15.2 embeddable package (64-bit)** (PSF licence, GPL-compatible), python.org release page `python-3152`, `python-3.15.2-embed-amd64.zip` (SHA-256 `D012F3AA29CF07436DAE8AEA1FEC0FD195C2612A0B059B1F915AE0AFB9AD1F62`, verified against the hash on python.org). Shipped unchanged as `tools\python\` (about 14 MB) so the launcher can run the game project's mod tools without Python installed on the player's PC (Miko approved bundling, 2026-11-21). The tools themselves (`tools\mods\iso_to_mod.py`, `bsf_edit.py`, `step_diff.py`) are the game project's own GPL-2.0-or-later code, standard library only.

@@ -11,7 +11,7 @@
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-orange">
 </p>
 
-![The launcher's Video tab](docs/screenshots/0.3.1_launcher_video.png)
+![The launcher's Video tab](docs/screenshots/0.4.0_launcher_video.png)
 
 ## What it does
 
@@ -25,24 +25,27 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
-## What's new in v0.3.1
+## What's new in v0.4.0
 
-- **Mods that are built on your PC.** Solo Destruction ships inside the download, switched off. Turn it on in the **Mods** tab, press Play, and the launcher builds it from your own game files (a few seconds, nothing is downloaded). The Mods tab shows "Needs build" until then. A small Python comes with the download, so nothing has to be installed. Walkthrough: **[Mods that are built on your PC](docs/MODDING.md#mods-that-are-built-on-your-pc-script-mods)**. Based on ANILORAK's Godzilla Ultra research (our own rewrite).
+- **Biollante is playable.** The download carries the Biollante mod (switched off). Turn it on in the **Mods** tab, press Play, and the launcher builds it from your own game files (a few seconds, nothing is downloaded). She appears on a third row of the character select screen. Biollante's data is the retail game's; the third select row is inspired by ANILORAK's research (our own code; no code from ANILORAK used). Walkthrough: **[Mods that are built on your PC](docs/MODDING.md#mods-that-are-built-on-your-pc-script-mods)**; for modders: **[Add a monster to the roster](docs/MODDING.md#add-a-monster-to-the-roster)**.
+- **Several script mods at once.** Solo Destruction and Biollante can both be on; the launcher builds them together and names both mods if they ever clash. The Mods tab says "Needs build" until it is done, and "Built from your game files and ready" after.
+- **Solo Destruction** ships inside the download too, switched off. Inspired by ANILORAK's Godzilla Ultra research (our own code; no code from ANILORAK used).
 - **Photo mode** settings on the Controllers tab (on/off, keys, camera speed, controller shortcut) and a PHOTO MODE button in the in-game menu.
-- New guide section: [make a mod from a modified disc image or folder](docs/MODDING.md#make-a-mod-from-a-modified-disc-image-or-folder).
-- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.3.1-alpha).
+- A small Python comes with the download, so nothing has to be installed. New guide section: [make a mod from a modified disc image or folder](docs/MODDING.md#make-a-mod-from-a-modified-disc-image-or-folder).
+- **Credits:** [CREDITS.md](CREDITS.md) now has two parts: code and assets used, and research and inspiration (no code used). Full list for the game: https://github.com/replayrevival/ste-recomp/blob/main/CREDITS.md
+- Known issues are listed in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.4.0-alpha).
 
 ## Screenshots
 
 | | |
 |---|---|
-| ![Mods: Solo Destruction built and ready](docs/screenshots/0.3.1_launcher_mods_solo_built.png) | ![Video](docs/screenshots/0.3.1_launcher_video.png) |
-| *Mods: Solo Destruction, built from your own game files.* | *Video: resolution, widescreen, draw distance.* |
-| ![Controllers tab with the new Photo mode group](docs/screenshots/0.3.1_launcher_controllers_photo.png) | ![Controllers with PlayStation pictures](docs/screenshots/archive/0.2.3/0.2.3_launcher_controllers_playstation.png) |
+| ![Mods: Biollante and Solo Destruction, built from your own game files](docs/screenshots/0.4.0_launcher_mods_both.png) | ![Video](docs/screenshots/0.4.0_launcher_video.png) |
+| *Mods: Biollante and Solo Destruction, built from your own game files.* | *Video: resolution, widescreen, draw distance.* |
+| ![Controllers tab with the new Photo mode group](docs/screenshots/0.4.0_launcher_controllers_photo.png) | ![Controllers with PlayStation pictures](docs/screenshots/archive/0.2.3/0.2.3_launcher_controllers_playstation.png) |
 | *Controllers tab with the new Photo mode group.* | *The same screen with PlayStation pictures.* |
-| ![Mods](docs/screenshots/0.3.1_launcher_video.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
+| ![Mods](docs/screenshots/0.4.0_launcher_video.png) | ![Choosing a mod in the built-in file browser](docs/screenshots/mod_browser_zip.png) |
 | *Video tab.* | *The built-in file browser.* |
-| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.3.1_launcher_enhancements.png) | |
+| ![Enhancements: the G:STEM-inspired options with their credit](docs/screenshots/0.4.0_launcher_enhancements.png) | |
 | *Enhancements: the G:STEM-inspired options and their credit.* | |
 | ![The in-game menu](docs/screenshots/0.1.6_ingame_menu_paused.png) | ![The in-game menu's Enhancements page with the G:STEM-inspired options](docs/screenshots/0.2.0_ingame_menu_enhancements_credit.jpg) |
 | *The same screens inside the game (Back+Start or F1).* | *The Enhancements page in the game, with the G:STEM credit.* |

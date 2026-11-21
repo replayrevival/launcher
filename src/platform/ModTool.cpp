@@ -43,7 +43,7 @@ fs::path findScript(const fs::path& exeDir) {
 
 }  // namespace
 
-ExternalResult runModTool(const fs::path& exeDir, const fs::path& modDir, const fs::path& gameDir, const std::atomic<bool>* cancel) {
+static ExternalResult runTool(const fs::path& exeDir, const std::wstring& verbArgs, const std::atomic<bool>* cancel) {
     ExternalResult r;
     std::error_code ec;
     const fs::path script = findScript(exeDir);
@@ -58,7 +58,7 @@ ExternalResult runModTool(const fs::path& exeDir, const fs::path& modDir, const 
     }
 #ifdef _WIN32
     auto q = [](const fs::path& p) { return L"\"" + p.wstring() + L"\""; };
-    std::wstring cmd = q(py) + L" -I " + q(script) + L" prepare " + q(modDir) + L" " + q(gameDir);
+    std::wstring cmd = q(py) + L" -I " + q(script) + L" " + verbArgs;
     SECURITY_ATTRIBUTES sa{sizeof(sa), nullptr, TRUE};
     HANDLE pipeIn = nullptr, pipeOut = nullptr;
     if (!CreatePipe(&pipeIn, &pipeOut, &sa, 0)) { r.startError = "Could not start the helper (pipe)."; return r; }
@@ -96,4 +96,24 @@ ExternalResult runModTool(const fs::path& exeDir, const fs::path& modDir, const 
     r.startError = "Building recipe mods is only supported on Windows.";
 #endif
     return r;
+}
+
+ExternalResult runModTool(const fs::path& exeDir, const fs::path& modDir, const fs::path& gameDir, const std::atomic<bool>* cancel) {
+#ifdef _WIN32
+    return runTool(exeDir, L"prepare \"" + modDir.wstring() + L"\" \"" + gameDir.wstring() + L"\"", cancel);
+#else
+    return runTool(exeDir, L"", cancel);
+#endif
+}
+
+ExternalResult runModToolStack(const fs::path& exeDir, const fs::path& modsRoot, const fs::path& gameDir, const std::vector<std::string>& ids,
+                               const std::atomic<bool>* cancel) {
+#ifdef _WIN32
+    std::wstring list;
+    for (auto& i : ids) { if (!list.empty()) list += L","; list += std::wstring(i.begin(), i.end()); }
+    return runTool(exeDir, L"prepare-stack \"" + modsRoot.wstring() + L"\" \"" + gameDir.wstring() + L"\" --enable " + (list.empty() ? L"-" : list), cancel);
+#else
+    (void)modsRoot; (void)gameDir; (void)ids;
+    return runTool(exeDir, L"", cancel);
+#endif
 }
