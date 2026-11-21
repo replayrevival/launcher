@@ -64,6 +64,7 @@ endif()
 add_library(launcher_ui STATIC
     src/platform/Displays.cpp
     src/platform/GameProcess.cpp
+    src/platform/ModTool.cpp
     src/platform/DriveSearch.cpp
     src/platform/UpdateFetch.cpp
     src/ui/App.cpp

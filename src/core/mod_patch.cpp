@@ -305,16 +305,49 @@ std::string lowerKey(std::string s) {
     return s;
 }
 
+bool isExternalFormat(const std::string& f) { return f == "bsf-edit" || f == "zip-of"; }
+
+std::string normTarget(std::string t) {
+    for (auto& c : t) { if (c == '\\') c = '/'; c = char(std::tolower((unsigned char)c)); }
+    return t;
+}
+
+// Is the built file there and the one the manifest announces? (size first, then the hash)
+bool builtMatches(const ModInfo& m, const ModPatchEntry& p) {
+    std::error_code ec;
+    const fs::path b = builtPath(m, p.target);
+    if (!fs::is_regular_file(b, ec)) return false;
+    if (p.size && fs::file_size(b, ec) != p.size) return false;
+    std::string e;
+    return !p.resultSha256.empty() && sha256OfFile(b, e) == p.resultSha256;
+}
+
+}  // namespace
+
+bool isExternalPatch(const ModPatchEntry& p) { return isExternalFormat(p.format); }
+bool modNeedsExternalTool(const ModInfo& m) {
+    for (auto& p : m.patches) if (isExternalPatch(p)) return true;
+    return false;
+}
+
+namespace {
+
 }  // namespace
 
 std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const fs::path& gameDir) {
     std::vector<ModPatchReport> out;
     if (mod.patches.empty()) return out;
     const auto st = loadState(mod);
+    const bool ext = modNeedsExternalTool(mod);
     for (auto& p : mod.patches) {
         ModPatchReport r;
         r.modId = mod.id;
         r.target = p.target;
+        if (ext) {  // built by the helper tool: current when the built file is there and has the announced hash
+            r.state = builtMatches(mod, p) ? PatchState::Ready : PatchState::NotBuilt;
+            out.push_back(std::move(r));
+            continue;
+        }
         std::string e;
         const std::string patchSha = sha256OfFile(mod.dir / pathFromUtf8(p.patchRel), e);
         const auto it = st.find(p.target);
@@ -331,7 +364,7 @@ std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const fs::path&
 }
 
 PatchRunResult preparePatches(const ModStore& store, const fs::path& gameDir, const std::function<bool(const ModInfo&)>& fits,
-                              const std::atomic<bool>* cancel) {
+                              const std::atomic<bool>* cancel, const ExternalRunner& external) {
     PatchRunResult run;
     struct Cur { fs::path path; std::string sha, owner; };
     std::map<std::string, Cur> cur;  // target -> where the current version of that file is
@@ -348,6 +381,67 @@ PatchRunResult preparePatches(const ModStore& store, const fs::path& gameDir, co
         };
         if (!m.problem.empty() || !m.enabled || !fits(m)) {
             for (auto& p : m.patches) add(p, PatchState::Skipped, m.enabled ? "This mod does not fit your game." : "The mod is switched off.");
+            continue;
+        }
+        if (modNeedsExternalTool(m)) {
+            const bool cancelled = cancel && cancel->load();
+            bool allReady = true;
+            for (auto& p : m.patches) if (!builtMatches(m, p)) allReady = false;
+            if (cancelled) { for (auto& p : m.patches) add(p, PatchState::Skipped, "Cancelled."); continue; }
+            if (allReady) {
+                for (auto& p : m.patches) { add(p, PatchState::Ready, ""); cur[lowerKey(p.target)] = {builtPath(m, p.target), p.resultSha256, m.id}; }
+                continue;
+            }
+            auto failAll = [&](PatchState st, const std::string& why) { for (auto& p : m.patches) add(p, st, why); };
+            if (!external) { failAll(PatchState::BadPatch, "This mod is built on your PC and needs a helper that this launcher does not have."); continue; }
+            const ExternalResult er = external(m.dir, gameDir);
+            if (!er.started) { failAll(PatchState::BadPatch, er.startError.empty() ? "The helper that builds this mod could not be started." : er.startError); continue; }
+            std::map<std::string, std::pair<PatchState, std::string>> lines;  // normalised target -> state, text
+            size_t pos = 0;
+            while (pos <= er.output.size()) {
+                size_t nl = er.output.find('\n', pos);
+                std::string line = er.output.substr(pos, nl == std::string::npos ? std::string::npos : nl - pos);
+                pos = nl == std::string::npos ? er.output.size() + 1 : nl + 1;
+                while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) line.pop_back();
+                const size_t c = line.find(": ");
+                if (c == std::string::npos) continue;
+                const std::string tgt = normTarget(line.substr(0, c)), msg = line.substr(c + 2);
+                PatchState st;
+                if (msg == "built") st = PatchState::Built;
+                else if (msg.rfind("BASE MISMATCH", 0) == 0) st = PatchState::BaseMismatch;
+                else if (msg.rfind("RESULT MISMATCH", 0) == 0) st = PatchState::ResultMismatch;
+                else if (msg.find("not in your game") != std::string::npos) st = PatchState::MissingTarget;
+                else st = PatchState::BadPatch;  // "script does not match what this tool expects ..." and anything unknown
+                lines[tgt] = {st, msg};
+            }
+            bool bad = false;
+            for (auto& p : m.patches) {
+                const auto it = lines.find(normTarget(p.target));
+                if (it == lines.end()) {
+                    bad = true;
+                    std::string tail;  // the helper's last line, which usually says why it stopped
+                    {
+                        std::string o = er.output;
+                        while (!o.empty() && (o.back() == '\n' || o.back() == '\r' || o.back() == ' ')) o.pop_back();
+                        const size_t nl = o.find_last_of('\n');
+                        tail = o.substr(nl == std::string::npos ? 0 : nl + 1);
+                        if (tail.size() > 160) tail = tail.substr(0, 160) + "...";
+                    }
+                    add(p, PatchState::BadPatch, er.exitCode == 0 ? "The helper did not report this file." :
+                        "The helper stopped before it reached this file (exit code " + std::to_string(er.exitCode) + ")." + (tail.empty() ? "" : " It said: " + tail));
+                } else if (it->second.first == PatchState::Built) {
+                    if (builtMatches(m, p)) { add(p, PatchState::Built, ""); cur[lowerKey(p.target)] = {builtPath(m, p.target), p.resultSha256, m.id}; }
+                    else { bad = true; add(p, PatchState::ResultMismatch, "The built file is not the one this mod expects, so the game will use your original file."); }
+                } else {
+                    bad = true;
+                    std::string txt = it->second.second;
+                    if (it->second.first == PatchState::BaseMismatch) txt = "Your game file is not the one this mod was made for (a different version of the game?).";
+                    else if (it->second.first == PatchState::MissingTarget) txt = "Your game has no file \"" + p.target + "\".";
+                    else if (it->second.first == PatchState::ResultMismatch) txt = "The rebuilt file does not match what the mod expects, so the game will use your original file.";
+                    add(p, it->second.first, txt);
+                }
+            }
+            (void)bad;
             continue;
         }
         auto state = loadState(m);

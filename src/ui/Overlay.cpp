@@ -199,8 +199,19 @@ void Overlay::ProcessEvent(Rml::Event& ev) {
     act(e->GetAttribute<Rml::String>("data-action", ""), e->GetAttribute<Rml::String>("data-arg", ""));
 }
 
+// "PHOTO MODE": only when the game reports the feature and the player has not switched it off (ini camera.photo_mode).
+std::string Overlay::photoButton() const {
+    if (!model_->settings.hasCapability("photo_mode")) return "";
+    const auto v = model_->settings.value("camera.photo_mode");
+    if (v && *v == "off") return "";
+    return navButton("PHOTO MODE", "ov-photo", "", "ov-photo");
+}
+
 void Overlay::act(const std::string& action, const std::string& arg) {
     if (action == "ov-resume") {
+        hide();
+    } else if (action == "ov-photo") {  // the game opens the free camera at its next frame of a running fight (not in menus)
+        if (cb_.applySetting) cb_.applySetting("camera.open_photo_mode", "1");
         hide();
     } else if (action == "ov-go") {
         go(arg == "video" ? Screen::Video
@@ -322,7 +333,7 @@ void Overlay::renderScreen() {
         case Screen::Main:
             title = "PAUSED";
             h = "<div class=\"ov-menu\">" + navButton("RESUME", "ov-resume", "", "ov-resume", true) + navButton("VIDEO", "ov-go", "video", "ov-video") +
-                navButton("ENHANCEMENTS", "ov-go", "enhance", "ov-enhance") + navButton("CONTROLLERS", "ov-go", "controls", "ov-controls") +
+                navButton("ENHANCEMENTS", "ov-go", "enhance", "ov-enhance") + navButton("CONTROLLERS", "ov-go", "controls", "ov-controls") + photoButton() +
                 navButton("RETURN TO LAUNCHER", "ov-go", "launcher", "ov-launcher") + navButton("QUIT GAME", "ov-go", "quit", "ov-quit") + "</div>";
             break;
         case Screen::Video: title = "VIDEO"; h = views::settingsRows(*model_, "video", true, &applied_); break;

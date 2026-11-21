@@ -66,6 +66,10 @@ bool App::init(Rml::ElementDocument* doc, std::string& err) {
     if (!screenEl_) { err = "The launcher screen file is missing its content area."; return false; }
     if (!model_.load(err)) return false;
     refreshDisplays();
+    if (!profile_.modsDirEnv.empty() && !modsRoot().empty()) {  // mods that ship in the download (off until the player switches them on)
+        mods_.setRoot(modsRoot());
+        mods_.seedBundled(paths_.exeDir / "bundled_mods");
+    }
     nav_.swapConfirmBack = input_.swapConfirmBack;
     nav_.capture = [this](const SDL_Event& ev) { return onCapture(ev); };
 

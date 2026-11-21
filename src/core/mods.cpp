@@ -117,7 +117,7 @@ bool parseManifest(const std::string& text, ModInfo& m, std::string& err) {
                     err = "A patch entry in manifest.json needs \"target\", \"patch\", \"base_sha256\" and \"result_sha256\".";
                     return false;
                 }
-                if (!safeRel(e.target) || !safeRel(e.patchRel)) { err = "A patch entry in manifest.json has an unsafe file path."; return false; }
+                if (!safeRel(e.target) || (e.format != "zip-of" && !safeRel(e.patchRel))) { err = "A patch entry in manifest.json has an unsafe file path."; return false; }
                 m.patches.push_back(std::move(e));
             }
         }
@@ -537,4 +537,25 @@ bool ModStore::remove(const std::string& id, std::string& err) {
     std::string serr;
     save(serr);  // drop it from order.json
     return true;
+}
+
+void ModStore::seedBundled(const fs::path& bundledDir) {
+    std::error_code ec;
+    if (root_.empty() || !fs::is_directory(bundledDir, ec)) return;
+    for (auto& d : fs::directory_iterator(bundledDir, ec)) {
+        if (!d.is_directory(ec)) continue;
+        const fs::path marker = root_ / "_seeded" / (d.path().filename().string() + ".txt");
+        if (fs::exists(marker, ec)) continue;
+        const ModInstallResult r = installFolder(d.path(), false);
+        if (r.kind == ModInstallResult::Failed) continue;
+        if (r.kind == ModInstallResult::Ok) {
+            reload();
+            setEnabled(r.id, false);
+            std::string e;
+            save(e);
+        }
+        fs::create_directories(marker.parent_path(), ec);
+        std::ofstream(marker) << "installed from the download\n";
+    }
+    reload();
 }

@@ -41,6 +41,7 @@ std::string modsPage(const LauncherModel& m_, const ModsViewState& v) {
             std::string kind = m.profile;
             if (kind == "textures" || kind == "texture") kind = "Texture pack";
             else if (kind == "sounds" || kind == "sound" || kind == "audio") kind = "Sound pack";
+            else if (kind == "content") kind = "Gameplay mod";
             line2 += (line2.empty() ? "" : " · ") + kind;
         }
 
@@ -58,6 +59,9 @@ std::string modsPage(const LauncherModel& m_, const ModsViewState& v) {
                     if (r.state == PatchState::NotBuilt || r.state == PatchState::Skipped) continue;
                     lines += "<div class=\"small warnline\">" + esc(r.target) + ": " + esc(r.detail) + "</div>";
                 }
+            if (modNeedsExternalTool(m))  // a recipe: built on this PC from the player's own game files
+                h += std::string("<div class=\"muted small\">") + (ready == int(m.patches.size()) ? "Built from your game files and ready." : "Needs build: made from your own game files when you press PLAY (nothing is downloaded).") + "</div>" + lines;
+            else
             h += "<div class=\"muted small\">Patches: " + std::to_string(ready) + " of " + std::to_string(m.patches.size()) +
                  " prepared" + (ready < int(m.patches.size()) && lines.empty() ? " (built from your game files when you press PLAY)" : "") + "</div>" + lines;
         }

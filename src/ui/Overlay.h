@@ -76,6 +76,7 @@ private:
     void controllerAction(const std::string& action, const std::string& arg);
     void step(const std::string& id, int dir);
     void notifyGame(const std::string& rowId);
+    std::string photoButton() const;
     void handleNav(NavAction a);
     void restoreFocus(const std::string& key);
     std::string focusKey() const;

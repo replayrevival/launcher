@@ -53,6 +53,13 @@
     "enhance.stem_rule_empty_arena": {"s": "enhance", "k": "stem_rule_empty_arena", "d": "0"},
     "enhance.button_prompts": {"s": "input", "k": "button_prompts", "d": "auto"},
     "enhance.overlay_guide": {"s": "input", "k": "overlay_guide", "d": "0"},
+    "camera.photo_mode": {"f": "enhance", "s": "camera", "k": "photo_mode", "d": "on"},
+    "camera.photo_key": {"f": "enhance", "s": "camera", "k": "photo_key", "d": "F8"},
+    "camera.photo_screenshot_key": {"f": "enhance", "s": "camera", "k": "photo_screenshot_key", "d": "F12"},
+    "camera.photo_hud_key": {"f": "enhance", "s": "camera", "k": "photo_hud_key", "d": "H"},
+    "camera.photo_speed": {"f": "enhance", "s": "camera", "k": "photo_speed", "d": "400"},
+    "camera.photo_range": {"f": "enhance", "s": "camera", "k": "photo_range", "d": "8000"},
+    "camera.photo_pad_chord": {"f": "enhance", "s": "camera", "k": "photo_pad_chord", "d": "off"},
     "enhance.seed_from_game_dir": {"s": "saves", "k": "seed_from_game_dir", "d": "0"}
   },
 
@@ -94,7 +101,14 @@
          {"label": "Xbox", "set": {"enhance.button_prompts": "xbox"}},
          {"label": "Original Xbox (Black and White)", "set": {"enhance.button_prompts": "xbox_original"}},
          {"label": "PlayStation", "set": {"enhance.button_prompts": "playstation"}}]},
-      {"id": "guide", "apply": "restart", "type": "toggle", "label": "Guide button opens the menu", "hint": "The Guide / Home / PlayStation button also opens the in-game menu. Off by default; holding Back and Start, or F1, always work.", "on": {"enhance.overlay_guide": "1"}}
+      {"id": "guide", "apply": "restart", "type": "toggle", "label": "Guide button opens the menu", "hint": "The Guide / Home / PlayStation button also opens the in-game menu. Off by default; holding Back and Start, or F1, always work.", "on": {"enhance.overlay_guide": "1"}},
+      {"group": "PHOTO MODE", "needs": "photo_mode", "note": "Pause a fight and fly a free camera. Open it from the in-game menu (Photo mode), with the key below, or hold Back and Y on a controller if you switch that on."},
+      {"id": "ph_on", "needs": "photo_mode", "apply": "restart", "label": "Photo mode", "hint": "Switch the free camera on or off. Changing it needs a restart of the game.", "choices": [{"label": "On", "set": {"camera.photo_mode": "on"}}, {"label": "Off", "set": {"camera.photo_mode": "off"}}]},
+      {"id": "ph_key", "needs": "photo_mode", "apply": "restart", "label": "Photo mode key", "hint": "Opens photo mode during a fight. Close it with B or Esc.", "choices": [{"label": "F8", "set": {"camera.photo_key": "F8"}}, {"label": "F9", "set": {"camera.photo_key": "F9"}}, {"label": "F10", "set": {"camera.photo_key": "F10"}}, {"label": "Tab", "set": {"camera.photo_key": "Tab"}}, {"label": "None", "set": {"camera.photo_key": "none"}}]},
+      {"id": "ph_shot", "needs": "photo_mode", "apply": "restart", "label": "Screenshot key", "hint": "Saves a full-resolution PNG without the menu. They go to the screenshots folder in the launcher data folder.", "choices": [{"label": "F12", "set": {"camera.photo_screenshot_key": "F12"}}, {"label": "F11", "set": {"camera.photo_screenshot_key": "F11"}}, {"label": "F9", "set": {"camera.photo_screenshot_key": "F9"}}, {"label": "None", "set": {"camera.photo_screenshot_key": "none"}}]},
+      {"id": "ph_hud", "needs": "photo_mode", "apply": "restart", "label": "Hide HUD key", "hint": "Hides or shows the on-screen display while photo mode is open.", "choices": [{"label": "H", "set": {"camera.photo_hud_key": "H"}}, {"label": "J", "set": {"camera.photo_hud_key": "J"}}, {"label": "None", "set": {"camera.photo_hud_key": "none"}}]},
+      {"id": "ph_speed", "needs": "photo_mode", "apply": "restart", "label": "Camera speed", "hint": "How fast the free camera flies.", "choices": [{"label": "200", "set": {"camera.photo_speed": "200"}}, {"label": "400", "set": {"camera.photo_speed": "400"}}, {"label": "800", "set": {"camera.photo_speed": "800"}}, {"label": "1200", "set": {"camera.photo_speed": "1200"}}]},
+      {"id": "ph_chord", "needs": "photo_mode", "apply": "restart", "type": "toggle", "label": "Controller shortcut", "hint": "Hold Back and Y for about half a second during a fight to open photo mode.", "on": {"camera.photo_pad_chord": "on"}}
     ],
     "video": [
       {"id": "display", "type": "display", "label": "Display", "hint": "Which monitor the game opens on"},
@@ -214,6 +228,7 @@
       {"id": "wvk", "apply": "match", "type": "toggle", "label": "Weapon-independent vertical knockback", "hint": "", "on": {"enhance.stem_weapon_vertical_knockback": "1"}},
       {"id": "dim", "apply": "match", "type": "toggle", "label": "No results-screen dimming", "hint": "", "on": {"enhance.stem_no_results_dim": "1"}},
       {"id": "empty", "apply": "match", "type": "toggle", "label": "Empty arena", "hint": "Flat ground, no buildings.", "on": {"enhance.stem_rule_empty_arena": "1"}},
+      {"group": "GODZILLA ULTRA FEATURES", "needs": "ultra_features", "note": "Based on ANILORAK's Godzilla Ultra research."},
       {"group": "CHEATS"},
       {"id": "inv1", "apply": "match", "type": "toggle", "label": "Player 1 invulnerable", "hint": "Checked against the real game.", "on": {"enhance.cheat_invulnerable_p1": "1"}},
       {"id": "invc", "apply": "match", "type": "toggle", "label": "Computer player invulnerable", "hint": "", "on": {"enhance.cheat_invulnerable_com": "1"}},

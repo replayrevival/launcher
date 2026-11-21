@@ -1,0 +1,42 @@
+Everything in v0.2.3 is in it, plus:
+
+GAME (build c434)
+- Solo Destruction: a new SOLO DESTRUCTION row on the main menu. Pick any monster and any city and destroy at your own pace.
+  ROUND LENGTH is 1 to 10 minutes, or NO TIME LIMIT. A results screen shows at 0:00. Normal Versus is unchanged.
+  It is a mod that is built on your PC from your own game files, so the download contains no game data. It is switched OFF
+  until you turn it on in the Mods tab. Based on ANILORAK's Godzilla Ultra research (our own rewrite; nothing of his is included).
+- Photo mode: pause a fight and fly a free camera. Change the field of view, roll the camera, hide the HUD and save full-resolution
+  PNG screenshots. Open it from the in-game menu (PHOTO MODE), with F8, or by holding Back and Y (switch that on in the Controllers tab).
+
+LAUNCHER
+- Mods that change game scripts are now built from your own game files when you press PLAY (nothing is downloaded). The Mods tab
+  shows "Needs build" until it is done. Works with an unpacked folder and with a disc image.
+- The download now contains a small Python (python.org's embeddable Python 3.15.2, about 14 MB) and the game project's mod tools,
+  so nothing has to be installed. The Solo Destruction mod is already in your Mods tab, switched off.
+- Controllers tab: a "Photo mode" group (on/off, keys, camera speed, controller shortcut). The in-game menu has a PHOTO MODE button.
+- The Mods tab labels gameplay mods "Gameplay mod".
+
+KNOWN ISSUES
+- Photo mode works during a fight only (not in menus). The picture of the HUD clock keeps counting while the HUD is shown and snaps
+  back on close; the match clock itself is frozen. A live free camera while the match runs is not in this release.
+- Photo mode: flying with keyboard and mouse and the in-game menu button were not tested by hand (the tests used scripted input).
+- Solo Destruction: Mothra in solo is untested, and a 5-digit score banner is untested. The menu text is English only.
+- Sound packs: making a replaced sound loop (a file name ending in _loop) is untested in the game.
+- Sound packs: the first start with a pack takes a few seconds longer while the game prepares the changed sounds.
+- Unlimited draw distance can still show buildings popping in and out at the far skyline (not fixed, not verified either way).
+- In Tokyo a UFO can leave the playing area (out of bounds). Not fixed yet.
+- The announcer's "RAGE" line plays on a rage pickup; tell us if you don't hear it.
+- Retexturing: every monster has one skin set (colour and bump map). Menu name plates are not power-of-two pictures and
+  may look stretched if you change their shape.
+- Typing a name was tested with a virtual keyboard path only, not with a physical keyboard.
+- Playing from a disc image was tested with images made from an extracted game folder, plain and with a video
+  partition in front. Images dumped from a real disc have not been tested yet.
+- A rare crash while loading, seen on slow systems. Still being investigated.
+- A possible rare stall in the game's DirectSound audio code, seen in two test runs. Not reproduced, not fixed.
+- With the in-game menu open the picture is redrawn only when something changes, so it can look choppy in video.
+- Exclusive fullscreen is less tested than the other modes.
+- A real physical controller has not been tried with the in-game menu (the tests used a virtual one).
+  Only Xbox controllers have been tested. Windows only.
+
+PACKAGE
+- Same files as v0.2.3 plus tools\python (embedded Python), tools\mods (the mod tools) and bundled_mods\ste.solo-destruction.

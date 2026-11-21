@@ -287,3 +287,8 @@ The bundled vcruntime140.dll, vcruntime140_1.dll, and msvcp140.dll are Microsoft
 
 Portions of this software are copyright (c) The FreeType Project (www.freetype.org). All rights reserved.
 FreeType is used under the FreeType License (FTL).
+
+--- Python (embedded) ---
+
+The folder tools\python holds the unmodified "embeddable package" of Python 3.15.2 (64-bit) from python.org, used only to run the project's mod tools (tools\mods) on your PC. Python is distributed under the Python Software Foundation License; its licence text is in tools\python\LICENSE.txt.
+

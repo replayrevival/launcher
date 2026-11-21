@@ -188,6 +188,29 @@ step_patch_tool check  <original> <out.step> <modified>    applies it and compar
 
 Small edits give small patches (the tool keeps the common start and end and stores the middle; add `--raw` to skip compression). Install it like any mod. The launcher reads the player's own file (read only), checks its hash, builds the result into `mods\<id>\_built\` and checks that hash too; PLAY does this for you, **PREPARE PATCHES** does it by hand. Failures are per patch: "made for a different version of the game" (shows both hashes), "result did not match", "damaged patch". Patch mods need an unpacked game folder (they are not applied when you play straight from a disc image).
 
+## Mods that are built on your PC (script mods)
+
+Some mods change the game's scripts (Solo Destruction is one). The changed scripts are game data, so nobody may share them. Instead the mod ships only a **recipe**: a list of small edits (about 85 KB, no game data). The launcher builds the changed files from **your own** game files, checks each one against the hash the mod expects, and the game uses them.
+
+**For players: Solo Destruction.**
+1. Open the **Mods** tab. "Solo Destruction" is already there, switched **OFF**. It says "Needs build".
+2. Switch it **ON** and press **PLAY**. The first time, the launcher builds the files (a few seconds, nothing is downloaded). Afterwards the Mods tab says "Built from your game files and ready".
+3. In the game, the main menu has a **SOLO DESTRUCTION** row (it takes the place of the hidden System Link row). Pick your monster, press START, pick any monster for the COM (it is only needed to continue; it does not appear in the match), press X for Rules (ROUND LENGTH 1 to 10 minutes, or NO TIME LIMIT), pick a city and play. At 0:00 or when your monster is down, CHALLENGE RESULTS shows your points.
+4. Switch the mod OFF and the menu and every mode are the original again.
+
+It works with an unpacked game folder and with a disc image. If a build fails the launcher says why in plain words ("Your game file is not the one this mod was made for", "the script does not match what this tool expects, is this the original Xbox game?") and starts the game without that mod.
+
+**For modders: a recipe mod.** A recipe mod is a normal mod folder (`"api": 2`) whose `patches` entries have `"format": "bsf-edit"` and `"patch": "edits\<name>.json"` (a list of `old` / `new` script snippets) with `base_sha256` and `result_sha256`. The launcher runs the project's tool for you (`iso_to_mod.py prepare`, standard-library Python; the download carries its own small Python in `tools\python`, so nothing has to be installed). You can run it by hand too: `python -I iso_to_mod.py prepare <mod folder> <game folder or .iso>`; it prints one line per file (`built`, `BASE MISMATCH`, `RESULT MISMATCH`, ...). Details: the game project's `docsormats\mod_build_recipe.md`. Never publish the `_built` folder: it holds game data.
+
+## Make a mod from a modified disc image or folder
+
+If you have edited a copy of the game (a disc image or an unpacked folder) and want to share it **without** sharing game files, make a patch mod from the difference. You need your own retail copy and the project's `iso_to_mod.py` (Python 3.9 or newer, nothing else):
+```
+python -I iso_to_mod.py diff <your modified image or folder> <your retail folder or image>
+python -I iso_to_mod.py make <modified> <retail> <output mod folder> --id my.mod --name "My mod"
+```
+`diff` lists what changed. `make` writes a mod folder with only patches (the differences), never game files. Files that exist only in your modified copy cannot be shared this way unless you point them at a similar retail file with `--new-base NEW=RETAIL`; otherwise they are listed as "not expressible" and left out. Players install the mod from the Mods tab like any other; PLAY builds the patched files from their own game, including the zip packages some files live in, and checks every result. Only share what you made or have the rights to share. Details: the game project's `docsormats\mod_patch.md`, section 8.
+
 ## Settings and tweaks you can change
 
 These are the options in the launcher (Video and Enhancements tabs) and in the in-game menu (hold Back and Start, or F1). They are saved in `ste_video.ini` and `ste_enhance.ini` (in the launcher's `data\game_settings\`) and can also be set for one run with an environment variable. Off, or the first value, is the original game.
@@ -291,7 +314,8 @@ Every key can also be set for one run with the environment variable `STE_<SECTIO
 
 ## What's changed for modders
 
-- **0.2.3 (next)**: sound packs (`sound_pack.py export` and `import`, mod type "Sound pack" in the Mods tab, loaded from the Mods folder with the on/off switch and order); a "Replace sounds and music" walkthrough.
+- **0.3.1 (next)**: photo mode settings (`[camera]` in `ste_enhance.ini`; the in-game menu has a PHOTO MODE button). Mods that build on your PC (recipe mods, `"format": "bsf-edit"`) and `zip-of` patches are built by the launcher's Prepare step with `iso_to_mod.py prepare`, using the embedded Python in `tools\python`; Solo Destruction ships as one, switched off; new walkthroughs "Mods that are built on your PC" and "Make a mod from a modified disc image or folder". Recipe mods also work when you play from a disc image.
+- **0.2.3**: sound packs (`sound_pack.py export` and `import`, mod type "Sound pack" in the Mods tab, loaded from the Mods folder with the on/off switch and order); a "Replace sounds and music" walkthrough.
 - **0.2.2**: texture export (`import_texture_set.py export`) to get a monster's original textures as named PNGs, and `import` reads your game folder or `.iso` directly (no separate index step); texture packs installed in the Mods tab are loaded by the game from the Mods folder, with the Mods tab's ON/OFF and order (checked end to end: install in the launcher, PLAY, `last_report.txt` says ACTIVE); this guide restructured with a generated settings reference.
 - **0.2.1**: no change for modders.
 - **0.2.0**: play straight from a disc image (file mods and texture packs work; patch mods need an unpacked folder). The Enhancements settings that come from G:STEM are grouped as "G:STEM-inspired options" (credit in the launcher and the in-game menu).

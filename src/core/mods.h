@@ -74,6 +74,10 @@ public:
     ModInstallResult installZip(const std::filesystem::path& zip, bool replace);
     ModInstallResult installFolder(const std::filesystem::path& folder, bool replace);
 
+    // Mods that ship inside the download (<launcher folder>undled_mods\<folder>): each is installed once, switched OFF, and a
+    // marker in <root>\_seeded\ remembers it, so a mod the player removed does not come back.
+    void seedBundled(const std::filesystem::path& bundledDir);
+
     // Moves the mod's folder to _removed\<folder>-<stamp>. Nothing is deleted.
     bool remove(const std::string& id, std::string& err);
 

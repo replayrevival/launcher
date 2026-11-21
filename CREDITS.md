@@ -31,3 +31,9 @@ Shipped font files (`scripts/package.ps1` refuses to package any other .ttf): Ch
 
 ## Design reference
 The approved launcher mockup (kept in the game project's docs): navy blueprint grid, cyan chamfered buttons, yellow markers.
+
+## Test-only tooling (not shipped, not in any repo)
+- **Pillow 13.0.0** (Python imaging library, MIT-CMU / HPND licence), installed with pip into the throwaway venv `F:\modder_test\venv` on 2026-11-19 (Miko approved) to test the game project's `import_texture_set.py` texture export/import as a modder would. Not bundled in any package.
+
+## Shipped helper: embedded Python
+- **Python 3.15.2 embeddable package (64-bit)** (PSF licence, GPL-compatible), python.org release page `python-3152`, `python-3.15.2-embed-amd64.zip` (SHA-256 `D012F3AA29CF07436DAE8AEA1FEC0FD195C2612A0B059B1F915AE0AFB9AD1F62`, verified against the hash on python.org). Shipped unchanged as `tools\python\` (about 14 MB) so the launcher can run the game project's mod tools without Python installed on the player's PC (Miko approved bundling, 2026-11-21). The tools themselves (`tools\mods\iso_to_mod.py`, `bsf_edit.py`, `step_diff.py`) are the game project's own GPL-2.0-or-later code, standard library only.

@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "core/identify.h"
+#include "platform/ModTool.h"
 #include "ui/App.h"
 
 namespace fs = std::filesystem;
@@ -123,9 +124,11 @@ static bool modFits(const ModStore& store, const ModInfo& m, const std::string& 
 
 void App::refreshPatchStates() {
     patchReports_.clear();
-    if (playingFromImage()) {  // the patches are built next to the game files, which a disc image cannot hold
+    if (playingFromImage()) {  // plain patch mods are built from game files in a folder; recipe mods can be built from the image itself
         for (auto& m : mods_.mods())
-            if (!m.patches.empty() && m.enabled) { modsNote_ = "Mods that patch the game's files need an unpacked game folder, so they are not applied while you play from a disc image. Unpack the image into a folder and choose that folder to use them."; break; }
+            if (modNeedsExternalTool(m)) patchReports_[m.id] = quickPatchStates(m, {});
+        for (auto& m : mods_.mods())
+            if (!m.patches.empty() && !modNeedsExternalTool(m) && m.enabled) { modsNote_ = "Mods that patch the game's files need an unpacked game folder, so they are not applied while you play from a disc image. Unpack the image into a folder and choose that folder to use them."; break; }
         return;
     }
     const fs::path gameDir = state_.gamePath.empty() ? fs::path() : pathFromUtf8(state_.gamePath);
@@ -135,10 +138,10 @@ void App::refreshPatchStates() {
 
 // True when an enabled mod that fits the game has a patch that is not built (or not current).
 bool App::patchesNeedPrepare() const {
-    if (state_.gamePath.empty() || playingFromImage()) return false;
+    if (state_.gamePath.empty()) return false;
     const fs::path gameDir = pathFromUtf8(state_.gamePath);
     for (auto& m : mods_.mods()) {
-        if (m.patches.empty() || !m.enabled || !m.problem.empty() || patchFailed_.count(m.id) || !modFits(mods_, m, state_.sha256, profile_.expectedGameId)) continue;
+        if (m.patches.empty() || (playingFromImage() && !modNeedsExternalTool(m)) || !m.enabled || !m.problem.empty() || patchFailed_.count(m.id) || !modFits(mods_, m, state_.sha256, profile_.expectedGameId)) continue;
         for (auto& r : quickPatchStates(m, gameDir))
             if (!r.ok()) return true;
     }
@@ -146,7 +149,8 @@ bool App::patchesNeedPrepare() const {
 }
 
 void App::startPatchPrepare(bool thenPlay, bool original, bool borderless) {
-    if (patchBusy_ || state_.gamePath.empty() || playingFromImage()) return;
+    if (patchBusy_ || state_.gamePath.empty()) return;
+    const bool image = playingFromImage();
     patchBusy_ = true;
     patchThenPlay_ = thenPlay;
     patchOrig_ = original;
@@ -157,8 +161,10 @@ void App::startPatchPrepare(bool thenPlay, bool original, bool borderless) {
     ModStore copy = mods_;
     const fs::path gameDir = pathFromUtf8(state_.gamePath);
     const std::string sha = state_.sha256, gameId = profile_.expectedGameId;
-    patchRun_ = std::async(std::launch::async, [copy, gameDir, sha, gameId, this]() {
-        return preparePatches(copy, gameDir, [&](const ModInfo& m) { return modFits(copy, m, sha, gameId); }, &patchCancel_);
+    const fs::path exeDir = paths_.exeDir;
+    patchRun_ = std::async(std::launch::async, [copy, gameDir, sha, gameId, exeDir, image, this]() {
+        return preparePatches(copy, gameDir, [&](const ModInfo& m) { return modFits(copy, m, sha, gameId) && (!image || modNeedsExternalTool(m)); }, &patchCancel_,
+                              [&](const fs::path& modDir, const fs::path& game) { return runModTool(exeDir, modDir, game, &patchCancel_); });
     });
     render();
 }

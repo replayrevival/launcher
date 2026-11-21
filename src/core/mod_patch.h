@@ -50,6 +50,19 @@ std::string sha256OfBytes(const std::vector<uint8_t>& b);
 // What is built and current, from <mod>\_built\state.json (no hashing of game files). One entry per patch of the mod.
 std::vector<ModPatchReport> quickPatchStates(const ModInfo& mod, const std::filesystem::path& gameDir);
 
+// Mods whose patches are "bsf-edit" (a recipe built from the player's own scripts) or "zip-of" (a zip rebuilt from a patched
+// member) are built by the game project's tool (iso_to_mod.py prepare), never by this launcher. The runner starts it:
+// `prepare <mod folder> <game folder>`, exit 0 = all built, 2 = a file failed, 1 = usage; one line per file on stdout.
+struct ExternalResult {
+    bool started = false;
+    std::string startError;  // plain language when the tool could not be started
+    int exitCode = -1;
+    std::string output;
+};
+using ExternalRunner = std::function<ExternalResult(const std::filesystem::path& modDir, const std::filesystem::path& gameDir)>;
+bool isExternalPatch(const ModPatchEntry& p);
+bool modNeedsExternalTool(const ModInfo& m);
+
 struct PatchRunResult {
     std::vector<ModPatchReport> reports;  // every patch of every enabled patch mod, in load order
     int built = 0, ready = 0, failed = 0;
@@ -58,4 +71,4 @@ struct PatchRunResult {
 // load order; two mods may patch the same file only when the later one's base is the earlier one's result.
 // `cancel` may be null; it is checked between files.
 PatchRunResult preparePatches(const ModStore& store, const std::filesystem::path& gameDir, const std::function<bool(const ModInfo&)>& fits,
-                              const std::atomic<bool>* cancel);
+                              const std::atomic<bool>* cancel, const ExternalRunner& external = {});

@@ -7,7 +7,7 @@ Not affiliated with or endorsed by Toho, Atari or Pipeworks. **You must own the 
 ## What you need
 - Windows 10 or 11, 64-bit, a graphics card with Direct3D 11.
 - Your own copy of the Xbox game: a disc image (`.iso`) or an extracted folder that contains `default.xbe`.
-- Nothing extra for an `.iso`: it is played straight from the image. (With an older game program the image is unpacked once and needs about 0.8 GB.)
+- About 0.8 GB of free space if you use an `.iso` (it is unpacked once).
 - Windows "N" editions need Microsoft's Media Feature Pack.
 
 ## Install
@@ -21,7 +21,7 @@ The first time, the launcher asks for your game.
 
 ![Choose your game](screenshots/10_setup_choose.png)
 
-- **Choose disc image** takes your `.iso`. It is checked, then played straight from the image (read-only). Mods that change the game's own files need an unpacked folder instead.
+- **Choose disc image** takes your `.iso`. It is checked, then unpacked once into `data\game\`.
 - **Choose a folder** takes an already extracted game folder.
 - You can also drag an `.iso` or a folder onto the window.
 
@@ -68,7 +68,7 @@ The keyboard works too: arrows = d-pad, Enter = Start, Backspace = Back, Z X C V
 The whole launcher can be used from a pad.
 
 ## Mods
-The **MODS** tab installs mods from a `.zip` or a folder, turns them on and off, sets their order and removes them. Removed mods are moved aside, not deleted. A badge says whether a mod works with your game. See [MODDING.md](MODDING.md) for how mods are made. This project ships no mods; modders host their own.
+The **MODS** tab installs mods from a `.zip` or a folder, turns them on and off, sets their order and removes them. Removed mods are moved aside, not deleted. A badge says whether a mod works with your game. See [MODDING.md](MODDING.md) for how mods are made. The download carries one mod, **Solo Destruction**, switched off: turn it on and press PLAY and the launcher builds it from your own game files (nothing is downloaded); it adds a SOLO DESTRUCTION row to the main menu. Modders host their own mods.
 
 ![Mods](screenshots/111_mods_tab.png)
 
@@ -108,3 +108,11 @@ While the game runs, hold **Back and Start** together for a second on any contro
 - **Return to launcher** asks once more, then closes the game and brings you back to the launcher. Unsaved progress is lost.
 - The menu needs `ste_overlay.dll` next to the game program (it is in the download). Without it the game runs as before.
 - Back and Start held together are not passed to the game.
+
+## Photo mode
+Pause a fight and fly a free camera: wider or narrower field of view, roll, hide the HUD, and save full-resolution PNG screenshots (no menu in the picture). It works during a fight only, not in menus.
+- **Open it:** the in-game menu's **PHOTO MODE** button, **F8**, or hold **Back and Y** for about half a second (switch the controller shortcut on in the Controllers tab).
+- **Fly:** left stick or W A S D to move, right stick or the arrow keys to look, LT / RT or Q / E down and up, LB / RB or Ctrl / Shift slower and faster.
+- **Camera:** D-pad up / down or the + / - keys change the field of view, D-pad left / right or Z / X roll the camera.
+- **Pictures:** Y or H hides the HUD, A or F12 saves a screenshot to the `screenshots` folder inside the launcher's data folder. B, Esc or F8 closes photo mode and the match carries on.
+- The match is frozen while photo mode is open (the HUD clock picture keeps counting while the HUD is shown and snaps back when you close). Keys and speed are on the Controllers tab.

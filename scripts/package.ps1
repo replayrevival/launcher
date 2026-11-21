@@ -27,6 +27,9 @@ param(
     [string]$BuildDir,                                # default: <repo>\build
     [string]$PackBuilder,                             # build_button_pack.py of the game project (default: the game repo's mission-l6	ools\mods copy)
     [switch]$Overlay,                                 # also ship ste_overlay.dll (the in-game overlay); done automatically when the game's capabilities.json lists "overlay"
+    [string]$ToolsMods,                               # folder with iso_to_mod.py, bsf_edit.py, step_diff.py (the game project's mod tools); shipped as tools\mods
+    [string]$EmbeddedPython,                          # python-3.15.2-embed-amd64.zip (python.org); shipped as tools\python so recipe mods can be built without Python installed
+    [string]$BundledMods,                             # folder holding mod folders that ship in the download (installed once, switched OFF)
     [switch]$NoBuild
 )
 $ErrorActionPreference = 'Stop'
@@ -111,6 +114,26 @@ robocopy $FsrDir (Join-Path $stage 'fsr1') /E /NFL /NDL /NJH /NJS /NP | Out-Null
 foreach ($f in 'LICENSE', 'CREDITS.md') { Copy-Item (Join-Path $repo $f) $stage }
 Copy-Item (Join-Path $repo 'packaging\THIRD_PARTY_NOTICES.md') $stage
 Copy-Item (Join-Path $repo 'packaging\GAME_DATA_NOTICE.md') $stage
+# Recipe mods are built on the player's PC by the game project's standard-library Python tools (tools\mods) with an embedded Python.
+if ($ToolsMods) {
+    foreach ($f in 'iso_to_mod.py', 'bsf_edit.py', 'step_diff.py') { if (-not (Test-Path (Join-Path $ToolsMods $f))) { Fail "Mod tool missing: $f in $ToolsMods" } }
+    $tm = Join-Path $stage 'tools\mods'; New-Item -ItemType Directory -Force $tm | Out-Null
+    foreach ($f in 'iso_to_mod.py', 'bsf_edit.py', 'step_diff.py') { Copy-Item (Join-Path $ToolsMods $f) $tm }
+    Write-Host 'mod tools: tools\mods included'
+}
+if ($EmbeddedPython) {
+    $pyPin = 'D012F3AA29CF07436DAE8AEA1FEC0FD195C2612A0B059B1F915AE0AFB9AD1F62'   # python-3.15.2-embed-amd64.zip, python.org release page
+    if ((Get-FileHash $EmbeddedPython -Algorithm SHA256).Hash -ne $pyPin) { Fail 'The embedded Python zip does not match the pinned SHA-256.' }
+    Expand-Archive $EmbeddedPython (Join-Path $stage 'tools\python') -Force
+    Write-Host 'python    : embedded Python 3.15.2 included (tools\python)'
+}
+if ($BundledMods) {
+    foreach ($d in Get-ChildItem $BundledMods -Directory) {
+        if (Test-Path (Join-Path $d.FullName '_built')) { Fail "Bundled mod $($d.Name) contains _built (game data): not shipped." }
+        robocopy $d.FullName (Join-Path (Join-Path $stage 'bundled_mods') $d.Name) /E /XD _built /NFL /NDL /NJH /NJS /NP | Out-Null
+    }
+    Write-Host 'mods      : bundled_mods included'
+}
 (Get-Content (Join-Path $repo 'packaging\README.txt.in') -Raw -Encoding utf8).Replace('@VERSION@', $Version) |
     Set-Content (Join-Path $stage 'README.txt') -Encoding utf8 -NoNewline
 New-Item -ItemType File (Join-Path $stage 'portable.txt') | Out-Null
@@ -161,7 +184,7 @@ $L.Add("Total: $($files.Count) files, $([math]::Round($total / 1MB, 1)) MB uncom
 $L.Add("Zip: $folderName-win64.zip | $zipSize bytes | SHA-256 $zipHash")
 $L.Add('')
 $L.Add('=== EXPLICIT EXCLUDES (never in the zip) ===')
-$L.Add('data\, mods\, texturepacks\ except the two button_prompts_* packs, shadercache\, saves\, logs, *.log, *.err, *.out, *.dmp, screenshots, *.pdb, *.bak, other candidate exes, any default.xbe / game files / disc images, tools\, docs\, tests\, .agent-state, .claude, play*.bat, xiso_unpack_tool.exe.')
+$L.Add('data\, mods\, texturepacks\ except the two button_prompts_* packs, shadercache\, saves\, logs, *.log, *.err, *.out, *.dmp, screenshots, *.pdb, *.bak, other candidate exes, any default.xbe / game files / disc images, tools\ (except tools\mods and tools\python), docs\, tests\, .agent-state, .claude, play*.bat, xiso_unpack_tool.exe.')
 $L.Add('')
 $L.Add('=== NOTES ===')
 $L.Add("profile.json: compat.vsync_vrr_fix_build = $fixBuild (game build c$gameBuild is at or above it); input_map.supported = $($profile.launch.input_map.supported).")
