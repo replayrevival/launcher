@@ -545,7 +545,29 @@ void ModStore::seedBundled(const fs::path& bundledDir) {
     for (auto& d : fs::directory_iterator(bundledDir, ec)) {
         if (!d.is_directory(ec)) continue;
         const fs::path marker = root_ / "_seeded" / (d.path().filename().string() + ".txt");
-        if (fs::exists(marker, ec)) continue;
+        if (fs::exists(marker, ec)) {
+            // Already seeded by an earlier download. If this download carries a changed recipe (a hotfix), swap it
+            // in: the old folder goes to _removed, the on/off choice and the load order stay. Needs a rebuild.
+            ModInfo bi;
+            std::string berr;
+            if (!readManifest(d.path() / "manifest.json", bi, berr) || bi.id.empty()) continue;
+            const ModInfo* cur = find(bi.id);
+            if (!cur) continue;  // the player removed it: stays removed
+            auto slurp = [](const fs::path& p) {
+                std::ifstream in(p, std::ios::binary);
+                return std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+            };
+            if (slurp(cur->dir / "manifest.json") == slurp(d.path() / "manifest.json")) continue;
+            const bool wasOn = cur->enabled;
+            const ModInstallResult up = installFolder(d.path(), true);
+            if (up.kind == ModInstallResult::Ok) {
+                reload();
+                setEnabled(up.id, wasOn);
+                std::string e;
+                save(e);
+            }
+            continue;
+        }
         const ModInstallResult r = installFolder(d.path(), false);
         if (r.kind == ModInstallResult::Failed) continue;
         if (r.kind == ModInstallResult::Ok) {

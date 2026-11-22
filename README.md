@@ -25,6 +25,14 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
+## What's new in v0.4.1 (hotfix)
+
+**After updating, press PLAY once:** the Mods tab says "Needs build" and the launcher rebuilds your script mods. If you have the 0.4.0 Solo Destruction mod, the launcher swaps in the updated one at the next start (the old copy goes to the mods folder's `_removed` folder; your on/off choice stays).
+
+- Solo Destruction and Biollante are built together in one go, because both now change the same menu file.
+- The download carries the new mod tool `solo_ui.py` and the game build c441 (fixes in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.4.1-alpha)).
+- Credits: [CREDITS.md](CREDITS.md).
+
 ## What's new in v0.4.0
 
 - **Biollante is playable.** The download carries the Biollante mod (switched off). Turn it on in the **Mods** tab, press Play, and the launcher builds it from your own game files (a few seconds, nothing is downloaded). She appears on a third row of the character select screen. Biollante's data is the retail game's; the third select row is inspired by ANILORAK's research (our own code; no code from ANILORAK used). Walkthrough: **[Mods that are built on your PC](docs/MODDING.md#mods-that-are-built-on-your-pc-script-mods)**; for modders: **[Add a monster to the roster](docs/MODDING.md#add-a-monster-to-the-roster)**.

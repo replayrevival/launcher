@@ -1,0 +1,17 @@
+Hotfix for 0.4.0. After updating, open the launcher and press PLAY once: the Mods tab says "Needs build" and the launcher rebuilds your script mods (Prepare mods).
+
+GAME (build c441)
+- Fixed: after SOLO DESTRUCTION (or backing out of it) Versus, Action and Melee could open the Solo select screen. The Solo setting is now cleared when you leave it.
+- Fixed: the SOLO DESTRUCTION title now has the same font, size and colour as VERSUS.
+- A crash that could happen when the network link was forced up with an environment variable is fixed. Normal play was not affected.
+
+LAUNCHER
+- The updated Solo Destruction mod comes with the download. If you already have the 0.4.0 one, the launcher swaps it for the new one at the next start (the old copy goes to the mods folder's _removed folder; your on/off choice stays). Solo Destruction and Biollante are built together in one go, because both now change the same menu file.
+- The download also carries the new mod tool solo_ui.py.
+
+KNOWN ISSUES
+- Same as 0.4.0. Not reproduced here, details wanted: the Biollante tile on the Solo select screen, a black picture during the attract movie, and the globe on the ultrawide main menu.
+
+PACKAGE
+- Same files as v0.4.0 plus tools\mods\solo_ui.py and the updated Solo Destruction mod.
+- Credits: Solo Destruction is inspired by ANILORAK's research (our own code; no code from ANILORAK used). Full credits: CREDITS.md.

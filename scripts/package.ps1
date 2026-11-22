@@ -27,7 +27,7 @@ param(
     [string]$BuildDir,                                # default: <repo>\build
     [string]$PackBuilder,                             # build_button_pack.py of the game project (default: the game repo's mission-l6	ools\mods copy)
     [switch]$Overlay,                                 # also ship ste_overlay.dll (the in-game overlay); done automatically when the game's capabilities.json lists "overlay"
-    [string]$ToolsMods,                               # folder with iso_to_mod.py, bsf_edit.py, step_diff.py, pw_bundle.py, bio_ui.py, texlib.py (+ build_biollante.py) (the game project's mod tools); shipped as tools\mods
+    [string]$ToolsMods,                               # folder with iso_to_mod.py, bsf_edit.py, step_diff.py, pw_bundle.py, bio_ui.py, solo_ui.py, texlib.py (+ build_biollante.py, build_solo_destruction.py) (the game project's mod tools); shipped as tools\mods
     [string]$EmbeddedPython,                          # python-3.15.2-embed-amd64.zip (python.org); shipped as tools\python so recipe mods can be built without Python installed
     [string]$BundledMods,                             # folder holding mod folders that ship in the download (installed once, switched OFF)
     [switch]$NoBuild
@@ -116,9 +116,9 @@ Copy-Item (Join-Path $repo 'packaging\THIRD_PARTY_NOTICES.md') $stage
 Copy-Item (Join-Path $repo 'packaging\GAME_DATA_NOTICE.md') $stage
 # Recipe mods are built on the player's PC by the game project's standard-library Python tools (tools\mods) with an embedded Python.
 if ($ToolsMods) {
-    foreach ($f in 'iso_to_mod.py', 'bsf_edit.py', 'step_diff.py', 'pw_bundle.py', 'bio_ui.py', 'texlib.py') { if (-not (Test-Path (Join-Path $ToolsMods $f))) { Fail "Mod tool missing: $f in $ToolsMods" } }
+    foreach ($f in 'iso_to_mod.py', 'bsf_edit.py', 'step_diff.py', 'pw_bundle.py', 'bio_ui.py', 'solo_ui.py', 'texlib.py') { if (-not (Test-Path (Join-Path $ToolsMods $f))) { Fail "Mod tool missing: $f in $ToolsMods" } }
     $tm = Join-Path $stage 'tools\mods'; New-Item -ItemType Directory -Force $tm | Out-Null
-    foreach ($f in 'iso_to_mod.py', 'bsf_edit.py', 'step_diff.py', 'pw_bundle.py', 'bio_ui.py', 'texlib.py', 'build_biollante.py') { if (Test-Path (Join-Path $ToolsMods $f)) { Copy-Item (Join-Path $ToolsMods $f) $tm } }
+    foreach ($f in 'iso_to_mod.py', 'bsf_edit.py', 'step_diff.py', 'pw_bundle.py', 'bio_ui.py', 'solo_ui.py', 'texlib.py', 'build_biollante.py', 'build_solo_destruction.py') { if (Test-Path (Join-Path $ToolsMods $f)) { Copy-Item (Join-Path $ToolsMods $f) $tm } }
     Write-Host 'mod tools: tools\mods included'
 }
 if ($EmbeddedPython) {
