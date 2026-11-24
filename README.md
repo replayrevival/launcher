@@ -25,6 +25,13 @@
 
 The game itself is in its own repository: **[replayrevival/ste-recomp](https://github.com/replayrevival/ste-recomp)**. The download on its [Releases](https://github.com/replayrevival/ste-recomp/releases/latest) page contains the game and this launcher together.
 
+## What's new in v0.4.2
+
+**After updating, press PLAY once:** the Mods tab says "Needs build" and the launcher rebuilds your script mods. Biollante is now unlocked on every profile when her mod is on; re-run Prepare mods after updating. The launcher swaps in the updated Biollante mod (1.0.1) at the next start (the old copy goes to the mods folder's `_removed` folder; your on/off choice stays).
+
+- The download carries game build c460 (details in the [release notes](https://github.com/replayrevival/launcher/releases/tag/v0.4.2-alpha)).
+- Credits: [CREDITS.md](CREDITS.md).
+
 ## What's new in v0.4.1 (hotfix)
 
 **After updating, press PLAY once:** the Mods tab says "Needs build" and the launcher rebuilds your script mods. If you have the 0.4.0 Solo Destruction mod, the launcher swaps in the updated one at the next start (the old copy goes to the mods folder's `_removed` folder; your on/off choice stays).

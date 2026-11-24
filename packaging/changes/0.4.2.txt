@@ -1,0 +1,14 @@
+Update for 0.4.1. After updating, open the launcher and press PLAY once: the Mods tab says "Needs build" and the launcher rebuilds your script mods (Prepare mods).
+
+GAME (build c460)
+- Biollante is now unlocked on every profile when her mod is on: her tile shows her icon and can be picked without unlocking all monsters first. With the mod off the base game is unchanged.
+- No other gameplay change.
+
+LAUNCHER
+- The updated Biollante mod (1.0.1) comes with the download. If you already have the older one, the launcher swaps it for the new one at the next start (the old copy goes to the mods folder's _removed folder; your on/off choice stays). Until the mods are rebuilt the game ignores the changed file, so press PLAY once.
+
+KNOWN ISSUES
+- Same as 0.4.1/0.4.0. Not reproduced here, details wanted: a black picture during the attract movie, and the globe on the ultrawide main menu.
+
+PACKAGE
+- Same files as v0.4.1 plus the updated Biollante mod. Credits: Biollante's data is the retail game's; the third select row is inspired by ANILORAK's research (our own code; no code from ANILORAK used). Full credits: CREDITS.md.
