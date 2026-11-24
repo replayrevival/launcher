@@ -1,0 +1,14 @@
+Update for 0.4.2. After updating, open the launcher and press PLAY once: the Mods tab says "Needs build" and the launcher rebuilds your script mods (Prepare mods).
+
+GAME (build c460, unchanged)
+- Biollante's tile grid on the character select screens is smaller and sits lower, so it no longer overlaps the portrait cards, the bios panel or the button hints. Checked at 16:9, 21:9 and 4:3.
+- No gameplay change.
+
+LAUNCHER
+- The updated Biollante mod (1.0.2) comes with the download. If you already have the older one, the launcher swaps it for the new one at the next start (the old copy goes to the mods folder's _removed folder; your on/off choice stays). Until the mods are rebuilt the game ignores the changed file, so press PLAY once.
+
+KNOWN ISSUES
+- Same as 0.4.2. Not reproduced here, details wanted: a black picture during the attract movie, and the globe on the ultrawide main menu.
+
+PACKAGE
+- Same files as v0.4.2 plus the updated Biollante mod and mod tool. Credits: Biollante's data is the retail game's; the third select row is inspired by ANILORAK's research (our own code; no code from ANILORAK used). Full credits: CREDITS.md.
